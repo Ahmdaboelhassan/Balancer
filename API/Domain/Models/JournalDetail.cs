@@ -14,12 +14,13 @@ public class JournalDetail
     public string? Notes { get; set; }
     public decimal Credit { get; set; }
     public decimal Debit { get; set; }
+    public bool IsDeleted { get; set; }
 
     [ForeignKey(nameof(AccountId))]
     public Account Account { get; set; }
 
     [ForeignKey(nameof(JournalId))]
-    public Account Journal { get; set; }
+    public Journal Journal { get; set; }
 
     [ForeignKey(nameof(CostCenterId))]
     public CostCenter? CostCenter { get; set; }

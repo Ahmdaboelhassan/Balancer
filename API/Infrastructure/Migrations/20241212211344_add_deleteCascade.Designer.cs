@@ -4,6 +4,7 @@ using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241212211344_add_deleteCascade")]
+    partial class add_deleteCascade
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -35,12 +38,6 @@ namespace API.Migrations
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
-
-                    b.Property<bool>("IsParent")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("Level")
-                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -104,9 +101,6 @@ namespace API.Migrations
                     b.Property<string>("Detail")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IncreasedBalance")
-                        .HasColumnType("bit");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -201,9 +195,6 @@ namespace API.Migrations
                     b.Property<DateOnly>("To")
                         .HasColumnType("date");
 
-                    b.Property<decimal>("TotalAmount")
-                        .HasColumnType("decimal(18,2)");
-
                     b.HasKey("Id");
 
                     b.ToTable("Periods");
@@ -217,34 +208,13 @@ namespace API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AssetsAccount")
-                        .HasColumnType("int");
-
                     b.Property<int>("DefaultCreditAccount")
                         .HasColumnType("int");
 
-                    b.Property<int>("DefaultDebitAccount")
+                    b.Property<int>("DefaultDepitAccount")
                         .HasColumnType("int");
 
-                    b.Property<int>("ExpensesAccount")
-                        .HasColumnType("int");
-
-                    b.Property<int>("LevelFourDigits")
-                        .HasColumnType("int");
-
-                    b.Property<int>("LevelOneDigits")
-                        .HasColumnType("int");
-
-                    b.Property<int>("LevelThreeDigits")
-                        .HasColumnType("int");
-
-                    b.Property<int>("LevelTwoDigits")
-                        .HasColumnType("int");
-
-                    b.Property<int>("LiabilitiesAccount")
-                        .HasColumnType("int");
-
-                    b.Property<int>("RevenueAccount")
+                    b.Property<int>("DefaultPeriodDays")
                         .HasColumnType("int");
 
                     b.HasKey("Id");

@@ -1,6 +1,8 @@
 ﻿using Application.IRepository;
+using Application.IServices;
 using Infrastructure.Data;
 using Infrastructure.Repository;
+using Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,6 +20,7 @@ namespace Infrastructure
             services.AddDbContext<AppDbContext>(option => option.UseSqlServer(ConnectionString));
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IServiceContext, ServiceContext>();
 
             return services;
         }

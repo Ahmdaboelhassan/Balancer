@@ -9,6 +9,7 @@ public interface IUnitOfWork
      IJournalRepo Journal { get;}
      IJournalDetailRepo JournalDetail { get;}
      ICostCenterRepo CostCenter { get;}
+     ISettingsRepo SettingsRepo { get; }
 
     Task SaveChangesAync();
     IDbTransaction StartTransaction();

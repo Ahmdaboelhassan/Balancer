@@ -16,14 +16,15 @@ namespace Domain.Models
         
         [Required]
         public DateTime CreatedAt { get; set; }
-        public DateTime LastUpdatedAt { get; set; }
+        public DateTime? LastUpdatedAt { get; set; }
+        public bool IsDeleted { get; set; }
+        public bool IncreasedBalance { get; set; }
 
         [Required]
         public int PeriodId { get; set; }
   
         [ForeignKey(nameof(PeriodId))]
         public Period Period { get; set; }
-
         public ICollection<JournalDetail> JournalDetails { get; set; }
     }
 }
