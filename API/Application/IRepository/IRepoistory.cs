@@ -9,8 +9,8 @@ public interface IRepository<T>
     Task<T?> Get(int id);
     Task<T?> Get(Expression<Func<T, bool>> criteria, params string[] includes);
     Task<T?> GetFirst(params string[] includes);
-    Task<T?> GetLast(params string[] includes);
     Task<T?> GetLast(Expression<Func<T, bool>> criteria, params string[] includes);
+    Task<T?> GetLastOrderBy<Key>(Expression<Func<T, Key>> orderBy, params string[] includes);
     Task<List<T>> GetAll(params string[]? includes);
     Task<List<T>> GetAll(Expression<Func<T, bool>> criteria, params string[]? includes);
     Task<IEnumerable<O>> SelectAll<O>(Expression<Func<T, bool>> criteria, Expression<Func<T, O>> columns, params string[]? includes);

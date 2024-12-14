@@ -4,7 +4,7 @@ using Application.DTO.Response;
 namespace Application.IServices;
 public interface IPeriodService
 {
-    Task<IEnumerable<PeriodListItemDTO>> GetAllPeriods(DateOnly? From, DateOnly? To);
+    Task<IEnumerable<PeriodListItemDTO>> GetAllPeriods(DateTime? From, DateTime? To);
     Task<IEnumerable<SelectItemDTO>> GetAllPeriodSelectList();
     Task<GetPeriodDetailDTO> GetNewPeriod();
     Task<GetPeriodDetailDTO> GetLastPeriod();

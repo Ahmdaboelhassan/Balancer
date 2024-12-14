@@ -26,6 +26,12 @@ public class AccountController : ControllerBase
         return Ok(await _serviceContext.AccountService.GetAllAccounts());
     }
 
+    [HttpGet("AccountsSelect")]
+    public async Task<IActionResult> AccountsSelect()
+    {
+        return Ok(await _serviceContext.AccountService.GetAccountSelectList());
+    }
+
     [HttpPost("CreateAccount")]
     public async Task<IActionResult> CreateAccount(AccountDTO DTO)
     {

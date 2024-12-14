@@ -1,8 +1,10 @@
 ﻿namespace Application.DTO.Response;
 public class PeriodListItemDTO
 {
+    public int Id { get; set; }
     public string Name { get; set; }
-    public DateOnly From { get; set; }
-    public DateOnly To { get; set; }
+    public DateTime From { get; set; }
+    public DateTime To { get; set; }
     public bool IncreasedBalance { get; set; }
+    public decimal TotalAmount { get; set; }
 }

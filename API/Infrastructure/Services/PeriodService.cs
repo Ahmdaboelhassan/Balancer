@@ -12,21 +12,24 @@ internal class PeriodService : IPeriodService
     {
         _uow = uow;
     }
-    public async Task<IEnumerable<PeriodListItemDTO>> GetAllPeriods(DateOnly? From, DateOnly? To)
+    public async Task<IEnumerable<PeriodListItemDTO>> GetAllPeriods(DateTime? From, DateTime? To)
     {
-        var periodList = await _uow.Periods.SelectAll(p => p.From >= From && p.To <= To, sp => new PeriodListItemDTO
+        var periodList = await _uow.Periods.SelectAll( a => true , sp => new PeriodListItemDTO
         {
+            Id = sp.Id,
+            Name = sp.Name,
             From = sp.From,
             To = sp.To,
-            Name = sp.Name,
-            IncreasedBalance = sp.TotalAmount > 0
+            TotalAmount = sp.TotalAmount,
+            IncreasedBalance = sp.TotalAmount > 0,
+            
         });
 
         if (From != null)
-            periodList = periodList.Where(p => p.From >= From);
+            periodList = periodList.Where(p => p.From >= From.Value.Date);
 
         if (To != null)
-            periodList = periodList.Where(p => p.To <= To);
+            periodList = periodList.Where(p => p.To <= To.Value.Date);
 
         return periodList;
     }
@@ -38,10 +41,10 @@ internal class PeriodService : IPeriodService
     public async Task<GetPeriodDetailDTO> GetNewPeriod()
     {
         var DTO = new GetPeriodDetailDTO();
-        var LastPeriod = await _uow.Periods.GetLast();
+        var LastPeriod = await _uow.Periods.GetLastOrderBy(p => p.Id);
 
         DTO.DaysCount = 7;
-        DTO.From = LastPeriod != null ? LastPeriod.To.AddDays(1) : DateOnly.FromDateTime(DateTime.Now);
+        DTO.From = LastPeriod != null ? LastPeriod.To.AddDays(1) : DateTime.Now;
         DTO.To = DTO.From.AddDays(DTO.DaysCount);
 
         return DTO;
@@ -79,7 +82,7 @@ internal class PeriodService : IPeriodService
     }
     public async Task<GetPeriodDetailDTO> GetLastPeriod()
     {
-        var lastPeriod = await _uow.Periods.GetLast("Journals");
+        var lastPeriod = await _uow.Periods.GetLastOrderBy(p => p.Id ,"Journals");
         if (lastPeriod == null)
             return null;
 
@@ -167,7 +170,7 @@ internal class PeriodService : IPeriodService
         await _uow.SaveChangesAync();
         return  new ConfirmationResponse { IsSucceed = true, Message = "Period Has Been Deleted Successfully" }; ;
     }
-    private async Task<int> GetPeriodNumber(DateOnly FromDate)
+    private async Task<int> GetPeriodNumber(DateTime FromDate)
     {
         int periodsInSameMonth = await _uow.Periods.Count(p => p.From.Month <= FromDate.Month && p.From.Year <= FromDate.Year);
         return periodsInSameMonth == 0 ? 1 : periodsInSameMonth + 1;

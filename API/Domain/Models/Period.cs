@@ -9,8 +9,8 @@ namespace Domain.Models
         [Required]
         public string Name { get; set; }
         [Required]
-        public DateOnly From { get; set; }
-        public DateOnly To { get; set; }
+        public DateTime From { get; set; }
+        public DateTime To { get; set; }
 
         [Required]
         public DateTime CreatedAt { get; set; }

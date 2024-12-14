@@ -36,6 +36,11 @@ internal class AccountService : IAccountService
                 IsParent = a.IsParent
             });
     }
+    public async Task<IEnumerable<SelectItemDTO>> GetAccountSelectList()
+    {
+        var accounts = await _uow.Accounts.SelectAll(a => true, a => new SelectItemDTO { Id = a.Id, Name = a.Name });
+        return accounts.OrderBy(a => a.Name);
+    }
     public async Task<AccountDTO?> GetAccountById(int id)
     {
         var account = await _uow.Accounts.Get(a => a.Id ==  id , "Parent");
@@ -245,4 +250,5 @@ internal class AccountService : IAccountService
         return new GetAccountNumberAndLevelResponse { IsSucceed = true, Message = "Account Number Generated Successfully"  , AccountLevel = accountLevel , AccountNumber = accountNumber};
 
     }
+
 }

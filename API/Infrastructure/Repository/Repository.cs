@@ -38,13 +38,13 @@ public class Repository<T> : IRepository<T> where T : class
 
         return query.FirstOrDefaultAsync();
     }
-    public Task<T?> GetLast(params string[] includes)
+    public Task<T?> GetLastOrderBy<Key>(Expression<Func<T, Key>> orderBy, params string[] includes)
     {
-        var query = _set.AsNoTracking();
+        var query = _set.AsNoTracking(); 
         foreach (var item in includes)
             query = query.Include(item);
 
-        return query.LastOrDefaultAsync();
+        return query.OrderBy(orderBy).LastOrDefaultAsync();
     }
     public Task<T?> GetLast(Expression<Func<T, bool>> criteria, params string[] includes)
     {
