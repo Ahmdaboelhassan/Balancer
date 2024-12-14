@@ -5,4 +5,5 @@ public class JournalListItemDTO
     public string Detail { get; set; }
     public DateTime CreatedAt { get; set; }
     public bool IncreasedBalance { get; set; }
+    public decimal Amount { get; set; }
 }

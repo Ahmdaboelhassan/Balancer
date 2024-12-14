@@ -4,6 +4,7 @@ using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241214204106_periodamountmaxlevel")]
+    partial class periodamountmaxlevel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -220,8 +223,8 @@ namespace API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AssetsAccountNumber")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("AssetsAccountNumber")
+                        .HasColumnType("int");
 
                     b.Property<int>("DefaultCreditAccount")
                         .HasColumnType("int");
@@ -229,8 +232,8 @@ namespace API.Migrations
                     b.Property<int>("DefaultDebitAccount")
                         .HasColumnType("int");
 
-                    b.Property<string>("ExpensesAccountNumber")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("ExpensesAccountNumber")
+                        .HasColumnType("int");
 
                     b.Property<int>("LevelFourDigits")
                         .HasColumnType("int");
@@ -244,14 +247,14 @@ namespace API.Migrations
                     b.Property<int>("LevelTwoDigits")
                         .HasColumnType("int");
 
-                    b.Property<string>("LiabilitiesAccountNumber")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("LiabilitiesAccountNumber")
+                        .HasColumnType("int");
 
                     b.Property<int>("MaxAccountLevel")
                         .HasColumnType("int");
 
-                    b.Property<string>("RevenueAccountNumber")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("RevenueAccountNumber")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 

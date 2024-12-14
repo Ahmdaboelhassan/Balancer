@@ -19,6 +19,7 @@ namespace Domain.Models
         public DateTime? LastUpdatedAt { get; set; }
         public bool IsDeleted { get; set; }
         public bool IncreasedBalance { get; set; }
+        public decimal Amount { get; set; }
 
         [Required]
         public int PeriodId { get; set; }

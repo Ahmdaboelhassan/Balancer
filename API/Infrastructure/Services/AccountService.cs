@@ -3,6 +3,7 @@ using Application.DTO.Request;
 using Application.DTO.Response;
 using Application.IRepository;
 using Application.IServices;
+using Azure;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore.Storage.Json;
 using Microsoft.Identity.Client;
@@ -55,60 +56,11 @@ internal class AccountService : IAccountService
         };
     }
     public async Task<ConfirmationResponse> CreateAccount(AccountDTO DTO)
-    {
-        int accountLevel = 1;
-        string accountNumber = string.Empty;
+    { 
+        var response = await GetAccountNumberAndLevel(DTO);
 
-        var settings = await _uow.SettingsRepo.GetFirst();
-        if (settings is null) 
-            return new ConfirmationResponse {IsSucceed = false,Message = "There Are No Settings"};
-
-        // Follow Parent Parent Account
-        if (DTO.ParentId != null && DTO.ParentId != 0)
-        {
-            var parentAccount = await _uow.Accounts.Get(DTO.ParentId.Value);
-            if (parentAccount is null)
-                return new ConfirmationResponse { IsSucceed = false, Message = "Parent Account Is Not Exist!" };
-
-            accountLevel = parentAccount.Level + 1;
-            if (accountLevel > 4)
-                return new ConfirmationResponse { IsSucceed = false, Message = "Level Can Not Greater Than 4!" };
-            
-            int levelDigitLength = GetAccountNumberDigits(accountLevel, settings);
-            // Parent Has Other Childs 
-            if (parentAccount.IsParent)
-            {
-                var childAccountsNums = await _uow.Accounts.SelectAll(a => a.ParentId == parentAccount.Id, a => long.Parse(a.Number));
-                long nextAccountNumber = childAccountsNums.Max() + 1;
-
-                var maxNumber = parentAccount.Number + (Math.Pow(10, levelDigitLength) - 1).ToString();
-                if (nextAccountNumber > long.Parse(maxNumber))
-                    return new ConfirmationResponse { IsSucceed = false, Message = $"Number In Level {accountLevel} Should Be {levelDigitLength} Digit!" };
-
-                accountNumber = nextAccountNumber.ToString();
-            }
-            else
-            {
-                // Parent Has No Childs
-                parentAccount.IsParent = true;
-                _uow.Accounts.Update(parentAccount);
-                accountNumber = GetNumberForFirstChild(levelDigitLength, parentAccount.Number);
-            }
-        }
-        else  // If Not has Parent - The Core 4
-        {
-            string nextAccountNumber = "1";
-            var numbersInSameLevel = await _uow.Accounts.SelectAll(a => a.Level == 1 , a => int.Parse(a.Number));
-
-            if (numbersInSameLevel.Count() > 0)
-                 nextAccountNumber  = (numbersInSameLevel.Max() + 1).ToString();
-
-            if (nextAccountNumber.Length > 1)
-                return new ConfirmationResponse { IsSucceed = false, Message = "Number In Level 1 Should Be One Digit!" };
-
-            accountNumber = nextAccountNumber;
-        }
-
+        if (!response.IsSucceed)
+            return new ConfirmationResponse { Message = response.Message};
 
         var newAccount = new Account
         {
@@ -116,13 +68,13 @@ internal class AccountService : IAccountService
             Description = DTO.Description,
             Name = DTO.Name,
             ParentId = DTO.ParentId > 0 ? DTO.ParentId : null,
-            Level = accountLevel,
-            Number = accountNumber,
+            Level = response.AccountLevel,
+            Number = response.AccountNumber,
         };
 
         await _uow.Accounts.AddAsync(newAccount);
         await _uow.SaveChangesAync();
-        return new ConfirmationResponse { IsSucceed = true, Message = "Account Has Been Created Successfully" };
+        return new ConfirmationResponse {IsSucceed = true ,Message = "Account Has Been Created Successfully" }; ;
 
     }
     public async Task<ConfirmationResponse> EditAccount(AccountDTO DTO)
@@ -137,73 +89,29 @@ internal class AccountService : IAccountService
         if (DTO.ParentId == account.Id)
             return new ConfirmationResponse { IsSucceed = false, Message = "Account Can Not Be A Parent For Him Self" };
 
-        int accountLevel = 1;
-        string accountNumber = string.Empty;
-
+  
+        // If Change In Basic Data Only
         if (account.ParentId == null && (DTO.ParentId == 0 || DTO.ParentId == null))  
         {
-            accountLevel = account.Level;
-            accountNumber = account.Number;
-            DTO.ParentId = null;
+            account.Name = DTO.Name;
+            account.Description = DTO.Description;
+
+            _uow.Accounts.Update(account);
+            await _uow.SaveChangesAync();
+
+            return new ConfirmationResponse { IsSucceed = true, Message = "Account Has Been Updated Successfully" };
         }
-        else
-        {
-            var settings = await _uow.SettingsRepo.GetFirst();
-            if (settings is null)
-                return new ConfirmationResponse { IsSucceed = false, Message = "There Are No Settings" };
 
-            // Follow Parent Parent Account
-            if (DTO.ParentId != null && DTO.ParentId != 0)
-            {
-                var parentAccount = await _uow.Accounts.Get(DTO.ParentId.Value);
-                if (parentAccount is null)
-                    return new ConfirmationResponse { IsSucceed = false, Message = "Parent Account Is Not Exist!" };
+        var response = await GetAccountNumberAndLevel(DTO);
 
-                accountLevel = parentAccount.Level + 1;
-                if (accountLevel > 4)
-                    return new ConfirmationResponse { IsSucceed = false, Message = "Level Can Not Greater Than 4!" };
+        if (!response.IsSucceed)
+            return new ConfirmationResponse { Message = response.Message };
 
-                int levelDigitLength = GetAccountNumberDigits(accountLevel, settings);
-                // Parent Has Other Childs 
-                if (parentAccount.IsParent)
-                {
-                    var childAccountsNums = await _uow.Accounts.SelectAll(a => a.ParentId == parentAccount.Id, a => long.Parse(a.Number));
-                    long nextAccountNumber = childAccountsNums.Max() + 1;
-
-                    var maxNumber = parentAccount.Number + (Math.Pow(10, levelDigitLength) - 1).ToString();
-                    if (nextAccountNumber > long.Parse(maxNumber))
-                        return new ConfirmationResponse { IsSucceed = false, Message = $"Number In Level {accountLevel} Should Be {levelDigitLength} Digit!" };
-
-                    accountNumber = nextAccountNumber.ToString();
-                }
-                else
-                {
-                    // Parent Has No Childs
-                    parentAccount.IsParent = true;
-                    _uow.Accounts.Update(parentAccount);
-                    accountNumber = GetNumberForFirstChild(levelDigitLength, parentAccount.Number);
-                }
-
-            }
-            else  // If Not has Parent - The Core 4
-            {
-                string nextAccountNumber = "1";
-                var numbersInSameLevel = await _uow.Accounts.SelectAll(a => a.Level == 1, a => int.Parse(a.Number));
-
-                if (numbersInSameLevel.Count() > 0)
-                    nextAccountNumber = (numbersInSameLevel.Max() + 1).ToString();
-
-                if (nextAccountNumber.Length > 1)
-                    return new ConfirmationResponse { IsSucceed = false, Message = "Number In Level 1 Should Be One Digit!" };
-
-                accountNumber = nextAccountNumber;
-            }
-        }
-        account.Number = accountNumber;
-        account.Name = DTO.Name;
-        account.Level = accountLevel;
-        account.Description = DTO.Description;
         account.ParentId = DTO.ParentId;
+        account.Name = DTO.Name;
+        account.Description = DTO.Description;
+        account.Level = response.AccountLevel;
+        account.Number = response.AccountNumber;
 
         _uow.Accounts.Update(account);
         await _uow.SaveChangesAync();
@@ -237,16 +145,9 @@ internal class AccountService : IAccountService
 
         return new ConfirmationResponse { IsSucceed = true, Message = "Account Deleted Successfully" };
     }
-    private string GetNumberForFirstChild(int digits , string parentNumber)
-    {
-        var number = new StringBuilder();
-        number.Append(parentNumber);
-        for (int i = 1; i < digits; i++)
-            number.Append('0');
-        number.Append('1');
-        return number.ToString();
-    }
-    private int GetAccountNumberDigits(int level ,Settings setting)
+
+    // Helper Methods
+    private int GetAccountNumberDigits(int level, Settings setting)
     {
         return level switch
         {
@@ -255,6 +156,93 @@ internal class AccountService : IAccountService
             4 => setting.LevelFourDigits,
             _ => throw new InvalidOperationException("Invalid level!")
         };
+
+    }
+    
+
+    // Helper Method
+    private async Task<string> GetFirstLevelNumber()
+    {
+        string nextAccountNumber = "1";
+        var numbersInSameLevel = await _uow.Accounts.SelectAll(a => a.Level == 1, a => int.Parse(a.Number));
+
+        if (numbersInSameLevel.Count() > 0)
+            nextAccountNumber = (numbersInSameLevel.Max() + 1).ToString();
+
+        return nextAccountNumber;
+    }
+    private async Task<int> GetNextNumber(int parentId , string parentNumber)
+    {
+        var childAccountsNums = await _uow.Accounts.SelectAll(a => a.ParentId == parentId, a => int.Parse(a.Number.Substring(parentNumber.Length)));
+        return childAccountsNums.Max() + 1;
+    }
+    private string GetFormattedNumber(int digits , string accNumber ,string parentNumber)
+    {
+        var number = new StringBuilder();
+
+        number.Append(parentNumber);
+
+        for (int i = 1; i <= digits - accNumber.Length; i++)
+            number.Append('0');
+
+        number.Append(accNumber);
+
+        return number.ToString();
+    }
+   
+    private async Task<GetAccountNumberAndLevelResponse> GetAccountNumberAndLevel(AccountDTO DTO)
+    {
+        var settings = await _uow.SettingsRepo.GetFirst();
+        if (settings is null)
+            return new GetAccountNumberAndLevelResponse{ Message = "There Are No Settings"};
+
+        var accountLevel = 1;
+        var accountNumber = string.Empty;
+
+        // Follow Parent Parent Account
+        if (DTO.ParentId != null && DTO.ParentId != 0)
+        {
+            var parent = await _uow.Accounts.Get(DTO.ParentId.Value);
+            if (parent is null)
+                return new GetAccountNumberAndLevelResponse { Message = "Parent Account Is Not Exist!" };
+
+            accountLevel = parent.Level + 1;
+            if (accountLevel > settings.MaxAccountLevel)
+                return new GetAccountNumberAndLevelResponse { Message = "Level Can Not Greater Than 4!" }; 
+
+            int levelDigitLength = GetAccountNumberDigits(accountLevel, settings);
+
+            // Parent Has Other Childs 
+            if (parent.IsParent)
+            {
+                int nextAccountNumber = await GetNextNumber(parent.Id, parent.Number);
+
+                var maxNumber = Math.Pow(10, levelDigitLength) - 1;
+                if (nextAccountNumber > maxNumber)
+                    return new GetAccountNumberAndLevelResponse { Message = $"Number In Level {accountLevel} Should Be {levelDigitLength} Digit!" };
+
+                accountNumber = GetFormattedNumber(levelDigitLength, nextAccountNumber.ToString(), parent.Number);
+            }
+            else
+            {
+                // Parent Has No Childs
+                accountNumber = GetFormattedNumber(levelDigitLength, "1" ,  parent.Number);
+
+                parent.IsParent = true;
+                _uow.Accounts.Update(parent);
+            }
+        }
+        else  // If Not has Parent - The Core 4
+        {
+            var nextAccountNumber = await GetFirstLevelNumber();
+
+            if (nextAccountNumber.Length > settings.LevelOneDigits)
+                return new GetAccountNumberAndLevelResponse { Message = $"Number In Level {accountLevel} Should Be {settings.LevelOneDigits} Digits!" };
+
+            accountNumber = nextAccountNumber;
+        }
+
+        return new GetAccountNumberAndLevelResponse { IsSucceed = true, Message = "Account Number Generated Successfully"  , AccountLevel = accountLevel , AccountNumber = accountNumber};
 
     }
 }
