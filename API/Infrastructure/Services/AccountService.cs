@@ -3,6 +3,7 @@ using Application.DTO.Request;
 using Application.DTO.Response;
 using Application.IRepository;
 using Application.IServices;
+using Application.Models;
 using Azure;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore.Storage.Json;
@@ -14,18 +15,18 @@ using System.Security.Principal;
 using System.Text;
 
 namespace Infrastructure.Services;
-internal class AccountService : IAccountService
+public class AccountService : IAccountService
 {
     private readonly IUnitOfWork _uow;
     public AccountService(IUnitOfWork uow)
     {
         _uow = uow;
     }
-    public async Task<IEnumerable<AccountDTO>> GetAllAccounts()
+    public async Task<IEnumerable<GetAccountDTO>> GetAllAccounts()
     {
         var allAccounts = await _uow.Accounts.GetAll("Parent");
         return allAccounts.Select(a =>
-            new AccountDTO {
+            new GetAccountDTO {
                 Id = a.Id,
                 Name = a.Name,
                 Description = a.Description,
@@ -38,17 +39,17 @@ internal class AccountService : IAccountService
     }
     public async Task<IEnumerable<SelectItemDTO>> GetAccountSelectList()
     {
-        var accounts = await _uow.Accounts.SelectAll(a => true, a => new SelectItemDTO { Id = a.Id, Name = a.Name });
+        var accounts = await _uow.Accounts.SelectAll(a => !a.IsParent, a => new SelectItemDTO { Id = a.Id, Name = a.Name });
         return accounts.OrderBy(a => a.Name);
     }
-    public async Task<AccountDTO?> GetAccountById(int id)
+    public async Task<GetAccountDTO?> GetAccountById(int id)
     {
         var account = await _uow.Accounts.Get(a => a.Id ==  id , "Parent");
 
         if (account is null || id == 0)
-            return new AccountDTO();
+            return new GetAccountDTO();
 
-        return new AccountDTO
+        return new GetAccountDTO
         {
             Id = account.Id,
             Name = account.Name,
@@ -60,7 +61,7 @@ internal class AccountService : IAccountService
             IsParent = account.IsParent
         };
     }
-    public async Task<ConfirmationResponse> CreateAccount(AccountDTO DTO)
+    public async Task<ConfirmationResponse> CreateAccount(CreateAccountDTO DTO)
     { 
         var response = await GetAccountNumberAndLevel(DTO);
 
@@ -82,7 +83,7 @@ internal class AccountService : IAccountService
         return new ConfirmationResponse {IsSucceed = true ,Message = "Account Has Been Created Successfully" }; ;
 
     }
-    public async Task<ConfirmationResponse> EditAccount(AccountDTO DTO)
+    public async Task<ConfirmationResponse> EditAccount(CreateAccountDTO DTO)
     {
         var account = await _uow.Accounts.Get(DTO.Id);
         if (account == null)
@@ -107,6 +108,8 @@ internal class AccountService : IAccountService
             return new ConfirmationResponse { IsSucceed = true, Message = "Account Has Been Updated Successfully" };
         }
 
+        int? oldParentId = account?.ParentId;
+
         var response = await GetAccountNumberAndLevel(DTO);
 
         if (!response.IsSucceed)
@@ -120,16 +123,27 @@ internal class AccountService : IAccountService
 
         _uow.Accounts.Update(account);
         await _uow.SaveChangesAync();
+
+        if (!await _uow.Accounts.Exists(a => a.ParentId == oldParentId && a.Id != account.Id))
+        {
+            await _uow.Accounts.ExecuteUpdateAsync(a => a.Id == oldParentId , e => e.SetProperty(a => a.IsParent , false));
+            await _uow.SaveChangesAync();
+        }
+
         return new ConfirmationResponse { IsSucceed = true, Message = "Account Has Been Updated Successfully" };
     }
     public async Task<ConfirmationResponse> DeleteAccount(int id)
     {
         var account = await _uow.Accounts.Get(id);
         if (account == null)
-            return new ConfirmationResponse { IsSucceed = false, Message = "Account Not Found" };
+            return new ConfirmationResponse {Message = "Account Not Found" };
 
         if (account.IsParent)
-            return new ConfirmationResponse { IsSucceed = false, Message = "Can not Remove The Account Because It Has Childs" };
+            return new ConfirmationResponse {Message = "Can not Remove The Account Because It Has Childs" };
+
+        if(await _uow.JournalDetail.Exists(d => d.AccountId == id))
+            return new ConfirmationResponse {Message = "Can not Remove The Account Because There Are Transactions On It" };
+
 
         account.IsDeleted = true;
         _uow.Accounts.Update(account);
@@ -152,21 +166,19 @@ internal class AccountService : IAccountService
     }
 
     // Helper Methods
-    private int GetAccountNumberDigits(int level, Settings setting)
+    public int GetAccountNumberDigits(int level, Settings setting)
     {
         return level switch
         {
             2 => setting.LevelTwoDigits,
             3 => setting.LevelThreeDigits,
             4 => setting.LevelFourDigits,
+            5 => setting.LevelFiveDigits,
             _ => throw new InvalidOperationException("Invalid level!")
         };
 
     }
-    
-
-    // Helper Method
-    private async Task<string> GetFirstLevelNumber()
+    public async Task<string> GetFirstLevelNumber()
     {
         string nextAccountNumber = "1";
         var numbersInSameLevel = await _uow.Accounts.SelectAll(a => a.Level == 1, a => int.Parse(a.Number));
@@ -176,12 +188,12 @@ internal class AccountService : IAccountService
 
         return nextAccountNumber;
     }
-    private async Task<int> GetNextNumber(int parentId , string parentNumber)
+    public async Task<int> GetNextNumber(int parentId , string parentNumber)
     {
         var childAccountsNums = await _uow.Accounts.SelectAll(a => a.ParentId == parentId, a => int.Parse(a.Number.Substring(parentNumber.Length)));
         return childAccountsNums.Max() + 1;
     }
-    private string GetFormattedNumber(int digits , string accNumber ,string parentNumber)
+    public string GetFormattedNumber(int digits , string accNumber ,string parentNumber)
     {
         var number = new StringBuilder();
 
@@ -195,9 +207,9 @@ internal class AccountService : IAccountService
         return number.ToString();
     }
    
-    private async Task<GetAccountNumberAndLevelResponse> GetAccountNumberAndLevel(AccountDTO DTO)
+    private async Task<GetAccountNumberAndLevelResponse> GetAccountNumberAndLevel(CreateAccountDTO DTO)
     {
-        var settings = await _uow.SettingsRepo.GetFirst();
+        var settings = await _uow.Settings.GetFirst();
         if (settings is null)
             return new GetAccountNumberAndLevelResponse{ Message = "There Are No Settings"};
 

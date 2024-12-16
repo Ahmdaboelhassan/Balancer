@@ -3,15 +3,19 @@
 public class Settings
 {
     public int Id { get; set; }
-    public int DefaultCreditAccount { get; set; }
-    public int DefaultDebitAccount { get; set; }
-    public string? ExpensesAccountNumber { get; set; }
-    public string? RevenueAccountNumber { get; set; }
-    public string? AssetsAccountNumber { get; set; }
-    public string? LiabilitiesAccountNumber { get; set; }
+    public int? DefaultCreditAccount { get; set; }
+    public int? DefaultDebitAccount { get; set; }
+    public int? DefaultPeriodDays { get; set; }
+    public int? ExpensesAccount { get; set; }
+    public int? RevenueAccount { get; set; }
+    public int? AssetsAccount { get; set; }
+    public int? LiabilitiesAccount { get; set; }
+    public int? BanksAccount { get; set; }
+    public int? DrawersAccount { get; set; }
     public int LevelOneDigits { get; set; }
     public int LevelTwoDigits { get; set; }
     public int LevelThreeDigits { get; set; }
     public int LevelFourDigits { get; set; }
+    public int LevelFiveDigits { get; set; }
     public int MaxAccountLevel { get; set; }
 }

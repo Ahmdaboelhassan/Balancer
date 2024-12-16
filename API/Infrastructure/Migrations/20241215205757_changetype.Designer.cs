@@ -4,6 +4,7 @@ using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241215205757_changetype")]
+    partial class changetype
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -108,6 +111,9 @@ namespace API.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IncreasedBalance")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -120,9 +126,6 @@ namespace API.Migrations
 
                     b.Property<int>("PeriodId")
                         .HasColumnType("int");
-
-                    b.Property<byte>("Type")
-                        .HasColumnType("tinyint");
 
                     b.HasKey("Id");
 
@@ -220,10 +223,7 @@ namespace API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("AssetsAccount")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("BanksAccount")
+                    b.Property<int?>("AssetsAccountNumber")
                         .HasColumnType("int");
 
                     b.Property<int?>("DefaultCreditAccount")
@@ -235,10 +235,7 @@ namespace API.Migrations
                     b.Property<int?>("DefaultPeriodDays")
                         .HasColumnType("int");
 
-                    b.Property<int?>("DrawersAccount")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ExpensesAccount")
+                    b.Property<int?>("ExpensesAccountNumber")
                         .HasColumnType("int");
 
                     b.Property<int>("LevelFiveDigits")
@@ -256,13 +253,13 @@ namespace API.Migrations
                     b.Property<int>("LevelTwoDigits")
                         .HasColumnType("int");
 
-                    b.Property<int?>("LiabilitiesAccount")
+                    b.Property<int?>("LiabilitiesAccountNumber")
                         .HasColumnType("int");
 
                     b.Property<int>("MaxAccountLevel")
                         .HasColumnType("int");
 
-                    b.Property<int?>("RevenueAccount")
+                    b.Property<int?>("RevenueAccountNumber")
                         .HasColumnType("int");
 
                     b.HasKey("Id");

@@ -89,8 +89,11 @@ public class Repository<T> : IRepository<T> where T : class
             .Select(columns)
             .ToListAsync();
     }
-    public async Task<bool> Exists(Expression<Func<T, bool>> criteria)
+    public async Task<bool> Exists(Expression<Func<T, bool>> criteria = null)
     {
+        if (criteria == null)
+            return await _set.AnyAsync();
+
         return await _set.AnyAsync(criteria);
     }
     public Task<int> Count(Expression<Func<T, bool>> criteria)

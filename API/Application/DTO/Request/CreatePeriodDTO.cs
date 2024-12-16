@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 namespace Application.DTO.Request;
-public class SavePeriodDTO
+public class CreatePeriodDTO
 {
     public int Id { get; set; }
     public DateTime From { get; set; }

@@ -2,6 +2,7 @@
 using Application.DTO.Response;
 using Application.IRepository;
 using Application.IServices;
+using Application.Models;
 using Domain.Models;
 
 namespace Infrastructure.Services;
@@ -38,18 +39,19 @@ internal class PeriodService : IPeriodService
         var periods = await _uow.Periods.GetAll();
         return periods.OrderByDescending(p => p.CreatedAt).Select(p => new SelectItemDTO { Id = p.Id, Name = p.Name });
     }
-    public async Task<GetPeriodDetailDTO> GetNewPeriod()
+    public async Task<GetPeriodDTO> GetNewPeriod()
     {
-        var DTO = new GetPeriodDetailDTO();
+        var DTO = new GetPeriodDTO();
         var LastPeriod = await _uow.Periods.GetLastOrderBy(p => p.Id);
+        var Settings = await _uow.Settings.GetFirst();
 
-        DTO.DaysCount = 7;
+        DTO.DaysCount = Settings?.DefaultPeriodDays ?? 7;
         DTO.From = LastPeriod != null ? LastPeriod.To.AddDays(1) : DateTime.Now;
         DTO.To = DTO.From.AddDays(DTO.DaysCount);
 
         return DTO;
     }
-    public async Task<GetPeriodDetailDTO> GetPeriodById(int id)
+    public async Task<GetPeriodDTO> GetPeriodById(int id)
     {
         var period = await _uow.Periods.Get(p => p.Id == id, "Journals");
 
@@ -61,11 +63,12 @@ internal class PeriodService : IPeriodService
             Code = j.Code,
             CreatedAt = j.CreatedAt,
             Detail = j.Detail,
-            IncreasedBalance = j.IncreasedBalance,
-             Amount = j.Amount,
+            Type = j.Type,
+            Amount = j.Amount,
+            Notes = j.Notes,
         });
 
-        var periodDto = new GetPeriodDetailDTO
+        var periodDto = new GetPeriodDTO
         {
             CreatedAt = period.CreatedAt,
             DaysCount = period.DaysCount,
@@ -80,7 +83,7 @@ internal class PeriodService : IPeriodService
 
         return periodDto;
     }
-    public async Task<GetPeriodDetailDTO> GetLastPeriod()
+    public async Task<GetPeriodDTO> GetLastPeriod()
     {
         var lastPeriod = await _uow.Periods.GetLastOrderBy(p => p.Id ,"Journals");
         if (lastPeriod == null)
@@ -91,11 +94,13 @@ internal class PeriodService : IPeriodService
             Code = j.Code,
             CreatedAt = j.CreatedAt,
             Detail = j.Detail,
-            IncreasedBalance = j.IncreasedBalance,
+            Type = j.Type,
             Amount = j.Amount,
+            Notes = j.Notes,
+            
         });
 
-        var lastPeriodDto = new GetPeriodDetailDTO
+        var lastPeriodDto = new GetPeriodDTO
         {
             CreatedAt = lastPeriod.CreatedAt,
             DaysCount = lastPeriod.DaysCount,
@@ -112,7 +117,7 @@ internal class PeriodService : IPeriodService
 
         return lastPeriodDto;
     }
-    public async Task<ConfirmationResponse> CreatePeriod(SavePeriodDTO DTO)
+    public async Task<ConfirmationResponse> CreatePeriod(CreatePeriodDTO DTO)
     {
         var From = DTO.From;
         var To = DTO.From.AddDays(DTO.DaysCount);
@@ -133,7 +138,7 @@ internal class PeriodService : IPeriodService
         await _uow.SaveChangesAync();
         return new ConfirmationResponse { IsSucceed = true , Message = "Period Has Been Created Successfully"};
     }
-    public async Task<ConfirmationResponse> EditPeriod(SavePeriodDTO DTO)
+    public async Task<ConfirmationResponse> EditPeriod(CreatePeriodDTO DTO)
     {
         var From = DTO.From;
         var To = DTO.From.AddDays(DTO.DaysCount);

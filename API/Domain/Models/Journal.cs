@@ -18,7 +18,7 @@ namespace Domain.Models
         public DateTime CreatedAt { get; set; }
         public DateTime? LastUpdatedAt { get; set; }
         public bool IsDeleted { get; set; }
-        public bool IncreasedBalance { get; set; }
+        public byte Type { get; set; }
         public decimal Amount { get; set; }
 
         [Required]

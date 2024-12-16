@@ -13,7 +13,7 @@ public class UnitOfWork : IUnitOfWork
     public IJournalRepo Journal { get; private set; }
     public IJournalDetailRepo JournalDetail { get; private set; }
     public ICostCenterRepo CostCenter { get; private set; }
-    public ISettingsRepo SettingsRepo { get; }
+    public ISettingsRepo Settings { get; }
 
     public UnitOfWork(AppDbContext context)
     {
@@ -23,7 +23,7 @@ public class UnitOfWork : IUnitOfWork
         Journal = new JournalRepo(context);
         JournalDetail = new JournalDetailRepo(context);
         CostCenter = new CostCenterRepo(context);
-        SettingsRepo = new SettingsRepo(context);
+        Settings = new SettingsRepo(context);
     }
    
 

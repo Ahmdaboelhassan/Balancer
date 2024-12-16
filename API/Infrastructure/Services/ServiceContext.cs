@@ -8,7 +8,9 @@ public class ServiceContext : IServiceContext
     {
         PeriodService = new PeriodService(uow);
         AccountService = new AccountService(uow);
+        JournalService = new JournalService(uow);
     }
     public IPeriodService PeriodService { get; private set; }
     public IAccountService AccountService { get; private set; }
+    public IJournalService JournalService { get; private set; }
 }

@@ -1,4 +1,4 @@
-﻿namespace Application.DTO.Response;
+﻿namespace Application.Models;
 public class SelectItemDTO
 {
     public int Id { get; set; }

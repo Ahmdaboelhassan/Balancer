@@ -1,4 +1,5 @@
 ﻿using Application.DTO.Request;
+using Application.DTO.Response;
 using Application.IServices;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -33,7 +34,7 @@ public class AccountController : ControllerBase
     }
 
     [HttpPost("CreateAccount")]
-    public async Task<IActionResult> CreateAccount(AccountDTO DTO)
+    public async Task<IActionResult> CreateAccount(CreateAccountDTO DTO)
     {
         var result = await _serviceContext.AccountService.CreateAccount(DTO);
         if (!result.IsSucceed)
@@ -42,7 +43,7 @@ public class AccountController : ControllerBase
         return Ok(result.Message);
     }
     [HttpPut("EditAccount")]
-    public async Task<IActionResult> EditAccount(AccountDTO DTO)
+    public async Task<IActionResult> EditAccount(CreateAccountDTO DTO)
     {
         var result = await _serviceContext.AccountService.EditAccount(DTO);
         if (!result.IsSucceed)

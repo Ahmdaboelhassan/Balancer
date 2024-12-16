@@ -14,7 +14,7 @@ public interface IRepository<T>
     Task<List<T>> GetAll(params string[]? includes);
     Task<List<T>> GetAll(Expression<Func<T, bool>> criteria, params string[]? includes);
     Task<IEnumerable<O>> SelectAll<O>(Expression<Func<T, bool>> criteria, Expression<Func<T, O>> columns, params string[]? includes);
-    Task<bool> Exists(Expression<Func<T, bool>> criteria);
+    Task<bool> Exists(Expression<Func<T, bool>>? criteria = null);
     Task<int> Count(Expression<Func<T, bool>> criteria);
 
     // Command

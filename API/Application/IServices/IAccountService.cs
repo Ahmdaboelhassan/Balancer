@@ -1,14 +1,14 @@
-﻿
-using Application.DTO.Request;
+﻿using Application.DTO.Request;
 using Application.DTO.Response;
+using Application.Models;
 
 namespace Application.IServices;
 public interface IAccountService
 {
-    Task<IEnumerable<AccountDTO>> GetAllAccounts();
+    Task<IEnumerable<GetAccountDTO>> GetAllAccounts();
     Task<IEnumerable<SelectItemDTO>> GetAccountSelectList();
-    Task<AccountDTO?> GetAccountById(int id);
-    Task<ConfirmationResponse> CreateAccount(AccountDTO DTO);
-    Task<ConfirmationResponse> EditAccount(AccountDTO DTO);
+    Task<GetAccountDTO?> GetAccountById(int id);
+    Task<ConfirmationResponse> CreateAccount(CreateAccountDTO DTO);
+    Task<ConfirmationResponse> EditAccount(CreateAccountDTO DTO);
     Task<ConfirmationResponse> DeleteAccount(int id);
 }

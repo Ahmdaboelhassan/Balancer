@@ -41,7 +41,7 @@ public class PeriodController : ControllerBase
 
 
     [HttpPost("CreatePeriod")]
-    public async Task<IActionResult> CreatePeriod(SavePeriodDTO DTO)
+    public async Task<IActionResult> CreatePeriod(CreatePeriodDTO DTO)
     {
         var result = await _services.PeriodService.CreatePeriod(DTO);
 
@@ -52,7 +52,7 @@ public class PeriodController : ControllerBase
     }
 
     [HttpPut("EditPeriod")]
-    public async Task<IActionResult> EditPeriod(SavePeriodDTO DTO)
+    public async Task<IActionResult> EditPeriod(CreatePeriodDTO DTO)
     {
         var result = await _services.PeriodService.EditPeriod(DTO);
 

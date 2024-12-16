@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.DTO.Response;
+namespace Application.Models;
 public record GetAccountNumberAndLevelResponse : ConfirmationResponse
 {
     public int AccountLevel { get; set; } = 1;
