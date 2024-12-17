@@ -16,29 +16,114 @@ internal class JournalService : IJournalService
     {
         _uow = uow;
     }
-    public Task<GetJournalDTO> NewJournal(int periodId)
+    public async Task<GetJournalDTO> New(int periodId)
     {
-        throw new NotImplementedException();
-    }
-    public Task<IEnumerable<JournalDetailDTO>> GetAccountStatement(int? AccountId, DateTime? from, DateTime? to)
-    {
-        throw new NotImplementedException();
-    }
-    public Task<IEnumerable<JournalListItemDTO>> GetAllJournal(int periodId)
-    {
-        throw new NotImplementedException();
-    }
+        var settings = await _uow.Settings.GetFirst();
+        if (settings is null)
+            return new GetJournalDTO();
 
-    public Task<IEnumerable<JournalListItemDTO>> GetAllJournal(DateTime? from, DateTime? to)
-    {
-        throw new NotImplementedException();
-    }
+        var code = await GetNextCode();
+        var accounts = await  _uow.Accounts.SelectAll(a => !a.IsParent, a => new SelectItemDTO { Id = a.Id, Name = a.Name });
+        var costCenters = await _uow.CostCenter.SelectAll(c => true, c => new SelectItemDTO { Id = c.Id, Name = c.Name });
 
-    public Task<GetJournalDTO> GetJournal(int id)
-    {
-        throw new NotImplementedException();
+        return new GetJournalDTO()
+        {
+            Accounts = accounts,
+            CostCenters = costCenters,
+            Code = code,
+            DebitAccountId = settings.DefaultDebitAccount.GetValueOrDefault(),
+            CreditAccountId = settings.DefaultCreditAccount.GetValueOrDefault(),
+            PeriodId = periodId,
+        };
     }
+    public async Task<GetJournalDTO> Get(int id)
+    {
+        var journal = await _uow.Journal.Get(j => j.Id == id , "JournalDetails");
+        if (journal is null)
+        {
+            var lastPeriod = await _uow.Periods.GetLastOrderBy(p => p.To);
+            int periodId = lastPeriod?.Id ?? 0;
 
+            return await New(periodId);
+        }
+
+        var accounts = await _uow.Accounts.SelectAll(a => !a.IsParent, a => new SelectItemDTO { Id = a.Id, Name = a.Name });
+        var costCenters = await _uow.CostCenter.SelectAll(c => true, c => new SelectItemDTO { Id = c.Id, Name = c.Name });
+
+        return new GetJournalDTO()
+        {
+            Id = journal.Id,
+            CostCenterId = journal.JournalDetails.FirstOrDefault()?.CostCenterId,
+            DebitAccountId = journal.JournalDetails.First(d => d.Debit > 0).AccountId,
+            CreditAccountId = journal.JournalDetails.First(d => d.Credit > 0).AccountId,
+            CreatedAt = journal.CreatedAt,
+            Amount = journal.Amount,
+            Type = journal.Type,
+            Code = journal.Code,
+            Notes = journal.Notes,
+            LastUpdatedAt = journal.LastUpdatedAt,
+            PeriodId = journal.PeriodId,
+            Detail = journal.Detail,
+            Description = journal.Description,
+            CostCenters = costCenters,
+            Accounts = accounts,
+        };
+
+    }
+    public async Task<IEnumerable<JournalListItemDTO>> Search(string criteria)
+    {
+       return  await _uow.Journal.SelectAll(a => a.Detail.Contains(criteria), a =>  new JournalListItemDTO
+        {
+            Id = a.Id,
+            Amount = a.Amount,
+            Type = a.Type,
+            Code = a.Code,
+            CreatedAt = a.CreatedAt,
+            Detail = a.Detail,
+            Notes = a.Notes
+        });
+    }
+    public async Task<IEnumerable<JournalListItemDTO>> GetAll(int page)
+    {
+        const int pageSize = 20;
+
+        return await _uow.Journal.SelectSome(a => true, a => new JournalListItemDTO
+        {
+            Id = a.Id,
+            Amount = a.Amount,
+            Type = a.Type,
+            Code = a.Code,
+            CreatedAt = a.CreatedAt,
+            Detail = a.Detail,
+            Notes = a.Notes
+        }, j => j.CreatedAt , page , pageSize);
+    }
+    public async Task<IEnumerable<JournalListItemDTO>> GetAll(DateTime from, DateTime to)
+    {
+        return await _uow.Journal.SelectAll(a => a.CreatedAt.Date >= from.Date && a.CreatedAt.Date <= to.Date  , a => new JournalListItemDTO
+        {
+            Id = a.Id,
+            Amount = a.Amount,
+            Type = a.Type,
+            Code = a.Code,
+            CreatedAt = a.CreatedAt,
+            Detail = a.Detail,
+            Notes = a.Notes
+        });
+    }
+    public async Task<IEnumerable<JournalListItemDTO>> GetPeriodJournals(int periodId)
+    {
+        return await _uow.Journal.SelectAll(a => a.PeriodId == periodId, a => new JournalListItemDTO
+        {
+            Id = a.Id,
+            Amount = a.Amount,
+            Type = a.Type,
+            Code = a.Code,
+            CreatedAt = a.CreatedAt,
+            Detail = a.Detail,
+            Notes = a.Notes
+        });
+    }
     public async Task<int> GetNextCode()
     {
         var isThereJournals = await _uow.Journal.Exists();
@@ -47,8 +132,7 @@ internal class JournalService : IJournalService
 
         return 1;
     }
-
-    public async Task<ConfirmationResponse> CreateJournal(CreateJournalDTO model)
+    public async Task<ConfirmationResponse> Create(CreateJournalDTO model)
     {
         using (var transaction = _uow.StartTransaction())
         {
@@ -61,6 +145,9 @@ internal class JournalService : IJournalService
 
                 if (credit == null || debit == null)
                     return new ConfirmationResponse { Message = "Credit Account or Debit Account is Wrong" };
+
+                if (credit.IsParent || debit.IsParent)
+                    return new ConfirmationResponse { Message = "Can Not Make Journal From Using Parent Accounts" };
 
                 if (period == null)
                     return new ConfirmationResponse { Message = "Some Thing Wrong While Selecting Journal Period" };
@@ -75,7 +162,7 @@ internal class JournalService : IJournalService
                 period.LastUpdatedAt = DateTime.Now;
                 await _uow.SaveChangesAync();
 
-                var notes = $"Transaction Done From [{credit.Name}] To [{debit.Name}]";
+                var notes = $"Transaction Done From ({credit.Name}) To ({debit.Name})";
                 var code = await GetNextCode();
 
 
@@ -168,14 +255,14 @@ internal class JournalService : IJournalService
             }
           }
     }
-    public async Task<ConfirmationResponse> EditJournal(CreateJournalDTO model)
+    public async Task<ConfirmationResponse> Edit(CreateJournalDTO model)
     {
         using (var transaction = _uow.StartTransaction())
         {
             try
             {
                 if (model.Id == 0)
-                    return await CreateJournal(model);
+                    return await Create(model);
 
                 var journal = await _uow.Journal.Get(j => j.Id == model.Id, "JournalDetails");
 
@@ -193,13 +280,16 @@ internal class JournalService : IJournalService
                 if (credit is null || debit is null)
                     return new ConfirmationResponse { Message = "Credit Account or Debit Account is Wrong" };
 
+                if (credit.IsParent || debit.IsParent)
+                    return new ConfirmationResponse { Message = "Can Not Make Journal Using Parent Accounts" };
+
                 if (period is null)
                     return new ConfirmationResponse { Message = "Some Thing Wrong While Selecting Journal Period" };
        
                 period.LastUpdatedAt = DateTime.Now;
                 await _uow.SaveChangesAync();
 
-                var notes = $"Updated Transaction Done From [{credit.Name}] To [{debit.Name}]";
+                var notes = $"Updated Transaction Done From ({credit.Name}) To ({debit.Name})";
 
                 var setting = await _uow.Settings.GetFirst();
                 if (setting == null)
@@ -290,15 +380,40 @@ internal class JournalService : IJournalService
             }
         }
     }
-
-    public Task<ConfirmationResponse> DeleteJournal(int id)
+    public async Task<ConfirmationResponse> Delete(int id)
     {
-        throw new NotImplementedException();
-    }
+        using var transaction = _uow.StartTransaction();
+        try
+        {
+            var journal = await _uow.Journal.Get(id);
 
+            if (journal is null)
+                new ConfirmationResponse { Message = "Journal Not Found" };
+
+            journal.IsDeleted = true;
+            await _uow.JournalDetail.ExecuteUpdateAsync(d => d.JournalId == journal.Id, e => e.SetProperty(d => d.IsDeleted, true));
+            await _uow.SaveChangesAync();
+
+
+            if (journal.Type != (byte)JournalTypes.Due)
+            {
+                await ResetPeriodValueBeforeJournal(journal.PeriodId, journal.Amount);
+                await _uow.SaveChangesAync();
+            }
+
+            transaction.Commit();
+        }
+        catch (Exception ex)
+        {
+            transaction.Rollback();
+            return new ConfirmationResponse { Message = $"Something Error When Saving => {ex.Message}" };
+        }
+        return new ConfirmationResponse { Message = "Journal Deleted Successfully"  , IsSucceed = true};
+    }
     private async Task ResetPeriodValueBeforeJournal(int periodId , decimal amount)
     {
         await _uow.Periods.ExecuteUpdateAsync(p => p.Id == periodId, e => e.SetProperty(p => p.TotalAmount, p => p.TotalAmount + (-1 * amount)));
         await _uow.SaveChangesAync();
     }
 }
+

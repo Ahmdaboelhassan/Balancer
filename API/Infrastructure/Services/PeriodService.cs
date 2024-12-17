@@ -13,9 +13,38 @@ internal class PeriodService : IPeriodService
     {
         _uow = uow;
     }
-    public async Task<IEnumerable<PeriodListItemDTO>> GetAllPeriods(DateTime? From, DateTime? To)
+    public async Task<IEnumerable<PeriodListItemDTO>> Search(string criteria)
     {
-        var periodList = await _uow.Periods.SelectAll( a => true , sp => new PeriodListItemDTO
+        return await _uow.Periods.SelectAll(p => p.Name.Contains(criteria), sp => new PeriodListItemDTO
+        {
+            Id = sp.Id,
+            Name = sp.Name,
+            From = sp.From,
+            To = sp.To,
+            TotalAmount = sp.TotalAmount,
+            IncreasedBalance = sp.TotalAmount > 0,
+
+        });
+    }
+    public async Task<IEnumerable<PeriodListItemDTO>> GetAll(int page)
+    {
+        const int pageSize = 20;
+
+        return await _uow.Periods.SelectSome(p => true,
+          sp => new PeriodListItemDTO
+          {
+              Id = sp.Id,
+              Name = sp.Name,
+              From = sp.From,
+              To = sp.To,
+              TotalAmount = sp.TotalAmount,
+              IncreasedBalance = sp.TotalAmount > 0,
+
+          }, p => p.To, page, pageSize);
+    }
+    public async Task<IEnumerable<PeriodListItemDTO>> GetAll(DateTime From, DateTime To)
+    {
+        return await _uow.Periods.SelectAll( p => p.From >= From.Date && p.To <= To.Date, sp => new PeriodListItemDTO
         {
             Id = sp.Id,
             Name = sp.Name,
@@ -25,21 +54,14 @@ internal class PeriodService : IPeriodService
             IncreasedBalance = sp.TotalAmount > 0,
             
         });
-
-        if (From != null)
-            periodList = periodList.Where(p => p.From >= From.Value.Date);
-
-        if (To != null)
-            periodList = periodList.Where(p => p.To <= To.Value.Date);
-
-        return periodList;
+  
     }
-    public async Task<IEnumerable<SelectItemDTO>> GetAllPeriodSelectList()
+    public async Task<IEnumerable<SelectItemDTO>> GetAllSelectList()
     {
         var periods = await _uow.Periods.GetAll();
         return periods.OrderByDescending(p => p.CreatedAt).Select(p => new SelectItemDTO { Id = p.Id, Name = p.Name });
     }
-    public async Task<GetPeriodDTO> GetNewPeriod()
+    public async Task<GetPeriodDTO> New()
     {
         var DTO = new GetPeriodDTO();
         var LastPeriod = await _uow.Periods.GetLastOrderBy(p => p.Id);
@@ -51,7 +73,7 @@ internal class PeriodService : IPeriodService
 
         return DTO;
     }
-    public async Task<GetPeriodDTO> GetPeriodById(int id)
+    public async Task<GetPeriodDTO> GetById(int id)
     {
         var period = await _uow.Periods.Get(p => p.Id == id, "Journals");
 
@@ -83,7 +105,7 @@ internal class PeriodService : IPeriodService
 
         return periodDto;
     }
-    public async Task<GetPeriodDTO> GetLastPeriod()
+    public async Task<GetPeriodDTO> GetLast()
     {
         var lastPeriod = await _uow.Periods.GetLastOrderBy(p => p.Id ,"Journals");
         if (lastPeriod == null)
@@ -117,7 +139,7 @@ internal class PeriodService : IPeriodService
 
         return lastPeriodDto;
     }
-    public async Task<ConfirmationResponse> CreatePeriod(CreatePeriodDTO DTO)
+    public async Task<ConfirmationResponse> Create(CreatePeriodDTO DTO)
     {
         var From = DTO.From;
         var To = DTO.From.AddDays(DTO.DaysCount);
@@ -138,7 +160,7 @@ internal class PeriodService : IPeriodService
         await _uow.SaveChangesAync();
         return new ConfirmationResponse { IsSucceed = true , Message = "Period Has Been Created Successfully"};
     }
-    public async Task<ConfirmationResponse> EditPeriod(CreatePeriodDTO DTO)
+    public async Task<ConfirmationResponse> Edit(CreatePeriodDTO DTO)
     {
         var From = DTO.From;
         var To = DTO.From.AddDays(DTO.DaysCount);
@@ -159,7 +181,7 @@ internal class PeriodService : IPeriodService
         await _uow.SaveChangesAync();
         return new ConfirmationResponse { IsSucceed = true, Message = "Period Has Been Updated Successfully" };
     }
-    public async Task<ConfirmationResponse> DeletePeriod(int id)
+    public async Task<ConfirmationResponse> Delete(int id)
     {
         var period = await _uow.Periods.Get(p => p.Id == id, "Journals");
 
@@ -180,4 +202,6 @@ internal class PeriodService : IPeriodService
         int periodsInSameMonth = await _uow.Periods.Count(p => p.From.Month <= FromDate.Month && p.From.Year <= FromDate.Year);
         return periodsInSameMonth == 0 ? 1 : periodsInSameMonth + 1;
     }
+
+    
 }

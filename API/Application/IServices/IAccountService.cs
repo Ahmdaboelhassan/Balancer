@@ -5,10 +5,11 @@ using Application.Models;
 namespace Application.IServices;
 public interface IAccountService
 {
-    Task<IEnumerable<GetAccountDTO>> GetAllAccounts();
-    Task<IEnumerable<SelectItemDTO>> GetAccountSelectList();
-    Task<GetAccountDTO?> GetAccountById(int id);
-    Task<ConfirmationResponse> CreateAccount(CreateAccountDTO DTO);
-    Task<ConfirmationResponse> EditAccount(CreateAccountDTO DTO);
-    Task<ConfirmationResponse> DeleteAccount(int id);
+    Task<IEnumerable<GetAccountDTO>> GetAll();
+    Task<IEnumerable<GetAccountDTO>> Search(string criteria);
+    Task<IEnumerable<SelectItemDTO>> GetSelectList();
+    Task<GetAccountDTO?> GetById(int id);
+    Task<ConfirmationResponse> Create(CreateAccountDTO DTO);
+    Task<ConfirmationResponse> Edit(CreateAccountDTO DTO);
+    Task<ConfirmationResponse> Delete(int id);
 }

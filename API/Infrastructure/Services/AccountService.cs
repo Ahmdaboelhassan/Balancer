@@ -22,7 +22,7 @@ public class AccountService : IAccountService
     {
         _uow = uow;
     }
-    public async Task<IEnumerable<GetAccountDTO>> GetAllAccounts()
+    public async Task<IEnumerable<GetAccountDTO>> GetAll()
     {
         var allAccounts = await _uow.Accounts.GetAll("Parent");
         return allAccounts.Select(a =>
@@ -37,12 +37,27 @@ public class AccountService : IAccountService
                 IsParent = a.IsParent
             });
     }
-    public async Task<IEnumerable<SelectItemDTO>> GetAccountSelectList()
+    public async Task<IEnumerable<GetAccountDTO>> Search(string criteria) {
+        var allAccounts = await _uow.Accounts.GetAll(a => a.Name.Contains(criteria) ,"Parent");
+        return allAccounts.Select(a =>
+            new GetAccountDTO
+            {
+                Id = a.Id,
+                Name = a.Name,
+                Description = a.Description,
+                ParentId = a.ParentId,
+                AccountNumber = a.Number,
+                ParentNumber = a.Parent?.Number,
+                ParentName = a.Parent?.Name,
+                IsParent = a.IsParent
+            });
+    }
+    public async Task<IEnumerable<SelectItemDTO>> GetSelectList()
     {
         var accounts = await _uow.Accounts.SelectAll(a => !a.IsParent, a => new SelectItemDTO { Id = a.Id, Name = a.Name });
         return accounts.OrderBy(a => a.Name);
     }
-    public async Task<GetAccountDTO?> GetAccountById(int id)
+    public async Task<GetAccountDTO?> GetById(int id)
     {
         var account = await _uow.Accounts.Get(a => a.Id ==  id , "Parent");
 
@@ -61,7 +76,7 @@ public class AccountService : IAccountService
             IsParent = account.IsParent
         };
     }
-    public async Task<ConfirmationResponse> CreateAccount(CreateAccountDTO DTO)
+    public async Task<ConfirmationResponse> Create(CreateAccountDTO DTO)
     { 
         var response = await GetAccountNumberAndLevel(DTO);
 
@@ -83,7 +98,7 @@ public class AccountService : IAccountService
         return new ConfirmationResponse {IsSucceed = true ,Message = "Account Has Been Created Successfully" }; ;
 
     }
-    public async Task<ConfirmationResponse> EditAccount(CreateAccountDTO DTO)
+    public async Task<ConfirmationResponse> Edit(CreateAccountDTO DTO)
     {
         var account = await _uow.Accounts.Get(DTO.Id);
         if (account == null)
@@ -132,7 +147,7 @@ public class AccountService : IAccountService
 
         return new ConfirmationResponse { IsSucceed = true, Message = "Account Has Been Updated Successfully" };
     }
-    public async Task<ConfirmationResponse> DeleteAccount(int id)
+    public async Task<ConfirmationResponse> Delete(int id)
     {
         var account = await _uow.Accounts.Get(id);
         if (account == null)
@@ -222,6 +237,10 @@ public class AccountService : IAccountService
             var parent = await _uow.Accounts.Get(DTO.ParentId.Value);
             if (parent is null)
                 return new GetAccountNumberAndLevelResponse { Message = "Parent Account Is Not Exist!" };
+
+            var parentHasJournals = await _uow.JournalDetail.Exists(d => d.AccountId == parent.Id);
+            if (parentHasJournals)
+                return new GetAccountNumberAndLevelResponse { Message = "This Account Can Not Has A Child Because It Has Transactions" };
 
             accountLevel = parent.Level + 1;
             if (accountLevel > settings.MaxAccountLevel)

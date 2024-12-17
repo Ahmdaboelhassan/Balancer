@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
-[Route("api/[controller]")]
+[Route("[controller]")]
 [ApiController]
 public class AccountController : ControllerBase
 {
@@ -15,46 +15,46 @@ public class AccountController : ControllerBase
         _serviceContext = serviceContext;
     }
 
-    [HttpGet("GetAccount/{id}")]
-    public async Task<IActionResult> GetAccount(int id)
+    [HttpGet("Get/{id}")]
+    public async Task<IActionResult> Get(int id)
     {
-        return Ok(await _serviceContext.AccountService.GetAccountById(id));
+        return Ok(await _serviceContext.AccountService.GetById(id));
     }
 
-    [HttpGet("GetAllAccounts")]
-    public async Task<IActionResult> GetAllAccounts()
+    [HttpGet("GetAll")]
+    public async Task<IActionResult> GetAll()
     {
-        return Ok(await _serviceContext.AccountService.GetAllAccounts());
+        return Ok(await _serviceContext.AccountService.GetAll());
     }
 
-    [HttpGet("AccountsSelect")]
-    public async Task<IActionResult> AccountsSelect()
+    [HttpGet("GetSelectList")]
+    public async Task<IActionResult> GetSelectList()
     {
-        return Ok(await _serviceContext.AccountService.GetAccountSelectList());
+        return Ok(await _serviceContext.AccountService.GetSelectList());
     }
 
-    [HttpPost("CreateAccount")]
-    public async Task<IActionResult> CreateAccount(CreateAccountDTO DTO)
+    [HttpPost("Create")]
+    public async Task<IActionResult> Create(CreateAccountDTO DTO)
     {
-        var result = await _serviceContext.AccountService.CreateAccount(DTO);
+        var result = await _serviceContext.AccountService.Create(DTO);
         if (!result.IsSucceed)
             return BadRequest(result.Message);
 
         return Ok(result.Message);
     }
-    [HttpPut("EditAccount")]
-    public async Task<IActionResult> EditAccount(CreateAccountDTO DTO)
+    [HttpPut("Edit")]
+    public async Task<IActionResult> Edit(CreateAccountDTO DTO)
     {
-        var result = await _serviceContext.AccountService.EditAccount(DTO);
+        var result = await _serviceContext.AccountService.Edit(DTO);
         if (!result.IsSucceed)
             return BadRequest(result.Message);
 
         return Ok(result.Message);
     }
-    [HttpDelete("DeleteAccount/{id}")]
-    public async Task<IActionResult> DeleteAccount(int id)
+    [HttpDelete("Delete/{id}")]
+    public async Task<IActionResult> Delete(int id)
     {
-        var result = await _serviceContext.AccountService.DeleteAccount(id);
+        var result = await _serviceContext.AccountService.Delete(id);
         if (!result.IsSucceed)
             return BadRequest(result.Message);
 

@@ -1,6 +1,7 @@
 ﻿using Application.IRepository;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.EntityFrameworkCore.Query;
 using System.Data;
 using System.Linq.Expressions;
@@ -88,6 +89,23 @@ public class Repository<T> : IRepository<T> where T : class
         return await query
             .Select(columns)
             .ToListAsync();
+    }
+    public async Task<IEnumerable<O>> SelectSome<O, K>(Expression<Func<T, bool>> criteria, Expression<Func<T, O>> columns, Expression<Func<T, K>> orderBy, int pageNum, int pageSize, params string[]? includes)
+    {
+        var query = _set
+            .AsNoTracking()
+            .Where(criteria)
+            .OrderByDescending(orderBy)
+            .Skip((pageNum - 1) * pageSize)
+            .Take(pageSize);
+
+        foreach (var item in includes)
+            query = query.Include(item);
+
+        return await query
+            .Select(columns)
+            .ToListAsync();
+
     }
     public async Task<bool> Exists(Expression<Func<T, bool>> criteria = null)
     {

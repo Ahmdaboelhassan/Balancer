@@ -6,14 +6,15 @@ using Application.Models;
 namespace Application.IServices;
 public interface IJournalService
 {
-    public Task<GetJournalDTO> NewJournal(int periodId);
-    public Task<GetJournalDTO> GetJournal(int id);
-    public Task<IEnumerable<JournalListItemDTO>> GetAllJournal(DateTime? from , DateTime? to);
-    public Task<IEnumerable<JournalListItemDTO>> GetAllJournal(int periodId);
+    public Task<GetJournalDTO> New(int periodId);
+    public Task<GetJournalDTO> Get(int id);
+    public Task<IEnumerable<JournalListItemDTO>> GetAll(int page);
+    public Task<IEnumerable<JournalListItemDTO>> GetPeriodJournals(int periodId);
+    public Task<IEnumerable<JournalListItemDTO>> GetAll(DateTime from , DateTime to);
+    public Task<IEnumerable<JournalListItemDTO>> Search(string criteria);
     public Task<int> GetNextCode();
-    public Task<IEnumerable<JournalDetailDTO>> GetAccountStatement(int? AccountId , DateTime? from , DateTime? to);
-    public Task<ConfirmationResponse> CreateJournal(CreateJournalDTO model);
-    public Task<ConfirmationResponse> EditJournal(CreateJournalDTO model);
-    public Task<ConfirmationResponse> DeleteJournal(int id);
+    public Task<ConfirmationResponse> Create(CreateJournalDTO model);
+    public Task<ConfirmationResponse> Edit(CreateJournalDTO model);
+    public Task<ConfirmationResponse> Delete(int id);
 
 }

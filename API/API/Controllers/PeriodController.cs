@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
-[Route("api/[controller]")]
+[Route("[controller]")]
 [ApiController]
 public class PeriodController : ControllerBase
 {
@@ -15,35 +15,45 @@ public class PeriodController : ControllerBase
         _services = serviceContext;
     }
 
-    [HttpGet("Periods")]
-    public async Task<IActionResult> Periods(DateTime? from  , DateTime? to)
+    [HttpGet("GetAll")]
+    public async Task<IActionResult> GetAll(int pages)
     {
-        return Ok(await _services.PeriodService.GetAllPeriods(from, to));
+        return Ok(await _services.PeriodService.GetAll(pages));
+    }
+    [HttpGet("FilterByTime")]
+    public async Task<IActionResult> FilterByTime(DateTime from  , DateTime to)
+    {
+        return Ok(await _services.PeriodService.GetAll(from, to));
+    }
+    [HttpGet("Search")]
+    public async Task<IActionResult> Search(string criteria)
+    {
+        return Ok(await _services.PeriodService.Search(criteria));
     }
 
-    [HttpGet("PeriodSelectList")]
-    public async Task<IActionResult> PeriodSelectList()
+    [HttpGet("GetSelectList")]
+    public async Task<IActionResult> GetSelectList()
     {
-        return Ok(await _services.PeriodService.GetAllPeriodSelectList());
+        return Ok(await _services.PeriodService.GetAllSelectList());
     }
 
-    [HttpGet("NewPeriod")]
-    public async Task<IActionResult> NewPeriod()
+    [HttpGet("New")]
+    public async Task<IActionResult> New()
     {
-        return Ok(await _services.PeriodService.GetNewPeriod());
+        return Ok(await _services.PeriodService.New());
     }
 
-    [HttpGet("Period/{id}")]
-    public async Task<IActionResult> Period(int id)
+    [HttpGet("Get/{id}")]
+    public async Task<IActionResult> Get(int id)
     {
-        return Ok(await _services.PeriodService.GetPeriodById(id));
+        return Ok(await _services.PeriodService.GetById(id));
     }
 
 
-    [HttpPost("CreatePeriod")]
-    public async Task<IActionResult> CreatePeriod(CreatePeriodDTO DTO)
+    [HttpPost("Create")]
+    public async Task<IActionResult> Create(CreatePeriodDTO DTO)
     {
-        var result = await _services.PeriodService.CreatePeriod(DTO);
+        var result = await _services.PeriodService.Create(DTO);
 
         if (result.IsSucceed)
             return Ok(result.Message);
@@ -51,10 +61,10 @@ public class PeriodController : ControllerBase
         return BadRequest(result.Message);
     }
 
-    [HttpPut("EditPeriod")]
-    public async Task<IActionResult> EditPeriod(CreatePeriodDTO DTO)
+    [HttpPut("Edit")]
+    public async Task<IActionResult> Edit(CreatePeriodDTO DTO)
     {
-        var result = await _services.PeriodService.EditPeriod(DTO);
+        var result = await _services.PeriodService.Edit(DTO);
 
         if (result.IsSucceed)
             return Ok(result.Message);
@@ -62,10 +72,10 @@ public class PeriodController : ControllerBase
         return BadRequest(result.Message);
     }
 
-    [HttpDelete("DeletePeriod/{id}")]
-    public async Task<IActionResult> DeletePeriod(int id)
+    [HttpDelete("Delete/{id}")]
+    public async Task<IActionResult> Delete(int id)
     {
-        var result = await _services.PeriodService.DeletePeriod(id);
+        var result = await _services.PeriodService.Delete(id);
 
         if (result.IsSucceed)
             return Ok(result.Message);

@@ -7,4 +7,5 @@ public class PeriodListItemDTO
     public DateTime To { get; set; }
     public bool IncreasedBalance { get; set; }
     public decimal TotalAmount { get; set; }
+    public int MaxPages { get; set; }
 }

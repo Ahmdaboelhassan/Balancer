@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Query;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.EntityFrameworkCore.Query;
 using System.Linq.Expressions;
 
 
@@ -14,6 +15,7 @@ public interface IRepository<T>
     Task<List<T>> GetAll(params string[]? includes);
     Task<List<T>> GetAll(Expression<Func<T, bool>> criteria, params string[]? includes);
     Task<IEnumerable<O>> SelectAll<O>(Expression<Func<T, bool>> criteria, Expression<Func<T, O>> columns, params string[]? includes);
+    Task<IEnumerable<O>> SelectSome<O,K>(Expression<Func<T, bool>> criteria, Expression<Func<T, O>> columns , Expression<Func<T, K>> orderBy, int pageNum, int pageSize, params string[]? includes);
     Task<bool> Exists(Expression<Func<T, bool>>? criteria = null);
     Task<int> Count(Expression<Func<T, bool>> criteria);
 
