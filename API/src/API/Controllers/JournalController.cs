@@ -14,11 +14,14 @@ public class JournalController : ControllerBase
         _serviceContext = serviceContext;
     }
 
-    [HttpGet("New/{periodId}")]
-    public async Task<IActionResult> New(int periodId)
-    {
-        return Ok(await _serviceContext.JournalService.New(periodId));
-
+    [HttpGet("New")]
+    public async Task<IActionResult> New(int? periodId)
+    {   
+        var result = await _serviceContext.JournalService.New(periodId);
+        if (result is null)
+            return BadRequest(new { message = "There Are No Period To Assign" });
+            
+        return Ok(result);
     }
 
     [HttpGet("Get/{id}")]
@@ -52,9 +55,9 @@ public class JournalController : ControllerBase
     {
         var result = await _serviceContext.JournalService.Create(model); 
         if (result.IsSucceed)
-            return Ok (result.Message);
+            return Ok (result);
 
-        return BadRequest(result.Message);
+        return BadRequest(result);
     }
 
     [HttpPut("Edit")]
@@ -62,9 +65,9 @@ public class JournalController : ControllerBase
     {
         var result = await _serviceContext.JournalService.Edit(model);
         if (result.IsSucceed)
-            return Ok(result.Message);
+            return Ok(result);
 
-        return BadRequest(result.Message);
+        return BadRequest(result);
     }
 
     [HttpDelete("Delete/{id}")]
@@ -72,9 +75,9 @@ public class JournalController : ControllerBase
     {
         var result = await _serviceContext.JournalService.Delete(id);
         if (result.IsSucceed)
-            return Ok(result.Message);
+            return Ok(result);
 
-        return BadRequest(result.Message);
+        return BadRequest(result);
     }
 
 

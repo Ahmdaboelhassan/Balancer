@@ -9,6 +9,7 @@ public interface IAccountService
     Task<IEnumerable<GetAccountDTO>> Search(string criteria);
     Task<IEnumerable<SelectItemDTO>> GetSelectList();
     Task<GetAccountDTO?> GetById(int id);
+    Task<decimal> GetBalance(int id);
     Task<ConfirmationResponse> Create(CreateAccountDTO DTO);
     Task<ConfirmationResponse> Edit(CreateAccountDTO DTO);
     Task<ConfirmationResponse> Delete(int id);

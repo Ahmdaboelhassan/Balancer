@@ -1,0 +1,163 @@
+<div class="bg-white rounded-lg p-10 mb-3">
+  <div>
+    <h1 class="text-slate-800 font-bold text-3xl mb-4">
+      {{ isEdit ? "Edit Journal" : "Create Journal" }}
+    </h1>
+    <hr />
+  </div>
+  @if(Journal() && JournalForm){
+  <div class="py-5">
+    <form [formGroup]="JournalForm" (submit)="SaveJournal()">
+      <input type="hidden" formControlName="id" />
+      <input type="hidden" formControlName="periodId" />
+      <div class="controls grid grid-cols-4 gap-5">
+        <div class="col-span-4 md:col-span-2">
+          <label for="details"> Detials </label>
+          <input
+            type="text"
+            id="details"
+            formControlName="details"
+            class="form-control w-full"
+          />
+        </div>
+        <div class="col-span-4 md:col-span-2">
+          <label for="amount"> Amount </label>
+          <input
+            (input)="ChangeBalances()"
+            type="number"
+            id="amount"
+            formControlName="amount"
+            class="form-control w-full"
+          />
+        </div>
+        <div class="col-span-4 md:col-span-1">
+          <label for="credit"> From Account </label>
+          <select
+            (change)="GetCreditBalance()"
+            class="form-control w-full"
+            id="credit"
+            formControlName="credit"
+          >
+            <option
+              *ngFor="let account of Journal().accounts"
+              [value]="account.id"
+            >
+              {{ account.name }}
+            </option>
+          </select>
+        </div>
+        <div class="col-span-4 md:col-span-1">
+          <label for="credit balance"> Source Current Balance </label>
+          <input
+            type="number"
+            class="form-control w-full"
+            formControlName="creditBalance"
+          />
+        </div>
+        <div class="col-span-4 md:col-span-1">
+          <label for="debit"> To Account</label>
+          <select
+            (change)="GetDebitBalance()"
+            class="form-control w-full"
+            id="debit"
+            formControlName="debit"
+          >
+            <option
+              *ngFor="let account of Journal().accounts"
+              [value]="account.id"
+            >
+              {{ account.name }}
+            </option>
+          </select>
+        </div>
+        <div class="col-span-4 md:col-span-1">
+          <label for="detail"> Distination Current Balance </label>
+          <input
+            type="number"
+            class="form-control w-full"
+            formControlName="debitBalance"
+          />
+        </div>
+        <div class="col-span-4 md:col-span-1">
+          <label for="costCenter"> Cost Center </label>
+          <select
+            id="costCenter"
+            formControlName="costCenter"
+            class="form-control w-full"
+          >
+            <option
+              *ngFor="let account of Journal().costCenters"
+              [value]="account.id"
+            >
+              {{ account.name }}
+            </option>
+          </select>
+        </div>
+        <div class="col-span-4 md:col-span-1">
+          <label for="detail"> Code </label>
+          <input
+            type="number"
+            class="form-control w-full"
+            formControlName="code"
+          />
+        </div>
+        @if (isEdit) {
+        <div class="col-span-4 md:col-span-1">
+          <label for="detail"> Created </label>
+          <input
+            type="text"
+            class="form-control w-full"
+            formControlName="created"
+          />
+        </div>
+        <div class="col-span-4 md:col-span-1">
+          <label for="detail"> Last Update </label>
+          <input
+            type="text"
+            class="form-control w-full"
+            formControlName="lastUpdate"
+          />
+        </div>
+        }
+        <div class="col-span-4">
+          <label for="descroption"> Description </label>
+          <textarea
+            class="form-control w-full resize-none"
+            formControlName="description"
+          ></textarea>
+        </div>
+      </div>
+      <div
+        class="mt-5 flex text-center md:justify-items-start md:flex-row flex-col"
+      >
+        <button
+          type="submit"
+          class="btn-save me-2"
+          [disabled]="!JournalForm.valid"
+        >
+          Save
+        </button>
+        <a routerLink="/Journal/List" class="btn-primary me-2">List</a>
+        @if(isEdit){
+        <a
+          (click)="DeleteJournal(Journal().id)"
+          class="btn-danger me-2"
+          role="button"
+          type="button"
+        >
+          Delete
+        </a>
+        }
+        <a [routerLink]="['/Period', 'Create']" class="btn-add me-2"
+          >New Period</a
+        >
+        <a
+          [routerLink]="['/Period', 'PeriodJournals', Journal().periodId]"
+          class="btn-add me-2"
+          >Period Journals</a
+        >
+      </div>
+    </form>
+  </div>
+  }
+</div>

@@ -31,18 +31,18 @@ public class CostCenterController : ControllerBase
     {
         var result = await _serviceContext.CostCenterService.Create(DTO);
         if (!result.IsSucceed)
-            return BadRequest(result.Message);
+            return BadRequest(result);
 
-        return Ok(result.Message);
+        return Ok(result);
     }
     [HttpPut("Edit")]
     public async Task<IActionResult> Edit(CreateCostCenter DTO)
     {
         var result = await _serviceContext.CostCenterService.Edit(DTO);
         if (!result.IsSucceed)
-            return BadRequest(result.Message);
+            return BadRequest(result);
 
-        return Ok(result.Message);
+        return Ok(result);
     }
 
 
@@ -51,8 +51,8 @@ public class CostCenterController : ControllerBase
     {
         var result = await _serviceContext.CostCenterService.Delete(id);
         if (!result.IsSucceed)
-            return BadRequest(result.Message);
+            return BadRequest(result);
 
-        return Ok(result.Message);
+        return Ok(result);
     }
 }

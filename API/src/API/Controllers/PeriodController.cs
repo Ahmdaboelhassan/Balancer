@@ -56,9 +56,9 @@ public class PeriodController : ControllerBase
         var result = await _services.PeriodService.Create(DTO);
 
         if (result.IsSucceed)
-            return Ok(result.Message);
+            return Ok(result);
 
-        return BadRequest(result.Message);
+        return BadRequest(result);
     }
 
     [HttpPut("Edit")]
@@ -67,9 +67,9 @@ public class PeriodController : ControllerBase
         var result = await _services.PeriodService.Edit(DTO);
 
         if (result.IsSucceed)
-            return Ok(result.Message);
+            return Ok(result);
 
-        return BadRequest(result.Message);
+        return BadRequest(result);
     }
 
     [HttpDelete("Delete/{id}")]
@@ -78,9 +78,9 @@ public class PeriodController : ControllerBase
         var result = await _services.PeriodService.Delete(id);
 
         if (result.IsSucceed)
-            return Ok(result.Message);
+            return Ok(result);
 
-        return BadRequest(result.Message);
+        return BadRequest(result);
     }
 
 

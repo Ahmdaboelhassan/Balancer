@@ -1,0 +1,17 @@
+<header
+  class="bg-white rounded-xl flex justify-between text-center items-center flex-col md:flex-row h-32 md:h-20 py-3 px-10 shadow-sm"
+>
+  <input
+    #key
+    class="md:w-1/2 w-full form-control"
+    required
+    placeholder="Seach"
+  />
+  <button
+    (click)="Seach(key)"
+    type="button"
+    class="btn-primary w-full md:w-1/4"
+  >
+    Search
+  </button>
+</header>

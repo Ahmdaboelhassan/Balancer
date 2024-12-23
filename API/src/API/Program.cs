@@ -8,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddCors();
 
 builder.Services
     .AddInfrastructureLayer(builder.Configuration)
@@ -22,6 +23,10 @@ app.UseSwaggerUI();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+app.UseCors( opt =>
+    opt.AllowAnyOrigin()
+       .AllowAnyHeader()
+       .AllowAnyMethod());
 
 app.MapControllers();
 

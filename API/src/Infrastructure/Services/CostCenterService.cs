@@ -91,6 +91,9 @@ public class CostCenterService : ICostCenterService
         if (costCenter is null)
             return new ConfirmationResponse { Message = "Invalid Cost Center" };
 
+        if (await _uow.JournalDetail.Exists(d => d.CostCenterId == id))
+            return new ConfirmationResponse { Message = "Can't Delete Cost Center It Has Journal" };
+
         costCenter.IsDeleted = true;
 
         _uow.CostCenter.Update(costCenter);

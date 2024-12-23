@@ -15,14 +15,16 @@ internal class PeriodService : IPeriodService
     }
     public async Task<IEnumerable<PeriodListItemDTO>> Search(string criteria)
     {
-        return await _uow.Periods.SelectAll(p => p.Name.Contains(criteria), sp => new PeriodListItemDTO
+        var periods = await _uow.Periods.GetAll(p => p.Name.Contains(criteria));
+
+        return periods.OrderByDescending(p => p.To).Select( sp => new PeriodListItemDTO
         {
             Id = sp.Id,
             Name = sp.Name,
-            From = sp.From,
-            To = sp.To,
+            From = sp.From.ToShortDateString(),
+            To = sp.To.ToShortDateString(),
             TotalAmount = sp.TotalAmount,
-            IncreasedBalance = sp.TotalAmount > 0,
+            IncreasedBalance = sp.TotalAmount >= 0,
 
         });
     }
@@ -35,42 +37,43 @@ internal class PeriodService : IPeriodService
           {
               Id = sp.Id,
               Name = sp.Name,
-              From = sp.From,
-              To = sp.To,
+              From = sp.From.ToShortDateString(),
+              To = sp.To.ToShortDateString(),
               TotalAmount = sp.TotalAmount,
-              IncreasedBalance = sp.TotalAmount > 0,
+              IncreasedBalance = sp.TotalAmount >= 0,
 
           }, p => p.To, page, pageSize);
     }
     public async Task<IEnumerable<PeriodListItemDTO>> GetAll(DateTime From, DateTime To)
     {
-        return await _uow.Periods.SelectAll( p => p.From >= From.Date && p.To <= To.Date, sp => new PeriodListItemDTO
+        var periods = await _uow.Periods.GetAll(p => p.From >= From.Date && p.From <= To.Date);  
+        return periods.OrderByDescending(p => p.To).Select(sp => new PeriodListItemDTO
         {
             Id = sp.Id,
             Name = sp.Name,
-            From = sp.From,
-            To = sp.To,
+            From = sp.From.ToShortDateString(),
+            To = sp.To.ToShortDateString(),
             TotalAmount = sp.TotalAmount,
-            IncreasedBalance = sp.TotalAmount > 0,
-            
+            IncreasedBalance = sp.TotalAmount >= 0,
         });
-  
     }
+
     public async Task<IEnumerable<SelectItemDTO>> GetAllSelectList()
     {
         var periods = await _uow.Periods.GetAll();
         return periods.OrderByDescending(p => p.CreatedAt).Select(p => new SelectItemDTO { Id = p.Id, Name = p.Name });
     }
-    public async Task<GetPeriodDTO> New()
+    public async Task<GetPeriodDTO?> New()
     {
         var DTO = new GetPeriodDTO();
-        var LastPeriod = await _uow.Periods.GetLastOrderBy(p => p.Id);
+        var lastPeriod = await _uow.Periods.GetLastOrderBy(p => p.Id);
+        if (lastPeriod is null)
+            return null;
         var Settings = await _uow.Settings.GetFirst();
-
         DTO.DaysCount = Settings?.DefaultPeriodDays ?? 7;
-        DTO.From = LastPeriod != null ? LastPeriod.To.AddDays(1) : DateTime.Now;
-        DTO.To = DTO.From.AddDays(DTO.DaysCount);
-
+        DTO.From = lastPeriod != null ? lastPeriod.To.AddDays(1) : DateTime.Now;
+        DTO.To = DTO.From.AddDays(DTO.DaysCount - 1);
+        DTO.Notes = $"New Period In {DateTime.Now.ToShortTimeString()}";
         return DTO;
     }
     public async Task<GetPeriodDTO> GetById(int id)
@@ -80,19 +83,10 @@ internal class PeriodService : IPeriodService
         if (period == null)
             return null;
 
-        var journals = period.Journals.Select(j => new JournalListItemDTO
-        {
-            Code = j.Code,
-            CreatedAt = j.CreatedAt,
-            Detail = j.Detail,
-            Type = j.Type,
-            Amount = j.Amount,
-            Notes = j.Notes,
-        });
 
         var periodDto = new GetPeriodDTO
         {
-            CreatedAt = period.CreatedAt,
+            CreatedAt = period.CreatedAt.ToString("F"),
             DaysCount = period.DaysCount,
             From = period.From,
             To = period.To,
@@ -100,7 +94,7 @@ internal class PeriodService : IPeriodService
             Name = period.Name,
             Notes = period.Notes,
             TotalAmount = period.TotalAmount,
-            LastUpdatedAt = period.LastUpdatedAt
+            LastUpdatedAt = period.LastUpdatedAt?.ToString("F") ?? "",
         };
 
         return periodDto;
@@ -111,20 +105,9 @@ internal class PeriodService : IPeriodService
         if (lastPeriod == null)
             return null;
 
-        var journals = lastPeriod.Journals.Select(j => new JournalListItemDTO
-        {
-            Code = j.Code,
-            CreatedAt = j.CreatedAt,
-            Detail = j.Detail,
-            Type = j.Type,
-            Amount = j.Amount,
-            Notes = j.Notes,
-            
-        });
-
         var lastPeriodDto = new GetPeriodDTO
         {
-            CreatedAt = lastPeriod.CreatedAt,
+            CreatedAt = lastPeriod.CreatedAt.ToString("F"),
             DaysCount = lastPeriod.DaysCount,
             From = lastPeriod.From,
             To = lastPeriod.To,
@@ -132,17 +115,16 @@ internal class PeriodService : IPeriodService
             Name = lastPeriod.Name,
             Notes = lastPeriod.Notes,
             TotalAmount = lastPeriod.TotalAmount,
+            LastUpdatedAt = lastPeriod.LastUpdatedAt?.ToString("F") ?? "",
         };
-
-        if (lastPeriod.LastUpdatedAt.HasValue)
-            lastPeriodDto.LastUpdatedAt = lastPeriod.LastUpdatedAt.Value;
 
         return lastPeriodDto;
     }
     public async Task<ConfirmationResponse> Create(CreatePeriodDTO DTO)
     {
         var From = DTO.From;
-        var To = DTO.From.AddDays(DTO.DaysCount);
+        var To = DTO.To;
+
         int periodNo = await GetPeriodNumber(From);
 
         var periodName = $"Period No. {periodNo} In Month {From.Month} In Year {From.Year}";
@@ -162,22 +144,26 @@ internal class PeriodService : IPeriodService
     }
     public async Task<ConfirmationResponse> Edit(CreatePeriodDTO DTO)
     {
+        if (DTO.Id == 0)
+            return await Create(DTO);
+
+        var period = await _uow.Periods.Get(DTO.Id);
+        if (period is null)
+            return new ConfirmationResponse { IsSucceed = false, Message = "Period Is Not Exist!" };
+
         var From = DTO.From;
-        var To = DTO.From.AddDays(DTO.DaysCount);
         int periodNo = await GetPeriodNumber(From);
 
         var periodName = $"Period No. {periodNo} In Month {From.Month} In Year {From.Year}";
 
-        var newPeriod = new Period
-        {
-            Name = periodName,
-            From = DTO.From,
-            To = To,
-            CreatedAt = DateTime.Now,
-            DaysCount = DTO.DaysCount,
-            Notes = DTO.Notes,
-        };
-        _uow.Periods.Update(newPeriod);
+        period.Name = periodName;
+        period.From = DTO.From;
+        period.To = DTO.To;
+        period.LastUpdatedAt = DateTime.Now;
+        period.DaysCount = DTO.DaysCount;
+        period.Notes = DTO.Notes;
+
+        _uow.Periods.Update(period);
         await _uow.SaveChangesAync();
         return new ConfirmationResponse { IsSucceed = true, Message = "Period Has Been Updated Successfully" };
     }

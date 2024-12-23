@@ -1,0 +1,25 @@
+<header
+  class="bg-white rounded-xl flex justify-evenly text-center items-center flex-col md:flex-row h-56 md:h-20 p-3 shadow-sm"
+>
+  <input
+    type="date"
+    class="md:w-1/4 w-full form-control"
+    required
+    #fromDate
+    [value]="from"
+  />
+  <label class="w-20 text-slate-900 font-bold text-xl">To</label>
+  <input
+    type="date"
+    class="md:w-1/4 w-full form-control"
+    #toDate
+    [value]="to"
+  />
+  <button
+    type="button"
+    class="btn-primary w-full md:w-2/12"
+    (click)="EmitDatesValue(fromDate, toDate)"
+  >
+    Search
+  </button>
+</header>

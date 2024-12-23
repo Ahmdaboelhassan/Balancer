@@ -1,0 +1,7 @@
+<div class="p-10 grid grid-cols-1 justify-center gap-3">
+  @for (item of periods; track $index) {
+  <div class="col-span-1">
+    <app-period-list-item [item]="item"></app-period-list-item>
+  </div>
+  }
+</div>

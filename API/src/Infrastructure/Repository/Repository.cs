@@ -118,7 +118,10 @@ public class Repository<T> : IRepository<T> where T : class
     {
         return _set.CountAsync(criteria);
     }
-
+    public Task<decimal> Sum(Expression<Func<T, decimal>> criteria)
+    {
+        return _set.SumAsync(criteria);
+    }
     // Commands
     public async Task AddAsync(T element)
     {

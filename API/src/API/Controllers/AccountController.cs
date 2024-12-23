@@ -20,6 +20,11 @@ public class AccountController : ControllerBase
     {
         return Ok(await _serviceContext.AccountService.GetById(id));
     }
+    [HttpGet("GetBalance/{id}")]
+    public async Task<IActionResult> GetBalance(int id)
+    {
+        return Ok(new { balance =  await _serviceContext.AccountService.GetBalance(id)});
+    }
 
     [HttpGet("GetAll")]
     public async Task<IActionResult> GetAll()
@@ -38,27 +43,27 @@ public class AccountController : ControllerBase
     {
         var result = await _serviceContext.AccountService.Create(DTO);
         if (!result.IsSucceed)
-            return BadRequest(result.Message);
+            return BadRequest(result);
 
-        return Ok(result.Message);
+        return Ok(result);
     }
     [HttpPut("Edit")]
     public async Task<IActionResult> Edit(CreateAccountDTO DTO)
     {
         var result = await _serviceContext.AccountService.Edit(DTO);
         if (!result.IsSucceed)
-            return BadRequest(result.Message);
+            return BadRequest(result);
 
-        return Ok(result.Message);
+        return Ok(result);
     }
     [HttpDelete("Delete/{id}")]
     public async Task<IActionResult> Delete(int id)
     {
         var result = await _serviceContext.AccountService.Delete(id);
         if (!result.IsSucceed)
-            return BadRequest(result.Message);
+            return BadRequest(result);
 
-        return Ok(result.Message);
+        return Ok(result);
     }
 
 }

@@ -1,0 +1,118 @@
+<div class="bg-white rounded-lg p-10 mb-3">
+  <div>
+    <h1 class="text-slate-800 font-bold text-3xl mb-4">
+      {{ isEdit ? "Edit Period" : "Create Period" }}
+    </h1>
+    <hr />
+  </div>
+  <div class="py-5">
+    @if(periodForm){
+    <form [formGroup]="periodForm" (ngSubmit)="Submit()">
+      <input type="hidden" formControlName="id" />
+      <div class="grid grid-cols-2 gap-4">
+        @if (isEdit) {
+        <div class="form-group col-span-2 md:col-span-1">
+          <label for="name">Name</label>
+
+          <input
+            formControlName="name"
+            readonly
+            type="text"
+            id="name"
+            class="form-control w-full"
+          />
+        </div>
+        <div class="form-group col-span-2 md:col-span-1">
+          <label for="Amount">Amount</label>
+          <input
+            formControlName="totalAmount"
+            type="text"
+            readonly
+            id="Amount"
+            class="form-control w-full"
+          />
+          <span></span>
+        </div>
+        }
+        <div class="form-group col-span-2 md:col-span-1">
+          <label for="From">From</label>
+          <input
+            type="date"
+            formControlName="from"
+            id="From"
+            class="form-control w-full"
+          />
+          <span></span>
+        </div>
+        <div class="form-group col-span-2 md:col-span-1">
+          <label for="To">To</label>
+          <input formControlName="to" type="date" class="form-control w-full" />
+          <span></span>
+        </div>
+        @if (isEdit) {
+        <div class="form-group col-span-2 md:col-span-1">
+          <label for="CreatedAt">Created</label>
+          <input
+            formControlName="createdAt"
+            type="text"
+            id="CreatedAt"
+            class="form-control w-full"
+          />
+          <span></span>
+        </div>
+        <div class="form-group col-span-2 md:col-span-1">
+          <label for="LastUpdatedAt">Last Updated</label>
+          <input
+            type="text"
+            id="LastUpdatedAt"
+            class="form-control w-full"
+            formControlName="lastUpdatedAt"
+          />
+          <span></span>
+        </div>
+        }
+        <div class="form-group col-span-2 md:col-span-1">
+          <label for="Notes">Notes</label>
+          <input
+            formControlName="notes"
+            type="text"
+            id="Notes"
+            class="form-control w-full"
+          />
+          <span></span>
+        </div>
+        <div class="form-group col-span-2 md:col-span-1">
+          <label for="DaysCount">Days Count</label>
+          <input
+            type="number"
+            readonly
+            id="DaysCount"
+            class="form-control w-full"
+            formControlName="daysCount"
+          />
+          <span></span>
+        </div>
+      </div>
+
+      <div class="mt-5">
+        <button type="submit" class="btn-save me-2">Save</button>
+        <a routerLink="/Period/List" class="btn-primary me-2">List</a>
+        @if(isEdit){
+        <button (click)="DeletePeriod()" class="btn-danger me-2">Delete</button>
+        <a
+          [routerLink]="['/Journal', 'Create']"
+          [queryParams]="{ periodId: period.id }"
+          class="btn-add me-2"
+          >New Journal</a
+        >
+        <a
+          [routerLink]="['/Period', 'PeriodJournals', period.id]"
+          class="btn-add me-2"
+          >Journals List</a
+        >
+        }
+      </div>
+    </form>
+    }
+  </div>
+</div>

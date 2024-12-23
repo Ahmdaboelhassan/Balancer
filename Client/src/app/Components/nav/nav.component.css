@@ -1,0 +1,16 @@
+ul a {
+  font-weight: bold;
+}
+
+mat-expansion-panel {
+  background-color: transparent;
+  color: white;
+}
+
+mat-panel-title {
+  color: #eee;
+}
+
+.route-active {
+  @apply text-slate-950;
+}

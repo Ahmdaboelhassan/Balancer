@@ -1,0 +1,39 @@
+<a
+  [routerLink]="['/Journal', 'Edit', journal.id]"
+  class="block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 mb-2 flex justify-between"
+>
+  <div>
+    <h4 class="mb-1 text-2xl font-bold tracking-tight text-gray-900">
+      {{ journal.detail }}
+    </h4>
+    <p class="mb-1 text-gray-600 font-bold">{{ journal.createdAt }}</p>
+    <p class="mb-1 text-gray-400 font-bold">{{ journal.notes }}</p>
+    <div class="mt-3 text-end"></div>
+  </div>
+  <div>
+    @if(journal.type === 1){
+    <div class="amount flex items-center text-3xl text-green-500">
+      <h1 class="me-2">{{ journal.amount }}</h1>
+      <i class="fa-solid fa-square-plus"></i>
+    </div>
+    } @else if(journal.type === 2){
+    <div class="amount flex items-center text-3xl text-red-400">
+      <h1 class="me-2">{{ journal.amount }}</h1>
+      <i class="fa-solid fa-square-minus"></i>
+    </div>
+
+    } @else if(journal.type === 3){
+
+    <div class="amount flex items-center text-3xl text-blue-400">
+      <h1 class="me-2">{{ journal.amount }}</h1>
+      <i class="fa-solid fa-thumbtack"></i>
+    </div>
+
+    } @else {
+    <div class="amount flex items-center text-3xl text-orange-400">
+      <h1 class="me-2">{{ journal.amount }}</h1>
+      <i class="fa-solid fa-reply fa-flip-horizontal"></i>
+    </div>
+    }
+  </div>
+</a>
