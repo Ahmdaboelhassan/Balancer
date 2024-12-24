@@ -8,6 +8,10 @@ import { CreateJournalComponent } from './Components/journal/create-journal/crea
 import { SearchJournalComponent } from './Components/journal/search-journal/search-journal.component';
 import { JournalComponent } from './Components/journal/journal.component';
 import { PeriodJournalsComponent } from './Components/period/period-journals/period-journals.component';
+import { AccountComponent } from './Components/account/account.component';
+import { CreateAccountComponent } from './Components/account/create-account/create-account.component';
+import { CreateCostcenterComponent } from './Components/costcenter/create-costcenter/create-costcenter.component';
+import { CostcenterComponent } from './Components/costcenter/costcenter.component';
 
 export const routes: Routes = [
   { path: 'Home', loadComponent: () => HomeComponent },
@@ -35,6 +39,24 @@ export const routes: Routes = [
         path: 'PeriodJournals/:id',
         loadComponent: () => PeriodJournalsComponent,
       },
+    ],
+  },
+  {
+    path: 'Account',
+    children: [
+      { path: '', redirectTo: 'List', pathMatch: 'full' },
+      { path: 'Create', loadComponent: () => CreateAccountComponent },
+      { path: 'Edit/:id', loadComponent: () => CreateAccountComponent },
+      { path: 'List', loadComponent: () => AccountComponent },
+    ],
+  },
+  {
+    path: 'CostCenter',
+    children: [
+      { path: '', redirectTo: 'List', pathMatch: 'full' },
+      { path: 'Create', loadComponent: () => CreateCostcenterComponent },
+      { path: 'Edit/:id', loadComponent: () => CreateCostcenterComponent },
+      { path: 'List', loadComponent: () => CostcenterComponent },
     ],
   },
   { path: '**', loadComponent: () => HomeComponent, pathMatch: 'full' },

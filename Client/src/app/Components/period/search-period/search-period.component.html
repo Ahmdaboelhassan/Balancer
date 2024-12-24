@@ -1,4 +1,4 @@
-<app-search (Search)="SearchPeriod($event)"></app-search>
+<app-search [Amount]="summary" (Search)="SearchPeriod($event)"></app-search>
 <main class="search-result bg-white mt-4 rounded-xl shadow-sm">
   <app-period-list [periods]="items"></app-period-list>
 </main>

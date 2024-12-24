@@ -146,7 +146,17 @@ export class CreateJournalComponent {
       this.journalService.SaveJournal(journal).subscribe({
         next: (result) => {
           this.toastr.success(result.message, 'Create Journal');
-          this.router.navigate(['/Journal', 'List']);
+          this.router.navigate(['/Journal', 'Create']).then(() => {
+            this.journalAmount = 0;
+            this.JournalForm.patchValue({
+              amount: 0,
+              details: '',
+              description: '',
+              code: this.JournalForm.get('code').value + 1,
+            });
+            this.GetCreditBalance();
+            this.GetDebitBalance();
+          });
         },
         error: (error) => {
           this.toastr.error(error.error.message, 'Create Journal');

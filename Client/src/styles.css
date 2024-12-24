@@ -226,17 +226,17 @@ button.toast-close-button {
   border-radius: 0.75rem;
 }
 .btn-primary {
-  @apply my-1 text-white bg-blue-700 hover:bg-blue-800 font-medium rounded-lg text-sm px-7 py-2.5;
+  @apply my-1 inline-block text-white bg-blue-700 hover:bg-blue-800 font-medium rounded-lg text-sm px-7 py-3;
 }
 .btn-save {
-  @apply my-1 text-white  bg-green-700 hover:bg-green-800 disabled:bg-green-300 font-medium rounded-lg text-sm px-7 py-2.5;
+  @apply my-1 inline-block text-white  bg-green-700 hover:bg-green-800 disabled:bg-green-300 font-medium rounded-lg text-sm px-7 py-3;
 }
 .btn-danger {
-  @apply my-1 text-white bg-red-700 hover:bg-red-800  font-medium rounded-lg text-sm px-7 py-2.5;
+  @apply my-1 inline-block text-white bg-red-700 hover:bg-red-800  font-medium rounded-lg text-sm px-7 py-3;
 }
 .btn-add {
-  @apply my-1 text-white bg-slate-700 hover:bg-slate-800 font-medium rounded-lg text-sm px-7 py-2.5;
+  @apply my-1 inline-block text-white bg-slate-700 hover:bg-slate-800 font-medium rounded-lg text-sm px-7 py-3;
 }
 .form-control {
-  @apply my-1 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus-visible:ring-slate-700 focus-visible:border-slate-700 shadow-sm block p-2.5 outline-none;
+  @apply my-1 inline-block bg-gray-50 border border-gray-300 text-gray-900 text-lg rounded-lg focus-visible:ring-slate-700 focus-visible:border-slate-700 shadow-sm block p-2.5 outline-none;
 }

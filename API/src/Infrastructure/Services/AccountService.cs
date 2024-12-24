@@ -35,7 +35,7 @@ public class AccountService : IAccountService
                 AccountNumber = a.Number,
                 ParentNumber = a.Parent?.Number,
                 ParentName = a.Parent?.Name,
-                IsParent = a.IsParent
+                IsParent = a.IsParent,
             });
     }
     public async Task<IEnumerable<GetAccountDTO>> Search(string criteria) {
@@ -55,7 +55,7 @@ public class AccountService : IAccountService
     }
     public async Task<IEnumerable<SelectItemDTO>> GetSelectList()
     {
-        var accounts = await _uow.Accounts.SelectAll(a => !a.IsParent, a => new SelectItemDTO { Id = a.Id, Name = a.Name });
+        var accounts = await _uow.Accounts.SelectAll(a => true, a => new SelectItemDTO { Id = a.Id, Name = a.Name });
         return accounts.OrderBy(a => a.Name);
     }
     public async Task<GetAccountDTO?> GetById(int id)
@@ -65,6 +65,7 @@ public class AccountService : IAccountService
         if (account is null || id == 0)
             return new GetAccountDTO();
 
+        var accounts = await _uow.Accounts.SelectAll(a => a.Id != id, a => new SelectItemDTO { Id = a.Id, Name = a.Name });
         return new GetAccountDTO
         {
             Id = account.Id,
@@ -74,7 +75,8 @@ public class AccountService : IAccountService
             AccountNumber = account.Number,
             ParentNumber = account.Parent?.Number,
             ParentName = account.Parent?.Name, 
-            IsParent = account.IsParent
+            IsParent = account.IsParent,
+            Accounts = accounts
         };
     }
     public async Task<ConfirmationResponse> Create(CreateAccountDTO DTO)

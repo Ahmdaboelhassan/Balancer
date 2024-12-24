@@ -1,12 +1,17 @@
 <a
   [routerLink]="['/Journal', 'Edit', journal.id]"
-  class="block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 mb-2 flex justify-between"
+  class="p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 flex justify-between"
 >
   <div>
-    <h4 class="mb-1 text-2xl font-bold tracking-tight text-gray-900">
+    <h4 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">
       {{ journal.detail }}
     </h4>
-    <p class="mb-1 text-gray-600 font-bold">{{ journal.createdAt }}</p>
+    <p class="mb-1 text-gray-600 font-bold">
+      Period-ID {{ journal.periodId }} | Code {{ journal.code }}
+    </p>
+    <p class="mb-1 text-gray-500 font-bold">
+      {{ journal.createdAt }}
+    </p>
     <p class="mb-1 text-gray-400 font-bold">{{ journal.notes }}</p>
     <div class="mt-3 text-end"></div>
   </div>

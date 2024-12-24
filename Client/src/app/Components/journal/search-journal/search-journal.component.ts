@@ -13,6 +13,7 @@ import { Title } from '@angular/platform-browser';
 })
 export class SearchJournalComponent {
   journals: any;
+  summary: number = 0;
   journalService = inject(JournalService);
   toestr = inject(ToastrService);
 
@@ -28,6 +29,10 @@ export class SearchJournalComponent {
     this.journalService.SearchJournals(key).subscribe({
       next: (result) => {
         this.journals = result;
+        this.summary = this.journals.reduce(
+          (acc, journal) => acc + journal.amount,
+          0
+        );
       },
     });
   }

@@ -28,7 +28,6 @@ export class PeriodJournalsComponent implements OnInit {
 
   getPeriodJournals() {
     this.journalService.GetPeriodJournals(this.periodId).subscribe((result) => {
-      console.log(result);
       this.model = result;
     });
   }

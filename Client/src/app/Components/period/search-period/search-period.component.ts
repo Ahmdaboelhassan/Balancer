@@ -14,7 +14,7 @@ import { Title } from '@angular/platform-browser';
 })
 export class SearchPeriodComponent {
   items: PeriodListItem | any = [];
-
+  summary: number = 0;
   constructor(
     private periodService: PeriodService,
     private toester: ToastrService,
@@ -32,6 +32,10 @@ export class SearchPeriodComponent {
     this.periodService.SearchPeriod(key).subscribe({
       next: (result: PeriodListItem | any) => {
         this.items = result;
+        this.summary = this.items.reduce(
+          (acc, period) => acc + period.totalAmount,
+          0
+        );
       },
     });
   }

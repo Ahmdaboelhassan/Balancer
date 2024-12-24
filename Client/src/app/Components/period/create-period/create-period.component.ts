@@ -56,7 +56,6 @@ export class CreatePeriodComponent implements OnInit {
         .GetCreatePeriod()
         .pipe(finalize(() => this.intializeForm()))
         .subscribe((period) => {
-          console.log(period);
           this.period = period;
         });
     }

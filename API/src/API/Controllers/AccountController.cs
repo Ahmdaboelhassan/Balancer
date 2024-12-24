@@ -20,6 +20,11 @@ public class AccountController : ControllerBase
     {
         return Ok(await _serviceContext.AccountService.GetById(id));
     }
+    [HttpGet("Search")]
+    public async Task<IActionResult> Get(string criteria)
+    {
+        return Ok(await _serviceContext.AccountService.Search(criteria));
+    }
     [HttpGet("GetBalance/{id}")]
     public async Task<IActionResult> GetBalance(int id)
     {

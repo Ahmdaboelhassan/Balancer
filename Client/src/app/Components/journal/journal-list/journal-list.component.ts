@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { JournalListItemComponent } from './journal-list-item/journal-list-item.component';
 import { JournalListItem } from '../../../Interfaces/Response/JournalListItem';
 
@@ -10,4 +10,5 @@ import { JournalListItem } from '../../../Interfaces/Response/JournalListItem';
 })
 export class JournalListComponent {
   @Input() journals: JournalListItem[] | any;
+  @Input() summary: 0;
 }

@@ -7,6 +7,16 @@
     required
     placeholder="Seach"
   />
+  @if(Amount){
+  <input
+    class="md:w-1/5 w-full text-center my-1 bg-gray-50 border border-gray-300 font-bold text-lg rounded-lg focus-visible:ring-slate-700 focus-visible:border-slate-700 shadow-sm block p-2.5 outline-none"
+    required
+    placeholder="Total Amount"
+    [ngClass]="Amount <= 0 ? 'text-red-500' : 'text-green-500'"
+    disabled
+    [value]="Amount"
+  />
+  }
   <button
     (click)="Seach(key)"
     type="button"

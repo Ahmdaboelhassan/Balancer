@@ -6,6 +6,7 @@ using Application.IServices;
 using Application.Models;
 using Domain;
 using Domain.Models;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using static Azure.Core.HttpHeader;
 
@@ -44,7 +45,6 @@ internal class JournalService : IJournalService
             Code = code,
             DebitAccountId = settings.DefaultDebitAccount.GetValueOrDefault(),
             CreditAccountId = settings.DefaultCreditAccount.GetValueOrDefault(),
-            Description = $"New Journal",
             PeriodId = jouranlPeriod.Value,
         };
     }
@@ -92,7 +92,8 @@ internal class JournalService : IJournalService
             Code = a.Code,
             CreatedAt = a.CreatedAt.ToString("F"),
             Detail = a.Detail,
-            Notes = a.Notes
+            Notes = a.Notes,
+            periodId = a.PeriodId,
         });
 
         return journals.OrderByDescending(j => j.Id);
@@ -122,8 +123,11 @@ internal class JournalService : IJournalService
             Code = a.Code,
             CreatedAt = a.CreatedAt.ToString("F"),
             Detail = a.Detail,
-            Notes = a.Notes
+            Notes = a.Notes,
+            periodId = a.PeriodId,
+            
         });
+
 
         return journals.OrderByDescending(j => j.Id);
     }

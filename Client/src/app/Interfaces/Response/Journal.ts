@@ -1,3 +1,6 @@
+import { AccountSelectList } from './AccountSelectList';
+import { CostCenterSelectList } from './CostCenterSelectList';
+
 export interface Journal {
   id: number;
   code: number;
@@ -5,8 +8,8 @@ export interface Journal {
   createdAt: string;
   lastUpdatedAt: any;
   type: number;
-  accounts: Account[];
-  costCenters: CostCenter[];
+  accounts: AccountSelectList[];
+  costCenters: CostCenterSelectList[];
   detail: any;
   description: any;
   amount: number;
@@ -14,14 +17,4 @@ export interface Journal {
   costCenterId: any;
   creditAccountId: number;
   debitAccountId: number;
-}
-
-export interface Account {
-  id: number;
-  name: string;
-}
-
-export interface CostCenter {
-  id: number;
-  name: string;
 }
