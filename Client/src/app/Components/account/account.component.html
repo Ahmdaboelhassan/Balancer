@@ -1,0 +1,7 @@
+<app-search
+  (Search)="SearchAccounts($event)"
+  [Amount]="AccountCounts"
+></app-search>
+<div class="mt-4 bg-white rounded-xl p-5 min-h-[calc(100%-13vh)]">
+  <app-accounts-list [accounts]="accounts"></app-accounts-list>
+</div>
