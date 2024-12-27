@@ -107,9 +107,9 @@ export class CreateAccountComponent implements OnInit {
       this.accountService.EditAccount(SaveJournal).subscribe({
         next: (result) => {
           this.toastr.success(result.message);
+          this.router.navigate(['/Account', 'List']);
         },
         error: (error) => {
-          console.log(error);
           this.toastr.error(error.error.message);
         },
       });
@@ -117,7 +117,7 @@ export class CreateAccountComponent implements OnInit {
       this.accountService.CreateAccount(SaveJournal).subscribe({
         next: (result) => {
           this.toastr.success(result.message);
-          this.router.navigate(['/Account/List']);
+          this.accountForm.reset();
         },
         error: (error) => this.toastr.error(error.error.message),
       });
@@ -125,7 +125,10 @@ export class CreateAccountComponent implements OnInit {
   }
   DeleteAccount() {
     this.accountService.DeleteAccount(this.account.id).subscribe({
-      next: (result) => this.toastr.success(result.message),
+      next: (result) => {
+        this.toastr.success(result.message);
+        this.router.navigate(['/Account', 'List']);
+      },
       error: (error) => this.toastr.error(error.error.message),
     });
   }

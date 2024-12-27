@@ -1,1 +1,60 @@
-<p>home works!</p>
+<div class="grid grid-cols-4 gap-3 select-none">
+  @for (item of balances(); track $index) {
+  <div
+    class="bg-white rounded-lg flex justify-between items-center shadow-sm p-5 hover:shadow-lg transition-all"
+  >
+    <div class="info">
+      <p class="text-sm text-gray-500">{{ item.accountName }}</p>
+      <p class="text-xl font-bold">{{ item.balance }}</p>
+    </div>
+    <div
+      class="rounded-3xl {{
+        colors[$index]
+      }}  flex justify-center items-center text-white"
+      style="height: 60px; width: 60px"
+    >
+      <i class="{{ icons[$index] }} fa-2xl"></i>
+    </div>
+  </div>
+  }
+</div>
+
+<div class="mt-6">
+  <div class="grid grid-cols-4 gap-3">
+    <div class="col-span-3">
+      <div class="bg-white rounded-lg p-5">
+        @if(barChart){
+        <canvas baseChart [data]="barChart()" [type]="'bar'"> </canvas>
+        }
+      </div>
+    </div>
+    <div class="col-span-1">
+      <div class="bg-white rounded-xl mb-2 p-5">
+        @if(pieChart){
+        <canvas baseChart [data]="pieChart()" [type]="'pie'"> </canvas>
+        }
+      </div>
+      <a
+        routerLink="/Journal/Create"
+        class="bg-white cursor-pointer flex justify-between items-center rounded-xl p-4 mb-2 transition-all hover:ps-7"
+      >
+        Create Journal
+        <i class="fa-solid fa-arrow-right fa-lg text-gray-700"></i>
+      </a>
+      <a
+        routerLink="/Period/Create"
+        class="bg-white cursor-pointer flex justify-between items-center rounded-xl p-4 mb-2 transition-all hover:ps-7"
+      >
+        Create Period
+        <i class="fa-solid fa-arrow-right fa-lg text-gray-700"></i>
+      </a>
+      <a
+        routerLink="/Journal/Create"
+        class="bg-white cursor-pointer flex justify-between items-center rounded-xl p-4 mb-2 transition-all hover:ps-7"
+      >
+        Account Statement
+        <i class="fa-solid fa-arrow-right fa-lg text-gray-700"></i>
+      </a>
+    </div>
+  </div>
+</div>

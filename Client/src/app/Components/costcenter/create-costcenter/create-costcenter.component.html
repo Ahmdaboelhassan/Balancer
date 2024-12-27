@@ -1,1 +1,56 @@
-<p>create-costcenter works!</p>
+<div class="bg-white rounded-lg p-10 mb-3">
+  <div>
+    <h1 class="text-slate-800 font-bold text-3xl mb-4">
+      {{ isEdit ? "Edit Cost Center" : "Create Cost Center" }}
+    </h1>
+    <hr />
+  </div>
+  <div class="py-5">
+    @if(CostCenterForm){
+    <form [formGroup]="CostCenterForm" (ngSubmit)="Submit()">
+      <input type="hidden" formControlName="id" />
+      <div class="grid grid-cols-2 gap-4">
+        <div class="form-group col-span-2 md:col-span-1">
+          <label for="name">Name</label>
+          <input
+            formControlName="name"
+            type="text"
+            id="name"
+            class="form-control w-full"
+            placeholder="Cost Center Name"
+          />
+        </div>
+        <div class="form-group col-span-2 md:col-span-1">
+          <label for="description">Description</label>
+          <input
+            formControlName="description"
+            class="form-control w-full"
+            placeholder="Write The Purpose For This Cost Center"
+          />
+        </div>
+        @if(isEdit){
+        <div class="form-group col-span-2 md:col-span-1">
+          <label for="description">Created at</label>
+          <input formControlName="CreatedAt" class="form-control w-full" />
+        </div>
+        }
+      </div>
+
+      <div class="mt-5">
+        <button type="submit" class="btn-save me-2">Save</button>
+        <a routerLink="/CostCenter/List" class="btn-primary me-2">List</a>
+        @if(isEdit){
+        <button
+          (click)="DeleteCostCenter()"
+          class="btn-danger me-2"
+          role="button"
+          type="button"
+        >
+          Delete
+        </button>
+        }
+      </div>
+    </form>
+    }
+  </div>
+</div>

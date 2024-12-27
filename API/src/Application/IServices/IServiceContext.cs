@@ -5,4 +5,5 @@ public interface IServiceContext
     IAccountService AccountService { get; }
     IJournalService JournalService { get; }
     ICostCenterService CostCenterService { get; }
+    IHomeService HomeService { get; }
 }

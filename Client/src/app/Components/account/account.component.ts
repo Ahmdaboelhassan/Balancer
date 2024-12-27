@@ -2,12 +2,11 @@ import { Component, inject, OnInit } from '@angular/core';
 import { AccountsListComponent } from './accounts-list/accounts-list.component';
 import { AccountService } from '../../Services/account.service';
 import { Account } from '../../Interfaces/Response/Account';
-import { RouterLink } from '@angular/router';
 import { SearchComponent } from '../search/search.component';
 
 @Component({
   selector: 'app-account',
-  imports: [AccountsListComponent, RouterLink, SearchComponent],
+  imports: [AccountsListComponent, SearchComponent],
   templateUrl: './account.component.html',
   styleUrl: './account.component.css',
 })

@@ -217,6 +217,7 @@ internal class JournalService : IJournalService
                     Detail = model.Detail,
                     Amount = journalAmount,
                     Type = (byte)journalType,
+                    Description = model.Description,
                 };
 
                 // Add Journal 
@@ -310,6 +311,7 @@ internal class JournalService : IJournalService
                 journal.Amount = journalAmount;
                 journal.Type = (byte)journalType;
                 journal.LastUpdatedAt = DateTime.Now;
+                journal.Description = model.Description;
 
                 // Add Journal 
                 _uow.JournalDetail.DeleteRange(journal.JournalDetails);

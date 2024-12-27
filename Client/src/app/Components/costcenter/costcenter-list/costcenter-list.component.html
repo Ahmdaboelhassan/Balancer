@@ -1,1 +1,7 @@
-<p>costcenter-list works!</p>
+<div class="grid grid-cols-4 gap-3">
+  @for (cost of costCenters; track cost.id) {
+  <div class="col-span-2">
+    <app-costcenter-list-item [costCenter]="cost"></app-costcenter-list-item>
+  </div>
+  }
+</div>

@@ -5,9 +5,11 @@ import { routes } from './app.routes';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { loadingInterceptor } from './Inerceptors/loading.interceptor';
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    provideCharts(withDefaultRegisterables()),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideAnimationsAsync(),
@@ -19,5 +21,6 @@ export const appConfig: ApplicationConfig = {
       positionClass: 'toast-top-right',
     }),
     provideHttpClient(withInterceptors([loadingInterceptor])),
+    provideCharts(withDefaultRegisterables()),
   ],
 };

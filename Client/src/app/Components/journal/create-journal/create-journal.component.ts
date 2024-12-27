@@ -13,10 +13,11 @@ import { Journal } from '../../../Interfaces/Response/Journal';
 import { NgFor } from '@angular/common';
 import { AccountService } from '../../../Services/account.service';
 import { CreateJournal } from '../../../Interfaces/Request/CreateJournal';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 @Component({
-  selector: 'app-create-journal',
-  imports: [RouterLink, ReactiveFormsModule, NgFor],
+  imports: [RouterLink, ReactiveFormsModule, NgFor, NgSelectModule],
+
   templateUrl: './create-journal.component.html',
   styleUrl: './create-journal.component.css',
 })
@@ -130,7 +131,6 @@ export class CreateJournalComponent {
       description: form.description,
       periodId: form.periodId,
     };
-
     if (this.isEdit) {
       this.journalService.EditJournal(journal).subscribe({
         next: (result) => {

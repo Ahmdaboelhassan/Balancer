@@ -5,20 +5,20 @@
   <h4 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">
     {{ item?.name }}
   </h4>
-  <h6 class="mb-2 text-lg font-bold tracking-tight text-gray-400">
+  <h6 class="mb-2 text-xl font-bold tracking-tight text-gray-500">
     {{ item?.from }} To {{ item?.to }}
   </h6>
   <div class="mt-3 text-end">
     @if (item?.increasedBalance){
-    <span class="text-green-500 text-2xl font-bold me-2"
+    <span class="text-green-500 text-3xl font-bold me-2"
       >{{ item?.totalAmount }}
     </span>
-    <i class="fa-solid fa-square-plus text-green-500 text-2xl"></i>
+    <i class="fa-solid fa-square-plus text-green-500 text-3xl"></i>
     } @else{
-    <span class="text-red-500 text-2xl font-bold me-2">{{
+    <span class="text-red-500 text-3xl font-bold me-2">{{
       item?.totalAmount
     }}</span>
-    <i class="fa-solid fa-square-minus text-red-500 text-2xl"></i>
+    <i class="fa-solid fa-square-minus text-red-500 text-3xl"></i>
     }
   </div>
 </a>
