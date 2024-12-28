@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { AccountStatement } from '../Interfaces/Response/AccountStatement';
+import { AccountsBalance } from '../Interfaces/Response/AccountsBalance';
 
 @Injectable({
   providedIn: 'root',
@@ -21,5 +22,11 @@ export class ReportService {
       url += `&openingbalance=${true}`;
     }
     return this.http.get<AccountStatement>(url);
+  }
+
+  GetIncomeStatement(from, to) {
+    let url = this.url + `/IncomeStatement?from=${from}&to=${to}`;
+
+    return this.http.get<AccountsBalance[]>(url);
   }
 }

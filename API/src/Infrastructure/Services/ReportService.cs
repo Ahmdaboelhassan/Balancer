@@ -78,6 +78,56 @@ public class ReportService : IReportService
         };
     }
 
+    public async Task<IEnumerable<AccountBalanceDTO>> GetIncomeStatement(DateTime from, DateTime to)
+    {
+        var settings = await _uow.Settings.GetFirst();
+
+        if (settings is null)
+            return Enumerable.Empty<AccountBalanceDTO>();
+
+        var expensesAccount = await _uow.Accounts.Get(settings.ExpensesAccount.GetValueOrDefault());
+        var RevenuesAccount = await _uow.Accounts.Get(settings.RevenueAccount.GetValueOrDefault());
+
+        if (RevenuesAccount is null || expensesAccount is null)
+            return Enumerable.Empty<AccountBalanceDTO>();
+
+
+        var journals = await _uow.JournalDetail
+            .SelectAll(d => d.Journal.CreatedAt.Date >= from && d.Journal.CreatedAt.Date <= to 
+               && (d.Account.Number.StartsWith(expensesAccount.Number) || d.Account.Number.StartsWith(RevenuesAccount.Number))
+            , d => new {accountId = d.AccountId , AccountNumber = d.Account.Number , AccountName = d.Account.Name , balance = d.Debit - d.Credit}
+            , "Account", "Journal");
+
+
+        var incomeStatement = journals.GroupBy(j => j.accountId)
+                .Select(d => new AccountBalanceDTO { AccountName = d.First().AccountName, Balance = d.Sum(d => d.balance).ToString("c") }).ToList();
+
+
+        var totalExpenses = journals.Where(a => a.AccountNumber.StartsWith(expensesAccount.Number)).Sum(a => a.balance);
+        var totalRevenues= journals.Where(a => a.AccountNumber.StartsWith(RevenuesAccount.Number)).Sum(a => (a.balance * -1));
+
+        var profit = totalRevenues - totalExpenses;
+
+        if (profit > 0)
+        {
+            incomeStatement.Add(new AccountBalanceDTO
+            {
+                AccountName = "Excess of Revenues Over Expenses",
+                Balance = profit.ToString("c")
+            });
+
+        }
+        else
+        {
+            incomeStatement.Add(new AccountBalanceDTO
+            {
+                AccountName = "Excess of Expenses Over Revenues",
+                Balance = (profit * -1).ToString("c")
+            });
+        }
+
+        return incomeStatement;
+        }
 
     private AccountStatement GetEmptyAccountStatement()
     {

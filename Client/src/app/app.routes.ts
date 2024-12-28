@@ -14,6 +14,7 @@ import { CreateCostcenterComponent } from './Components/costcenter/create-costce
 import { CostcenterComponent } from './Components/costcenter/costcenter.component';
 import { AccountstatementComponent } from './Components/accountstatement/accountstatement.component';
 import { AccountstatementDetialsComponent } from './Components/accountstatement/accountstatement-detials/accountstatement-detials.component';
+import { IncomeStatementComponent } from './Components/income-statement/income-statement.component';
 
 export const routes: Routes = [
   { path: 'Home', loadComponent: () => HomeComponent },
@@ -67,6 +68,10 @@ export const routes: Routes = [
       { path: '', loadComponent: () => AccountstatementComponent },
       { path: 'Get', loadComponent: () => AccountstatementDetialsComponent },
     ],
+  },
+  {
+    path: 'IncomeStatement',
+    loadComponent: () => IncomeStatementComponent,
   },
   { path: '**', loadComponent: () => HomeComponent, pathMatch: 'full' },
 ];

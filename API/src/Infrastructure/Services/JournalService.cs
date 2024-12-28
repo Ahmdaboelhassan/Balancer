@@ -35,7 +35,7 @@ internal class JournalService : IJournalService
 
 
         var code = await GetNextCode();
-        var accounts = (await  _uow.Accounts.SelectAll(a => !a.IsParent, a => new SelectItemDTO { Id = a.Id, Name = a.Name })).OrderBy(a => a.Name);
+        var accounts = (await  _uow.Accounts.SelectAll(a => !a.IsParent, a => new SelectItemDTO { Id = a.Id, Name = $"{a.Name} ({a.Number})"})).OrderBy(a => a.Name);
         var costCenters = (await _uow.CostCenter.SelectAll(c => true, c => new SelectItemDTO { Id = c.Id, Name = c.Name })).OrderBy(a => a.Name);
 
         return new GetJournalDTO()
@@ -59,7 +59,7 @@ internal class JournalService : IJournalService
             return await New(periodId);
         }
 
-        var accounts = (await _uow.Accounts.SelectAll(a => !a.IsParent, a => new SelectItemDTO { Id = a.Id, Name = a.Name })).OrderBy(a => a.Name);
+        var accounts = (await _uow.Accounts.SelectAll(a => !a.IsParent, a => new SelectItemDTO { Id = a.Id, Name = $"{a.Name} ({a.Number})" })).OrderBy(a => a.Name);
         var costCenters = (await _uow.CostCenter.SelectAll(c => true, c => new SelectItemDTO { Id = c.Id, Name = c.Name })).OrderBy(a => a.Name);
 
         return new GetJournalDTO()

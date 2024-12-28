@@ -1,20 +1,22 @@
 <a
   [routerLink]="['/Journal', 'Edit', journal.id]"
-  class="p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 flex justify-between"
+  class="p-5 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 grid grid-cols-4"
 >
-  <div>
+  <div class="col-span-3">
     <h4 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">
       {{ journal.detail }}
     </h4>
-    <p class="mb-1 text-gray-600 font-bold">
-      Code {{ journal.code }} | Period {{ journal.periodId }}
+    <p
+      class="mb-1 text-gray-600 font-medium max-w-full overflow-hidden text-nowrap text-ellipsis"
+    >
+      <i class="fa-regular fa-clock"></i>
+      {{ journal.createdAt }} # Code {{ journal.code }} # Period
+      {{ journal.periodId }} <i class="fa-solid fa-paperclip"></i>
+      {{ journal.notes }}
     </p>
-    <p class="mb-1 text-gray-500 font-bold">
-      {{ journal.createdAt }}
-    </p>
-    <p class="mb-1 text-gray-400 font-bold">{{ journal.notes }}</p>
+    <p></p>
   </div>
-  <div>
+  <div class="col-span-1 ms-auto">
     @if(journal.type === 1){
     <div class="amount flex items-center text-3xl text-green-500">
       <h1 class="me-2">{{ journal.amount }}</h1>

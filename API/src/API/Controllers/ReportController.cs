@@ -19,4 +19,10 @@ public class ReportController : ControllerBase
     {
         return Ok(await _serviceContext.ReportService.GetAccountStatement(from , to , account , costCenter , openingBalance));
     }
+
+    [HttpGet("IncomeStatement")]
+    public async Task<IActionResult> IncomeStatement(DateTime from, DateTime to)
+    {
+        return Ok(await _serviceContext.ReportService.GetIncomeStatement(from, to));
+    }
 }

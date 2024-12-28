@@ -46,7 +46,7 @@ public class AccountService : IAccountService
     }
     public async Task<IEnumerable<SelectItemDTO>> GetSelectList()
     {
-        var accounts = await _uow.Accounts.SelectAll(a => true, a => new SelectItemDTO { Id = a.Id, Name = a.Name });
+        var accounts = await _uow.Accounts.SelectAll(a => true, a => new SelectItemDTO { Id = a.Id, Name = $"{a.Name} ({a.Number})" });
         return accounts.OrderBy(a => a.Name);
     }
     public async Task<GetAccountDTO?> GetById(int id)

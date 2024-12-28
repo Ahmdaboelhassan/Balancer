@@ -1,5 +1,5 @@
 <div
-  class="relative bg-white rounded-lg shadow-md sm:rounded-lg overflow-auto h-[calc(100vh-7rem)]"
+  class="relative bg-white rounded-lg shadow-md sm:rounded-lg overflow-auto print:overflow-visible h-[calc(100vh-7rem)] print:h-fit"
 >
   <table class="w-full text-sm text-left rtl:text-right text-gray-500">
     <thead class="text-xs text-white uppercase bg-slate-800">
@@ -29,9 +29,11 @@
         <td class="px-5 py-4 font-bold">{{ item.credit }}</td>
         <td class="px-5 py-4 font-bold">{{ item.balance }}</td>
         <td class="px-5 py-4">{{ item.date }}</td>
-        <td class="px-5 py-4">{{ item.notes }}</td>
+        <td class="px-5 py-4">
+          {{ item.notes }}
+        </td>
         <td class="px-5 py-4">{{ item.costCenter }}</td>
-        <td class="px-2 py-4 text-right print:hidden">
+        <td class="px-3 py-4 text-right print:hidden">
           <a
             [routerLink]="['/Journal/Edit/', item.journalId]"
             class="font-medium text-green-600 hover:underline me-2"
@@ -63,8 +65,8 @@
     <span>{{ accountStatement.accountType }}</span>
     }
   </div>
-  <div class="print:hidden col-span-1 text-end">
-    <a routerLink="/AccountStatement" class="btn-add"
+  <div class="col-span-1 text-end">
+    <a routerLink="/AccountStatement" class="btn-add print:hidden"
       >New Account Statement
       <i class="fa-solid fa-arrow-right fa-lg ms-5"></i>
     </a>
