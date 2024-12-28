@@ -29,6 +29,16 @@ public class AccountService : IAccountService
                 IsParent = a.IsParent,
             });
     }
+
+    public async Task<IEnumerable<AccountingTreeItem>> GetPrimaryAccounts() {
+
+        return await _uow.Accounts.SelectAll(a => a.ParentId == null, a => new AccountingTreeItem { Name = a.Name, Number = a.Number, Id = a.Id , Level = a.Level });
+    }
+    public async Task<IEnumerable<AccountingTreeItem>> GetChilds(int id)
+    {
+        return await _uow.Accounts.SelectAll(a => a.ParentId == id, a => new AccountingTreeItem { Name = a.Name, Number = a.Number, Id = a.Id , Level = a.Level });
+
+    }
     public async Task<IEnumerable<GetAccountDTO>> Search(string criteria) {
         var allAccounts = await _uow.Accounts.GetAll(a => a.Name.Contains(criteria) ,"Parent");
         return allAccounts.Select(a =>
@@ -46,8 +56,7 @@ public class AccountService : IAccountService
     }
     public async Task<IEnumerable<SelectItemDTO>> GetSelectList()
     {
-        var accounts = await _uow.Accounts.SelectAll(a => true, a => new SelectItemDTO { Id = a.Id, Name = $"{a.Name} ({a.Number})" });
-        return accounts.OrderBy(a => a.Name);
+        return (await _uow.Accounts.SelectAll(a => true, a => new SelectItemDTO { Id = a.Id, Name = $"{a.Name} | {a.Number}" })).OrderBy(a => a.Name); 
     }
     public async Task<GetAccountDTO?> GetById(int id)
     {
@@ -285,5 +294,13 @@ public class AccountService : IAccountService
         return new GetAccountNumberAndLevelResponse { IsSucceed = true, Message = "Account Number Generated Successfully"  , AccountLevel = accountLevel , AccountNumber = accountNumber};
 
     }
+
+    
+}
+
+class accountchild
+{
+    public string account { get; set; }
+    public string[] childs { get; set; }
 
 }

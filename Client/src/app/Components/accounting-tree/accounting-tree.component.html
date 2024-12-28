@@ -1,0 +1,17 @@
+<div class="bg-white min-h-screen rounded-xl p-10 text-2xl">
+  <h1 class="text-slate-900 font-bold text-3xl mb-4">Accounting Tree</h1>
+  <hr />
+
+  <ul>
+    @for (item of primaryAccounts; track $index) {
+
+    <details
+      class="my-7 text-slate-900 font-semibold cursor-pointer bg-gray-200 p-5 transition-all rounded-lg"
+      (toggle)="GetAccountChild(item.id, $event)"
+    >
+      <summary>{{ item.name }} | {{ item.number }}</summary>
+    </details>
+
+    }
+  </ul>
+</div>

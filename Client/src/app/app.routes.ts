@@ -15,6 +15,7 @@ import { CostcenterComponent } from './Components/costcenter/costcenter.componen
 import { AccountstatementComponent } from './Components/accountstatement/accountstatement.component';
 import { AccountstatementDetialsComponent } from './Components/accountstatement/accountstatement-detials/accountstatement-detials.component';
 import { IncomeStatementComponent } from './Components/income-statement/income-statement.component';
+import { AccountingTreeComponent } from './Components/accounting-tree/accounting-tree.component';
 
 export const routes: Routes = [
   { path: 'Home', loadComponent: () => HomeComponent },
@@ -72,6 +73,10 @@ export const routes: Routes = [
   {
     path: 'IncomeStatement',
     loadComponent: () => IncomeStatementComponent,
+  },
+  {
+    path: 'AccountingTree',
+    loadComponent: () => AccountingTreeComponent,
   },
   { path: '**', loadComponent: () => HomeComponent, pathMatch: 'full' },
 ];

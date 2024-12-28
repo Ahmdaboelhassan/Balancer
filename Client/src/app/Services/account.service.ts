@@ -5,6 +5,7 @@ import { CreateAccount } from '../Interfaces/Request/CreateAccount';
 import { ConfirmationRespose } from '../Interfaces/Response/ConfirmationRespose';
 import { Account } from '../Interfaces/Response/Account';
 import { AccountSelectList } from '../Interfaces/Response/AccountSelectList';
+import { AccountTreeItem } from '../Interfaces/Response/AccountingTreeItem';
 
 @Injectable({
   providedIn: 'root',
@@ -18,10 +19,20 @@ export class AccountService {
     const url = this.url + `/GetBalance/${accountId}`;
     return this.http.get<{ balance: number }>(url);
   }
+  GetPrimaryAccounts() {
+    const url = this.url + `/GetPrimaryAccounts`;
+    return this.http.get<AccountTreeItem[]>(url);
+  }
+
+  GetChilds(accountId) {
+    const url = this.url + `/GetChilds/${accountId}`;
+    return this.http.get<AccountTreeItem[]>(url);
+  }
   GetAccount(accountId) {
     const url = this.url + `/Get/${accountId}`;
     return this.http.get<Account>(url);
   }
+
   SearchAccounts(key) {
     const url = this.url + `/Search?criteria=${key}`;
     return this.http.get<Account[]>(url);

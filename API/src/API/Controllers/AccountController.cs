@@ -36,6 +36,16 @@ public class AccountController : ControllerBase
     {
         return Ok(await _serviceContext.AccountService.GetAll());
     }
+    [HttpGet("GetPrimaryAccounts")]
+    public async Task<IActionResult> GetPrimaryAccounts()
+    {
+        return Ok(await _serviceContext.AccountService.GetPrimaryAccounts());
+    }
+    [HttpGet("GetChilds/{id}")]
+    public async Task<IActionResult> GetChilds(int id)
+    {
+        return Ok(await _serviceContext.AccountService.GetChilds(id));
+    }
 
     [HttpGet("GetSelectList")]
     public async Task<IActionResult> GetSelectList()

@@ -1,14 +1,10 @@
-﻿using API.Migrations;
-using Application.DTO.Request;
+﻿using Application.DTO.Request;
 using Application.DTO.Response;
 using Application.IRepository;
 using Application.IServices;
 using Application.Models;
 using Domain.Enums;
 using Domain.Models;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
-using static Azure.Core.HttpHeader;
 
 namespace Infrastructure.Services;
 internal class JournalService : IJournalService
@@ -35,7 +31,7 @@ internal class JournalService : IJournalService
 
 
         var code = await GetNextCode();
-        var accounts = (await  _uow.Accounts.SelectAll(a => !a.IsParent, a => new SelectItemDTO { Id = a.Id, Name = $"{a.Name} ({a.Number})"})).OrderBy(a => a.Name);
+        var accounts = (await  _uow.Accounts.SelectAll(a => !a.IsParent, a => new SelectItemDTO { Id = a.Id, Name = $"{a.Name} | {a.Number}" })).OrderBy(a => a.Name);
         var costCenters = (await _uow.CostCenter.SelectAll(c => true, c => new SelectItemDTO { Id = c.Id, Name = c.Name })).OrderBy(a => a.Name);
 
         return new GetJournalDTO()
@@ -59,7 +55,7 @@ internal class JournalService : IJournalService
             return await New(periodId);
         }
 
-        var accounts = (await _uow.Accounts.SelectAll(a => !a.IsParent, a => new SelectItemDTO { Id = a.Id, Name = $"{a.Name} ({a.Number})" })).OrderBy(a => a.Name);
+        var accounts = (await _uow.Accounts.SelectAll(a => !a.IsParent, a => new SelectItemDTO { Id = a.Id, Name = $"{a.Name} | {a.Number}" })).OrderBy(a => a.Name);
         var costCenters = (await _uow.CostCenter.SelectAll(c => true, c => new SelectItemDTO { Id = c.Id, Name = c.Name })).OrderBy(a => a.Name);
 
         return new GetJournalDTO()

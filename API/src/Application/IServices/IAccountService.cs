@@ -6,6 +6,8 @@ namespace Application.IServices;
 public interface IAccountService
 {
     Task<IEnumerable<GetAccountDTO>> GetAll();
+    Task<IEnumerable<AccountingTreeItem>> GetChilds(int id);
+    Task<IEnumerable<AccountingTreeItem>> GetPrimaryAccounts();
     Task<IEnumerable<GetAccountDTO>> Search(string criteria);
     Task<IEnumerable<SelectItemDTO>> GetSelectList();
     Task<GetAccountDTO?> GetById(int id);

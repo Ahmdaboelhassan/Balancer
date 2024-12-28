@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, WritableSignal } from '@angular/core';
+import { Component, signal, WritableSignal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { JournalService } from '../../../Services/journal.service';
 import { Title } from '@angular/platform-browser';
@@ -13,10 +13,9 @@ import { Journal } from '../../../Interfaces/Response/Journal';
 import { NgFor } from '@angular/common';
 import { AccountService } from '../../../Services/account.service';
 import { CreateJournal } from '../../../Interfaces/Request/CreateJournal';
-import { NgSelectModule } from '@ng-select/ng-select';
 
 @Component({
-  imports: [RouterLink, ReactiveFormsModule, NgFor, NgSelectModule],
+  imports: [RouterLink, ReactiveFormsModule, NgFor],
 
   templateUrl: './create-journal.component.html',
   styleUrl: './create-journal.component.css',
