@@ -20,6 +20,12 @@ public class CostCenterController : ControllerBase
         return Ok(await _serviceContext.CostCenterService.GetAll());
     }
 
+    [HttpGet("GetAllSelectList")]
+    public async Task<IActionResult> GetAllSelectList()
+    {
+        return Ok(await _serviceContext.CostCenterService.GetAllSelectList());
+    }
+
     [HttpGet("Get/{id}")]
     public async Task<IActionResult> Get(int id)
     {

@@ -1,0 +1,72 @@
+<div
+  class="relative bg-white rounded-lg shadow-md sm:rounded-lg overflow-auto h-[calc(100vh-7rem)]"
+>
+  <table class="w-full text-sm text-left rtl:text-right text-gray-500">
+    <thead class="text-xs text-white uppercase bg-slate-800">
+      <tr>
+        <th scope="col" class="px-8 py-3">Detail</th>
+        <th scope="col" class="px-5 py-3">Debit</th>
+        <th scope="col" class="px-5 py-3">Credit</th>
+        <th scope="col" class="px-5 py-3">Balance</th>
+        <th scope="col" class="px-5 py-3">Date</th>
+        <th scope="col" class="px-5 py-3">Notes</th>
+        <th scope="col" class="px-5 py-3">Cost Center</th>
+        <th scope="col" class="px-2 py-3 print:hidden text-center">Source</th>
+      </tr>
+    </thead>
+    @if(accountStatement){
+    <tbody>
+      @for(item of accountStatement.details ;track $index){
+
+      <tr class="bg-white border-b hover:bg-gray-50 dark:hover:bg-gray-50">
+        <th
+          scope="row"
+          class="px-6 py-4 font-bold text-base text-gray-900 whitespace-nowrap"
+        >
+          {{ item.detail }}
+        </th>
+        <td class="px-8 py-4 font-bold">{{ item.debit }}</td>
+        <td class="px-5 py-4 font-bold">{{ item.credit }}</td>
+        <td class="px-5 py-4 font-bold">{{ item.balance }}</td>
+        <td class="px-5 py-4">{{ item.date }}</td>
+        <td class="px-5 py-4">{{ item.notes }}</td>
+        <td class="px-5 py-4">{{ item.costCenter }}</td>
+        <td class="px-2 py-4 text-right print:hidden">
+          <a
+            [routerLink]="['/Journal/Edit/', item.journalId]"
+            class="font-medium text-green-600 hover:underline me-2"
+            >Journal</a
+          >
+          <a
+            [routerLink]="['/Period/Edit/', item.periodId]"
+            class="font-medium text-blue-600 hover:underline"
+            >Period</a
+          >
+        </td>
+      </tr>
+      }
+    </tbody>
+    }
+  </table>
+</div>
+<div class="grid grid-cols-2 items-center justify-between">
+  <div
+    class="bg-white rounded-lg mt-4 p-5 shadow-md flex justify-between items-center text-2xl font-bold col-span-2 print:col-span-2 md:col-span-1"
+    [ngClass]="
+      accountStatement && accountStatement.accountType === 'Credit'
+        ? 'text-red-700 '
+        : 'text-green-700'
+    "
+  >
+    @if(accountStatement){
+    <span class="me-4">{{ accountStatement.amount }}</span>
+    <span>{{ accountStatement.accountType }}</span>
+    }
+  </div>
+  <div class="print:hidden col-span-1 text-end">
+    <a routerLink="/AccountStatement" class="btn-add"
+      >New Account Statement
+      <i class="fa-solid fa-arrow-right fa-lg ms-5"></i>
+    </a>
+  </div>
+</div>

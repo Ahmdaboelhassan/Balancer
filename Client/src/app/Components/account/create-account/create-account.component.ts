@@ -117,7 +117,7 @@ export class CreateAccountComponent implements OnInit {
       this.accountService.CreateAccount(SaveJournal).subscribe({
         next: (result) => {
           this.toastr.success(result.message);
-          this.accountForm.reset();
+          this.GetAllAccountSelectList();
         },
         error: (error) => this.toastr.error(error.error.message),
       });

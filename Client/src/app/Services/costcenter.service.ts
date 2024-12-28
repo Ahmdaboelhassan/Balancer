@@ -4,6 +4,7 @@ import { environment } from '../../environments/environment';
 import { CostCenter } from '../Interfaces/Response/CostCenter';
 import { CreateCostCenter } from '../Interfaces/Request/CreateCostCenter';
 import { ConfirmationRespose } from '../Interfaces/Response/ConfirmationRespose';
+import { CostCenterSelectList } from '../Interfaces/Response/CostCenterSelectList';
 
 @Injectable({
   providedIn: 'root',
@@ -22,7 +23,10 @@ export class CostcenterService {
     const url = this.url + `/GetAll`;
     return this.http.get<CostCenter[]>(url);
   }
-
+  GetAllCostCenterSelectList() {
+    const url = this.url + `/GetAllSelectList`;
+    return this.http.get<CostCenterSelectList[]>(url);
+  }
   CreateCostCenter(CostCenter: CreateCostCenter) {
     const url = this.url + `/Create`;
     return this.http.post<ConfirmationRespose>(url, CostCenter);

@@ -67,8 +67,7 @@ internal class PeriodService : IPeriodService
     {
         var DTO = new GetPeriodDTO();
         var lastPeriod = await _uow.Periods.GetLastOrderBy(p => p.Id);
-        if (lastPeriod is null)
-            return null;
+
         var Settings = await _uow.Settings.GetFirst();
         DTO.DaysCount = Settings?.DefaultPeriodDays ?? 7;
         DTO.From = lastPeriod != null ? lastPeriod.To.AddDays(1) : DateTime.Now;
@@ -81,7 +80,7 @@ internal class PeriodService : IPeriodService
         var period = await _uow.Periods.Get(p => p.Id == id, "Journals");
 
         if (period == null)
-            return null;
+            return new GetPeriodDTO();
 
 
         var periodDto = new GetPeriodDTO
@@ -103,7 +102,7 @@ internal class PeriodService : IPeriodService
     {
         var lastPeriod = await _uow.Periods.GetLastOrderBy(p => p.Id ,"Journals");
         if (lastPeriod == null)
-            return null;
+            return new GetPeriodDTO();
 
         var lastPeriodDto = new GetPeriodDTO
         {

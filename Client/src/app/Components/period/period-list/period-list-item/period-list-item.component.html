@@ -3,6 +3,10 @@
   class="block p-5 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100"
 >
   <h4 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">
+    <i
+      class="fa-solid fa-clock me-2"
+      [ngClass]="item?.increasedBalance ? 'text-green-500' : 'text-red-500'"
+    ></i>
     {{ item?.name }}
   </h4>
   <h6 class="mb-2 text-xl font-bold tracking-tight text-gray-500">

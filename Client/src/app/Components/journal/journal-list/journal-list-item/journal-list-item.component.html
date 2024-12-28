@@ -7,13 +7,12 @@
       {{ journal.detail }}
     </h4>
     <p class="mb-1 text-gray-600 font-bold">
-      Period-ID {{ journal.periodId }} | Code {{ journal.code }}
+      Code {{ journal.code }} | Period {{ journal.periodId }}
     </p>
     <p class="mb-1 text-gray-500 font-bold">
       {{ journal.createdAt }}
     </p>
     <p class="mb-1 text-gray-400 font-bold">{{ journal.notes }}</p>
-    <div class="mt-3 text-end"></div>
   </div>
   <div>
     @if(journal.type === 1){

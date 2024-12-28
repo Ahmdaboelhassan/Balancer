@@ -1,5 +1,4 @@
-﻿
-namespace Domain;
+﻿namespace Domain.Enums;
 public enum JournalTypes
 {
     Add = 1,

@@ -1,19 +1,10 @@
-﻿using API.Migrations;
-using Application.DTO.Request;
+﻿using Application.DTO.Request;
 using Application.DTO.Response;
 using Application.IRepository;
 using Application.IServices;
 using Application.Models;
-using Azure;
 using Domain.Models;
-using Microsoft.EntityFrameworkCore.Storage.Json;
-using Microsoft.Identity.Client;
-using System.Linq;
-using System.Net.Http.Headers;
-using System.Net.WebSockets;
-using System.Security.Principal;
 using System.Text;
-using System.Threading.Tasks.Dataflow;
 
 namespace Infrastructure.Services;
 public class AccountService : IAccountService
@@ -25,8 +16,8 @@ public class AccountService : IAccountService
     }
     public async Task<IEnumerable<GetAccountDTO>> GetAll()
     {
-        var allAccounts = await _uow.Accounts.GetAll("Parent");
-        return allAccounts.Select(a =>
+        return (await _uow.Accounts.GetAll("Parent"))
+            .OrderBy(a => a.Level).Select(a =>
             new GetAccountDTO {
                 Id = a.Id,
                 Name = a.Name,

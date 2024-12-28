@@ -65,11 +65,20 @@ export class CreatePeriodComponent implements OnInit {
     this.periodForm = new FormGroup({
       id: new FormControl(this.period.id),
       name: new FormControl(this.period.name),
-      totalAmount: new FormControl(this.period.totalAmount),
+      totalAmount: new FormControl({
+        value: this.period.totalAmount,
+        disabled: true,
+      }),
       from: new FormControl(this.parseDate(this.period.from)),
       to: new FormControl(this.parseDate(this.period.to)),
-      createdAt: new FormControl(this.period.createdAt),
-      lastUpdatedAt: new FormControl(this.period.lastUpdatedAt),
+      createdAt: new FormControl({
+        value: this.period.createdAt,
+        disabled: true,
+      }),
+      lastUpdatedAt: new FormControl({
+        value: this.period.lastUpdatedAt,
+        disabled: true,
+      }),
       daysCount: new FormControl(this.period?.daysCount),
       notes: new FormControl(this.period.notes),
     });

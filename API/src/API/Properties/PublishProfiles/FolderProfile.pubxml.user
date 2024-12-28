@@ -5,7 +5,7 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
 <Project>
   <PropertyGroup>
     <_PublishTargetUrl>D:\Programming Progects\Dotnet\Balancer\Release</_PublishTargetUrl>
-    <History>True|2024-12-26T23:03:21.6842570Z||;True|2024-12-27T00:56:43.6504822+02:00||;True|2024-12-27T00:46:54.9567589+02:00||;False|2024-12-27T00:45:26.1570554+02:00||;</History>
+    <History>True|2024-12-27T13:19:31.5612056Z||;True|2024-12-27T02:05:12.8235855+02:00||;True|2024-12-27T01:03:21.6842570+02:00||;True|2024-12-27T00:56:43.6504822+02:00||;True|2024-12-27T00:46:54.9567589+02:00||;False|2024-12-27T00:45:26.1570554+02:00||;</History>
     <LastFailureDetails />
   </PropertyGroup>
 </Project>

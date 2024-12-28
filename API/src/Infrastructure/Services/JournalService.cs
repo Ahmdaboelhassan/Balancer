@@ -4,7 +4,7 @@ using Application.DTO.Response;
 using Application.IRepository;
 using Application.IServices;
 using Application.Models;
-using Domain;
+using Domain.Enums;
 using Domain.Models;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
@@ -35,8 +35,8 @@ internal class JournalService : IJournalService
 
 
         var code = await GetNextCode();
-        var accounts = await  _uow.Accounts.SelectAll(a => !a.IsParent, a => new SelectItemDTO { Id = a.Id, Name = a.Name });
-        var costCenters = await _uow.CostCenter.SelectAll(c => true, c => new SelectItemDTO { Id = c.Id, Name = c.Name });
+        var accounts = (await  _uow.Accounts.SelectAll(a => !a.IsParent, a => new SelectItemDTO { Id = a.Id, Name = a.Name })).OrderBy(a => a.Name);
+        var costCenters = (await _uow.CostCenter.SelectAll(c => true, c => new SelectItemDTO { Id = c.Id, Name = c.Name })).OrderBy(a => a.Name);
 
         return new GetJournalDTO()
         {
@@ -59,8 +59,8 @@ internal class JournalService : IJournalService
             return await New(periodId);
         }
 
-        var accounts = await _uow.Accounts.SelectAll(a => !a.IsParent, a => new SelectItemDTO { Id = a.Id, Name = a.Name });
-        var costCenters = await _uow.CostCenter.SelectAll(c => true, c => new SelectItemDTO { Id = c.Id, Name = c.Name });
+        var accounts = (await _uow.Accounts.SelectAll(a => !a.IsParent, a => new SelectItemDTO { Id = a.Id, Name = a.Name })).OrderBy(a => a.Name);
+        var costCenters = (await _uow.CostCenter.SelectAll(c => true, c => new SelectItemDTO { Id = c.Id, Name = c.Name })).OrderBy(a => a.Name);
 
         return new GetJournalDTO()
         {
@@ -84,7 +84,7 @@ internal class JournalService : IJournalService
     }
     public async Task<IEnumerable<JournalListItemDTO>> Search(string criteria)
     {
-        var journals =  await _uow.Journal.SelectAll(a => a.Detail.Contains(criteria), a =>  new JournalListItemDTO
+        var journals =  await _uow.Journal.SelectAll(a => a.Detail.Contains(criteria) || a.Code.ToString().Contains(criteria), a =>  new JournalListItemDTO
         {
             Id = a.Id,
             Amount = a.Amount,

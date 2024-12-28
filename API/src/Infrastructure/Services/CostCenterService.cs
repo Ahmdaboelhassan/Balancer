@@ -27,6 +27,16 @@ public class CostCenterService : ICostCenterService
         });
     }
 
+
+    public async Task<IEnumerable<SelectItemDTO>> GetAllSelectList()
+    {
+        return await _uow.CostCenter.SelectAll(a => true, a => new SelectItemDTO
+        {
+            Id = a.Id,
+            Name = a.Name,
+        });
+    }
+
     public async Task<GetCostCenter> Get(int id)
     {
         var costCenter = await _uow.CostCenter.Get(id);

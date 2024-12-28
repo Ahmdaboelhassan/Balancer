@@ -1,6 +1,6 @@
 ﻿using Application.IRepository;
 using Application.IServices;
-using Domain;
+using Domain.Enums;
 using Domain.Models;
 using System.Text;
 
