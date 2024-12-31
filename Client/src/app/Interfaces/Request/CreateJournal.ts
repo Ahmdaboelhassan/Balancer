@@ -7,4 +7,5 @@ export interface CreateJournal {
   costCenterId: number;
   creditAccountId: number;
   debitAccountId: number;
+  createdAt: string;
 }

@@ -9,6 +9,7 @@ public class CreateJournalDTO
     public string? Description { get; set; }
     public decimal Amount { get; set; }
     public int PeriodId { get; set; }
+    public DateTime CreatedAt { get; set; } // auto Generate
     public int? CostCenterId { get; set; }
     [Required]
     public int CreditAccountId { get; set; }

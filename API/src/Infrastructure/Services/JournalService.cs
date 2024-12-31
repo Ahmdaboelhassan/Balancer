@@ -42,6 +42,7 @@ internal class JournalService : IJournalService
             DebitAccountId = settings.DefaultDebitAccount.GetValueOrDefault(),
             CreditAccountId = settings.DefaultCreditAccount.GetValueOrDefault(),
             PeriodId = jouranlPeriod.Value,
+            CreatedAt = DateTime.Now,
         };
     }
     public async Task<GetJournalDTO> Get(int id)
@@ -64,12 +65,12 @@ internal class JournalService : IJournalService
             CostCenterId = journal.JournalDetails.FirstOrDefault()?.CostCenterId,
             DebitAccountId = journal.JournalDetails.First(d => d.Debit > 0).AccountId,
             CreditAccountId = journal.JournalDetails.First(d => d.Credit > 0).AccountId,
-            CreatedAt = journal.CreatedAt.ToString("F"),
+            CreatedAt = journal.CreatedAt,
             Amount = Math.Abs(journal.Amount),
             Type = journal.Type,
             Code = journal.Code,
             Notes = journal.Notes,
-            LastUpdatedAt = journal.LastUpdatedAt?.ToString("F"),
+            LastUpdatedAt = journal.LastUpdatedAt?.ToString("g"),
             PeriodId = journal.PeriodId,
             Detail = journal.Detail,
             Description = journal.Description,
@@ -183,9 +184,9 @@ internal class JournalService : IJournalService
                 if (period == null)
                     return new ConfirmationResponse { Message = "Some Thing Wrong While Selecting Journal Period" };
 
-                if (DateTime.Now.Date > period.To.Date)
+                if (model.CreatedAt.Date > period.To.Date)
                 {
-                    var difference = DateTime.Now.Date.Subtract(period.To.Date).TotalDays;
+                    var difference = model.CreatedAt.Date.Subtract(period.To.Date).TotalDays;
                     return new ConfirmationResponse { Message = $"Period Has Been Expired From {difference} Days Ago" };
                 }
                 
@@ -208,12 +209,13 @@ internal class JournalService : IJournalService
                 {
                     Code = code,
                     Notes = notes,
-                    CreatedAt = DateTime.Now,
+                    CreatedAt = model.CreatedAt,
                     PeriodId = model.PeriodId,
                     Detail = model.Detail,
                     Amount = journalAmount,
                     Type = (byte)journalType,
                     Description = model.Description,
+                    
                 };
 
                 // Add Journal 
@@ -256,7 +258,7 @@ internal class JournalService : IJournalService
           }
     }
     public async Task<ConfirmationResponse> Edit(CreateJournalDTO model)
-    {
+        {
         using (var transaction = _uow.StartTransaction())
         {
             try
@@ -285,7 +287,12 @@ internal class JournalService : IJournalService
 
                 if (period is null)
                     return new ConfirmationResponse { Message = "Some Thing Wrong While Selecting Journal Period" };
-       
+
+                if (model.CreatedAt.Date > period.To.Date)
+                {
+                    var difference = model.CreatedAt.Date.Subtract(period.To.Date).TotalDays;
+                    return new ConfirmationResponse { Message = $"Created Date Is Greater Than Period End Date With {difference} Days" };
+                }
 
                 var notes = $"Updated Transaction Done From ({credit.Name}) To ({debit.Name})";
 
@@ -308,6 +315,7 @@ internal class JournalService : IJournalService
                 journal.Type = (byte)journalType;
                 journal.LastUpdatedAt = DateTime.Now;
                 journal.Description = model.Description;
+                journal.CreatedAt = model.CreatedAt;
 
                 // Add Journal 
                 _uow.JournalDetail.DeleteRange(journal.JournalDetails);
@@ -315,11 +323,13 @@ internal class JournalService : IJournalService
 
                 _uow.Journal.Update(journal);
 
+                var costCenter = model.CostCenterId == 0 ? null : model.CostCenterId;
+
                 // Add Details 
                 await _uow.JournalDetail.AddAsync(new JournalDetail
                 {
                     AccountId = model.DebitAccountId,
-                    CostCenterId = model.CostCenterId,
+                    CostCenterId = costCenter,
                     Credit = 0,
                     Debit = model.Amount,
                     JournalId = journal.Id,
@@ -329,7 +339,7 @@ internal class JournalService : IJournalService
                 await _uow.JournalDetail.AddAsync(new JournalDetail
                 {
                     AccountId = model.CreditAccountId,
-                    CostCenterId = model.CostCenterId,
+                    CostCenterId = costCenter,
                     Credit = model.Amount,
                     Debit = 0,
                     JournalId = journal.Id,

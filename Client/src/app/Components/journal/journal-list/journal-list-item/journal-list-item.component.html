@@ -11,8 +11,10 @@
     >
       <i class="fa-regular fa-clock"></i>
       {{ journal.createdAt }} # Code {{ journal.code }} # Period
-      {{ journal.periodId }} <i class="fa-solid fa-paperclip"></i>
-      {{ journal.notes }}
+      {{ journal.periodId }}
+      <span [title]="journal.notes"
+        ><i class="fa-solid fa-paperclip"></i> {{ journal.notes }}</span
+      >
     </p>
     <p></p>
   </div>

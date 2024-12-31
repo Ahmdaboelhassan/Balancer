@@ -73,8 +73,10 @@ public class ReportService : IReportService
         {
             AccountType = balance > 0 ? "Debit" : "Credit",
             Details = journalsLinkedList,
+                AccountName = account.Name,
+                From = from.ToString("d"),
+                To = to.ToString("d"),
             Amount = Math.Abs(balance).ToString("c")
-
         };
     }
 

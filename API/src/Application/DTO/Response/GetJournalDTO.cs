@@ -9,7 +9,6 @@ public class GetJournalDTO : CreateJournalDTO
     public int Id { get; set; }
     public int Code { get; set; } // auto Generate
     public string Notes { get; set; } // auto Generate
-    public string CreatedAt { get; set; } // auto Generate
     public string? LastUpdatedAt { get; set; } // auto Generate
     public byte Type { get; set; }
     [Required]

@@ -113,9 +113,10 @@ public class AccountService : IAccountService
         if (DTO.ParentId == account.Id)
             return new ConfirmationResponse { IsSucceed = false, Message = "Account Can Not Be A Parent For Him Self" };
 
-  
+        int? oldParentId = account?.ParentId;
+
         // If Change In Basic Data Only
-        if (account.ParentId == null && (DTO.ParentId == 0 || DTO.ParentId == null))  
+        if (oldParentId.Equals(DTO.ParentId))  
         {
             account.Name = DTO.Name;
             account.Description = DTO.Description;
@@ -126,7 +127,6 @@ public class AccountService : IAccountService
             return new ConfirmationResponse { IsSucceed = true, Message = "Account Has Been Updated Successfully" };
         }
 
-        int? oldParentId = account?.ParentId;
 
         var response = await GetAccountNumberAndLevel(DTO);
 

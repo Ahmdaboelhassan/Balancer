@@ -10,13 +10,12 @@ import {
   Validators,
 } from '@angular/forms';
 import { Journal } from '../../../Interfaces/Response/Journal';
-import { NgFor } from '@angular/common';
+import { NgClass, NgFor } from '@angular/common';
 import { AccountService } from '../../../Services/account.service';
 import { CreateJournal } from '../../../Interfaces/Request/CreateJournal';
 
 @Component({
-  imports: [RouterLink, ReactiveFormsModule, NgFor],
-
+  imports: [RouterLink, ReactiveFormsModule, NgFor, NgClass],
   templateUrl: './create-journal.component.html',
   styleUrl: './create-journal.component.css',
 })
@@ -68,7 +67,9 @@ export class CreateJournalComponent {
       credit: new FormControl(journal.creditAccountId),
       costCenter: new FormControl(journal.costCenterId),
       code: new FormControl({ disabled: true, value: journal.code }),
-      created: new FormControl({ disabled: true, value: journal.createdAt }),
+      created: new FormControl(
+        this.GetLocaleDateTime(new Date(journal.createdAt))
+      ),
       lastUpdate: new FormControl({
         disabled: true,
         value: journal.lastUpdatedAt,
@@ -129,6 +130,7 @@ export class CreateJournalComponent {
       debitAccountId: form.debit,
       description: form.description,
       periodId: form.periodId,
+      createdAt: form.created,
     };
     if (this.isEdit) {
       this.journalService.EditJournal(journal).subscribe({
@@ -152,13 +154,16 @@ export class CreateJournalComponent {
               details: '',
               description: '',
               code: this.JournalForm.get('code').value + 1,
+              created: this.GetLocaleDateTime(new Date()),
+              costCenter: null,
             });
             this.GetCreditBalance();
             this.GetDebitBalance();
           });
         },
         error: (error) => {
-          this.toastr.error(error.error.message, 'Create Journal');
+          console.log(error),
+            this.toastr.error(error.error.message, 'Create Journal');
         },
       });
     }
@@ -169,5 +174,13 @@ export class CreateJournalComponent {
       error: (err) => this.toastr.error(err.error.message, 'Delete Journal'),
       complete: () => this.router.navigate(['/Journal', 'List']),
     });
+  }
+  GetLocaleDateTime(date: Date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
   }
 }

@@ -102,15 +102,21 @@
             formControlName="code"
           />
         </div>
-        @if (isEdit) {
-        <div class="col-span-4 md:col-span-1">
-          <label for="detail"> Created </label>
+
+        <div
+          class="col-span-4"
+          [ngClass]="
+            Journal().lastUpdatedAt ? 'md:col-span-1' : 'md:col-span-2'
+          "
+        >
+          <label for="created"> Date </label>
           <input
-            type="text"
+            type="datetime-local"
             class="form-control w-full"
             formControlName="created"
           />
         </div>
+        @if (Journal().lastUpdatedAt) {
         <div class="col-span-4 md:col-span-1">
           <label for="detail"> Last Update </label>
           <input
@@ -150,6 +156,9 @@
           Delete
         </a>
         }
+        <a [routerLink]="['/Journal', 'Create']" class="btn-add me-2"
+          >New Journal</a
+        >
         <a [routerLink]="['/Period', 'Create']" class="btn-add me-2"
           >New Period</a
         >
