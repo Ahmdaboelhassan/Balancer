@@ -1,7 +1,7 @@
 <div class="grid grid-cols-4 gap-3 select-none">
   @for (item of balances(); track $index) {
   <div
-    class="bg-white rounded-lg flex justify-between items-center shadow-sm p-5 hover:shadow-lg transition-all"
+    class="bg-white rounded-lg flex justify-between items-center shadow-sm p-5 hover:shadow-lg transition-all col-span-5 md:col-span-1"
   >
     <div class="info">
       <p class="text-sm text-gray-500">{{ item.accountName }}</p>
@@ -19,7 +19,7 @@
   }
 </div>
 
-<div class="mt-4">
+<div class="mt-4 hidden md:block">
   <div class="grid grid-cols-4 gap-3">
     <div class="col-span-3">
       <div class="bg-white rounded-lg p-5">
@@ -61,7 +61,7 @@
 
 <div class="grid grid-cols-2 gap-3 mt-3">
   <div
-    class="bg-white rounded-lg col-span-1 flex justify-between items-center shadow-sm p-5 hover:shadow-lg transition-all"
+    class="bg-white rounded-lg col-span-2 md:col-span-1 flex justify-between items-center shadow-sm p-5 hover:shadow-lg transition-all"
   >
     <div class="info">
       <p class="text-sm text-gray-600 mb-2">Time Left For The Month</p>
@@ -83,7 +83,7 @@
     </div>
   </div>
   <div
-    class="bg-white rounded-lg flex col-span-1 justify-between items-center shadow-sm p-5 hover:shadow-lg transition-all"
+    class="bg-white rounded-lg flex col-span-2 md:col-span-1 justify-between items-center shadow-sm p-5 hover:shadow-lg transition-all"
   >
     <div class="info">
       <p class="text-sm text-gray-600 mb-2">Estimated Money Need</p>

@@ -33,15 +33,20 @@
               {{ acc.name }}
             </option>
           </select>
-          <label class="mt-2 flex items-center">
+          <label class="inline-flex items-center cursor-pointer mt-3">
             <input
               type="checkbox"
-              class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 me-2"
-              [ngModel]="true"
+              [(ngModel)]="openingBalance"
               name="openingBalance"
+              class="sr-only peer"
             />
-            Opening Balance</label
-          >
+            <div
+              class="relative w-11 h-6 bg-gray-200 rounded-full peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"
+            ></div>
+            <span class="ms-3 text-sm font-medium text-gray-900"
+              >Opening Balance</span
+            >
+          </label>
         </div>
         <div class="form-group col-span-2 md:col-span-1">
           <label> Cost Center </label>

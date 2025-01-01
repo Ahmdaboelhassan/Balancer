@@ -22,7 +22,7 @@ public class ReportService : IReportService
                      && d.Journal.CreatedAt.Date >= from.Date
                      && d.Journal.CreatedAt.Date <= to.Date
                      && (costCenterId.HasValue ? d.CostCenterId == costCenterId : true)
-                   , "CostCenter", "Account", "Journal"));
+                   , "CostCenter", "Account", "Journal")).OrderBy(d => d.Journal.CreatedAt);
 
 
         var journalsLinkedList = new LinkedList<AccountStatementDetail>();
@@ -73,9 +73,9 @@ public class ReportService : IReportService
         {
             AccountType = balance > 0 ? "Debit" : "Credit",
             Details = journalsLinkedList,
-                AccountName = account.Name,
-                From = from.ToString("d"),
-                To = to.ToString("d"),
+            AccountName = account.Name,
+            From = from.ToString("d"),
+            To = to.ToString("d"),
             Amount = Math.Abs(balance).ToString("c")
         };
     }

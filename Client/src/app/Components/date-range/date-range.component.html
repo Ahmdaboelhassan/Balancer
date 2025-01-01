@@ -1,17 +1,17 @@
 <header
-  class="bg-white rounded-xl flex justify-evenly text-center items-center flex-col md:flex-row h-56 md:h-20 p-3 shadow-sm"
+  class="bg-white rounded-xl flex print:shadow-none justify-evenly text-center items-center flex-col md:flex-row h-56 md:h-20 p-3 shadow-sm"
 >
   <input
     type="date"
-    class="md:w-1/4 w-full form-control"
+    class="md:w-1/4 w-full print:text-xs form-control"
     required
     #fromDate
     [value]="from"
   />
-  <label class="w-20 text-slate-900 font-bold text-xl">To</label>
+  <label class="w-20 text-slate-900 font-bold text-xl print:text-xs">To</label>
   <input
     type="date"
-    class="md:w-1/4 w-full form-control"
+    class="md:w-1/4 w-full form-control print:text-xs"
     #toDate
     [value]="to"
   />

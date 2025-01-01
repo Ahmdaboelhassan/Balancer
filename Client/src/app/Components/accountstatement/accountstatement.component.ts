@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, Signal, signal } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AccountService } from '../../Services/account.service';
@@ -18,6 +18,7 @@ export class AccountstatementComponent {
   to = signal('');
   accounts: AccountSelectList[];
   costCenters: CostCenterSelectList[];
+  openingBalance: boolean = true;
 
   constructor(
     private router: Router,

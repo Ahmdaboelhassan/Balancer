@@ -58,11 +58,11 @@ public class HomeService : IHomeService
         var current = DateTime.Now.Date;
         var lastMonth = current.AddMonths(-1);
 
-        var currentMonthExpenses = await _unitOfWork.Journal
-               .GetAll(j => j.CreatedAt.Date.Month >= lastMonth.Month && j.CreatedAt.Date.Year == lastMonth.Year && j.Type == (byte)JournalTypes.Subtract);
+        var currentExpensesSum =(await _unitOfWork.Journal
+               .GetAll(j => j.CreatedAt.Date.Month == current.Month && j.CreatedAt.Date.Year == current.Year  && j.Type == (byte)JournalTypes.Subtract)).Sum(j => (j.Amount * -1));
 
-        var currentExpensesSum = currentMonthExpenses.Where(j => j.CreatedAt.Date.Month == current.Month).Sum(j => (j.Amount * -1));
-        var lastExpensesSum = currentMonthExpenses.Where(j => j.CreatedAt.Date.Month == lastMonth.Month).Sum(j => (j.Amount * -1));
+        var lastExpensesSum = (await _unitOfWork.Journal
+               .GetAll(j => j.CreatedAt.Date.Month == lastMonth.Month && j.CreatedAt.Date.Year == lastMonth.Year  && j.Type == (byte)JournalTypes.Subtract)).Sum(j => (j.Amount * -1));
 
 
         var currentAndLastMonthExpenses = new List<decimal> { lastExpensesSum, currentExpensesSum };

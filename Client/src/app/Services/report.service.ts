@@ -19,7 +19,7 @@ export class ReportService {
       url += `&costcenter=${costcenter}`;
     }
     if (openingbalance) {
-      url += `&openingbalance=${true}`;
+      url += `&openingbalance=${openingbalance}`;
     }
     return this.http.get<AccountStatement>(url);
   }
