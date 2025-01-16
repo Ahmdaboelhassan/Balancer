@@ -52,6 +52,10 @@ export class AccountstatementComponent {
   }
 
   GetAccountStatement(form: NgForm) {
-    this.router.navigate(['AccountStatement/Get'], { queryParams: form.value });
+    const baseUrl = window.location.origin;
+    const queryParams = new URLSearchParams(form.value).toString();
+    const hashRoute = `#/AccountStatement/Get?${queryParams}`;
+    const fullUrl = `${baseUrl}/${hashRoute}`;
+    window.open(fullUrl, '_blank');
   }
 }

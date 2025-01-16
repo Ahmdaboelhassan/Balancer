@@ -2,7 +2,7 @@
   [routerLink]="['/Journal', 'Edit', journal.id]"
   class="p-5 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 grid grid-cols-4"
 >
-  <div class="col-span-3">
+  <div class="lg:col-span-3 col-span-2">
     <h4 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">
       {{ journal.detail }}
     </h4>
@@ -18,9 +18,11 @@
     </p>
     <p></p>
   </div>
-  <div class="col-span-1 ms-auto">
+  <div class="lg:col-span-1 col-span-2 ms-auto">
     @if(journal.type === 1){
-    <div class="amount flex items-center text-3xl text-green-500">
+    <div
+      class="amount flex items-center text-3xl overflow-hidden text-green-500"
+    >
       <h1 class="me-2">{{ journal.amount }}</h1>
       <i class="fa-solid fa-square-plus"></i>
     </div>

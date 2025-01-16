@@ -3,11 +3,11 @@ import { AccountStatement } from '../../../Interfaces/Response/AccountStatement'
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ReportService } from '../../../Services/report.service';
 import { ToastrService } from 'ngx-toastr';
-import { NgClass } from '@angular/common';
+import { CurrencyPipe, NgClass, SlicePipe } from '@angular/common';
 
 @Component({
   selector: 'app-accountstatement-detials',
-  imports: [RouterLink, NgClass],
+  imports: [RouterLink, NgClass, SlicePipe, CurrencyPipe],
   templateUrl: './accountstatement-detials.component.html',
   styleUrl: './accountstatement-detials.component.css',
 })

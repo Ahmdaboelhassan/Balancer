@@ -25,4 +25,9 @@ public class ReportController : ControllerBase
     {
         return Ok(await _serviceContext.ReportService.GetIncomeStatement(from, to));
     }
+    [HttpGet("AccountsSummary")]
+    public async Task<IActionResult> AccountsSummary(DateTime from, DateTime to)
+    {
+        return Ok(await _serviceContext.ReportService.GetAccountsSummary(from, to));
+    }
 }

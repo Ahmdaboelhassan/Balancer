@@ -6,12 +6,12 @@ import { AccountSummary } from '../../Interfaces/Response/AccountSummary';
 import { CurrencyPipe } from '@angular/common';
 
 @Component({
-  selector: 'app-income-statement',
+  selector: 'app-accounts-summary',
   imports: [DateRangeComponent, CurrencyPipe],
-  templateUrl: './income-statement.component.html',
-  styleUrl: './income-statement.component.css',
+  templateUrl: './accounts-summary.component.html',
+  styleUrl: './accounts-summary.component.css',
 })
-export class IncomeStatementComponent {
+export class AccountsSummaryComponent {
   accounts: AccountSummary[] = [];
   constructor(
     private reportService: ReportService,
@@ -20,8 +20,8 @@ export class IncomeStatementComponent {
     this.titleServive.setTitle('Income Statement');
   }
 
-  GetIncomeStatement(dates: any) {
-    this.reportService.GetIncomeStatement(dates.from, dates.to).subscribe({
+  GetAccountsSummary(dates: any) {
+    this.reportService.GetAccountsSummary(dates.from, dates.to).subscribe({
       next: (accounts) => (this.accounts = accounts),
     });
   }

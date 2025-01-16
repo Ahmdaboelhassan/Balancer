@@ -1,25 +1,31 @@
 <header
-  class="bg-white rounded-xl flex print:shadow-none justify-evenly text-center items-center flex-col md:flex-row h-56 md:h-20 p-3 shadow-sm"
+  class="bg-white rounded-xl flex print:shadow-none justify-evenly text-center items-center flex-col lg:flex-row h-56 lg:h-20 print:h-fit shadow-sm py-3 px-4 print:p-0"
 >
   <input
     type="date"
-    class="md:w-1/4 w-full print:text-xs form-control"
+    class="lg:w-1/4 w-full print:text-xs date-form-control"
     required
     #fromDate
     [value]="from"
   />
-  <label class="w-20 text-slate-900 font-bold text-xl print:text-xs">To</label>
+  <label
+    class="w-20 text-slate-900 font-bold text-lg print:text-lg hidden lg:inline-block"
+    >To</label
+  >
   <input
     type="date"
-    class="md:w-1/4 w-full form-control print:text-xs"
+    class="lg:w-1/4 w-full date-form-control print:text-xs"
     #toDate
     [value]="to"
   />
   <button
     type="button"
-    class="btn-primary w-full md:w-2/12 print:hidden"
+    class="btn-primary w-full lg:w-2/12 print:hidden"
     (click)="EmitDatesValue(fromDate, toDate)"
   >
-    Search
+    <div class="flex justify-between items-center">
+      <span>Search</span>
+      <i class="fa-solid fa-magnifying-glass"></i>
+    </div>
   </button>
 </header>

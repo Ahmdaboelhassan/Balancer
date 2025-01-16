@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, viewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  HostListener,
+  ViewChild,
+  viewChild,
+} from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -26,4 +33,26 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 })
 export class NavComponent {
   accordion = viewChild.required(MatAccordion);
+  @ViewChild('nav', { static: true }) navbar: ElementRef;
+
+  constructor(private elementRef: ElementRef) {}
+
+  @HostListener('document:click', ['$event'])
+  handleOutsideClick(event: MouseEvent): void {
+    const targetElement = event.target as HTMLElement;
+    if (
+      targetElement &&
+      !this.elementRef.nativeElement.contains(targetElement)
+    ) {
+      if (
+        !this.navbar.nativeElement.classList.contains('-translate-x-[102%]')
+      ) {
+        this.navbar.nativeElement.classList.add('-translate-x-[102%]');
+      }
+    }
+  }
+
+  showNavBar(nav: HTMLElement) {
+    this.navbar.nativeElement.classList.toggle('-translate-x-[102%]');
+  }
 }

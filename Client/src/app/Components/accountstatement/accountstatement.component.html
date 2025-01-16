@@ -6,7 +6,7 @@
   <div class="py-5">
     <form #myForm="ngForm" (ngSubmit)="GetAccountStatement(myForm)">
       <div class="grid grid-cols-2 gap-4">
-        <div class="form-group col-span-2 md:col-span-1">
+        <div class="form-group col-span-2 lg:col-span-1">
           <label for="from">From</label>
           <input
             type="date"
@@ -16,7 +16,7 @@
             class="form-control w-full"
           />
         </div>
-        <div class="form-group col-span-2 md:col-span-1">
+        <div class="form-group col-span-2 lg:col-span-1">
           <label for="to">To</label>
           <input
             type="date"
@@ -26,7 +26,7 @@
             class="form-control w-full"
           />
         </div>
-        <div class="form-group col-span-2 md:col-span-1">
+        <div class="form-group col-span-2 lg:col-span-1">
           <label for="account">Account</label>
           <select class="form-control w-full" required ngModel name="account">
             <option *ngFor="let acc of accounts" [value]="acc.id">
@@ -48,7 +48,7 @@
             >
           </label>
         </div>
-        <div class="form-group col-span-2 md:col-span-1">
+        <div class="form-group col-span-2 lg:col-span-1">
           <label> Cost Center </label>
           <select class="form-control w-full" ngModel name="costCenter">
             <option *ngFor="let cost of costCenters" [value]="cost.id">
@@ -62,7 +62,7 @@
         <button
           type="submit"
           [disabled]="!myForm.valid"
-          class="btn-save me-2 w-full md:w-1/3"
+          class="btn-save me-2 w-full lg:w-1/3"
         >
           <div class="flex justify-between items-center">
             <span>Get Account Statement</span>

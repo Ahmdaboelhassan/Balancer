@@ -16,6 +16,7 @@ import { AccountstatementComponent } from './Components/accountstatement/account
 import { AccountstatementDetialsComponent } from './Components/accountstatement/accountstatement-detials/accountstatement-detials.component';
 import { IncomeStatementComponent } from './Components/income-statement/income-statement.component';
 import { AccountingTreeComponent } from './Components/accounting-tree/accounting-tree.component';
+import { AccountsSummaryComponent } from './Components/accounts-summary/accounts-summary.component';
 
 export const routes: Routes = [
   { path: 'Home', loadComponent: () => HomeComponent },
@@ -77,6 +78,10 @@ export const routes: Routes = [
   {
     path: 'AccountingTree',
     loadComponent: () => AccountingTreeComponent,
+  },
+  {
+    path: 'AccountsSummary',
+    loadComponent: () => AccountsSummaryComponent,
   },
   { path: '**', loadComponent: () => HomeComponent, pathMatch: 'full' },
 ];

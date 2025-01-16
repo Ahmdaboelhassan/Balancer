@@ -1,9 +1,10 @@
 <nav>
   <div
-    class="bg-slate-800 min-h-[calc(100vh-1.5rem)] mb-2 py-3 rounded-xl shadow-md"
+    #nav
+    class="bg-slate-800 min-h-[calc(100vh-1.5rem)] mb-2 py-3 rounded-xl shadow-md transition-all absolute z-20 -translate-x-[102%] lg:relative lg:translate-x-0 w-3/4 lg:w-full"
   >
     <div class="text-center p-5 flex justify-center">
-      <img src="favicon.ico" alt="Logo" class="w-40 h-40" />
+      <img src="favicon.ico" alt="Logo" class="w-28 h-28 md:w-40 md:h-40" />
     </div>
     <div class="p-5">
       <a
@@ -180,6 +181,15 @@
               </li>
               <li>
                 <a
+                  routerLink="/AccountsSummary"
+                  routerLinkActive="route-active"
+                  class="p-2 inline-block hover:text-slate-950"
+                >
+                  Accounts Summary</a
+                >
+              </li>
+              <li>
+                <a
                   routerLink="/IncomeStatement"
                   routerLinkActive="route-active"
                   class="p-2 inline-block hover:text-slate-950"
@@ -187,6 +197,7 @@
                   Icome Statment</a
                 >
               </li>
+
               <!-- <li>
                 <a
                   routerLink="Journal/Create"
@@ -212,3 +223,9 @@
     </div>
   </div>
 </nav>
+
+<span
+  (click)="showNavBar(nav)"
+  class="p-4 bg-slate-800/85 hover:bg-slate-800 text-white rounded-lg fixed inline-block bottom-4 right-2 z-10 lg:hidden transition-all cursor-pointer"
+  ><i class="fa-solid fa-bars fa-xl"></i
+></span>

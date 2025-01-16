@@ -1,5 +1,5 @@
-<app-date-range (dates)="GetIncomeStatement($event)"></app-date-range>
-<div class="daterange-result bg-white mt-4 rounded-xl overflow-auto">
+<app-date-range (dates)="GetAccountsSummary($event)"></app-date-range>
+<div class="daterange-result bg-white mt-2 rounded-xl overflow-auto">
   <table class="w-full text-sm text-left rtl:text-right text-gray-500">
     <tr class="text-xs text-white uppercase bg-slate-800">
       <th scope="col" class="px-8 py-3">Account</th>
@@ -20,7 +20,9 @@
           {{ account.accountName }}
         </th>
         <td class="px-8 py-4 font-bold">{{ account.accountNumber }}</td>
-        <td class="px-8 py-4 font-bold">{{ account.debit | currency }}</td>
+        <td class="px-8 py-4 font-bold">
+          {{ account.debit | currency }}
+        </td>
         <td class="px-8 py-4 font-bold">{{ account.credit | currency }}</td>
         <td class="px-8 py-4 font-bold">{{ account.balance | currency }}</td>
       </tr>

@@ -192,7 +192,7 @@ internal class JournalService : IJournalService
                 
                 var code = await GetNextCode();
 
-                var notes = $"Transaction Done From ({credit.Name}) To ({debit.Name})";
+                var notes = $"{credit.Name} : {debit.Name}";
 
                 var journalType = await GetJournalType(credit.Number , debit.Number);
                 var journalAmount = journalType == JournalTypes.Subtract ? model.Amount * (-1) : model.Amount;
@@ -294,7 +294,7 @@ internal class JournalService : IJournalService
                     return new ConfirmationResponse { Message = $"Created Date Is Greater Than Period End Date With {difference} Days" };
                 }
 
-                var notes = $"Updated Transaction Done From ({credit.Name}) To ({debit.Name})";
+                var notes = $"{credit.Name} : {debit.Name} (Updated)";
 
                 var journalType = await GetJournalType(credit.Number, debit.Number);
 

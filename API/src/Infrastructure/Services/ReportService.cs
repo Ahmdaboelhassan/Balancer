@@ -2,6 +2,7 @@
 using Application.IRepository;
 using Application.IServices;
 using Domain.Models;
+using System.Runtime.InteropServices.Marshalling;
 using System.Text;
 
 namespace Infrastructure.Services;
@@ -48,6 +49,7 @@ public class ReportService : IReportService
                     Debit = openingJournals.Sum(j => j.Debit),
                     Detail = "Opening Balance",
                     notes = "Opening Balance",
+                    Date = openingJournals.First().Journal.CreatedAt.ToShortDateString(),
                 });
             }
         }
@@ -69,6 +71,22 @@ public class ReportService : IReportService
                 Date = journal.Journal.CreatedAt.ToShortDateString(),
             });
         }
+
+        if (journalsLinkedList.Count > 0)
+        {
+            journalsLinkedList.AddLast(new AccountStatementDetail
+            {
+                Balance = balance,
+                Credit = journalsLinkedList.Sum(j => j.Credit),
+                Debit = journalsLinkedList.Sum(j => j.Debit),
+                CostCenter = "",
+                Detail = "Total",
+                JournalId = 0,
+                notes = "Total",
+                PeriodId = 0,
+                Date = "",
+            });
+        }
         return new AccountStatement()
         {
             AccountType = balance > 0 ? "Debit" : "Credit",
@@ -80,29 +98,38 @@ public class ReportService : IReportService
         };
     }
 
-    public async Task<IEnumerable<AccountBalanceDTO>> GetIncomeStatement(DateTime from, DateTime to)
+    public async Task<IEnumerable<AccountSummaryDTO>> GetIncomeStatement(DateTime from, DateTime to)
     {
         var settings = await _uow.Settings.GetFirst();
 
         if (settings is null)
-            return Enumerable.Empty<AccountBalanceDTO>();
+            return Enumerable.Empty<AccountSummaryDTO>();
 
         var expensesAccount = await _uow.Accounts.Get(settings.ExpensesAccount.GetValueOrDefault());
         var RevenuesAccount = await _uow.Accounts.Get(settings.RevenueAccount.GetValueOrDefault());
 
         if (RevenuesAccount is null || expensesAccount is null)
-            return Enumerable.Empty<AccountBalanceDTO>();
+            return Enumerable.Empty<AccountSummaryDTO>();
 
 
-        var journals = await _uow.JournalDetail
-            .SelectAll(d => d.Journal.CreatedAt.Date >= from && d.Journal.CreatedAt.Date <= to 
+        var journals = (await _uow.JournalDetail
+            .SelectAll(d => d.Journal.CreatedAt.Date >= from && d.Journal.CreatedAt.Date <= to
                && (d.Account.Number.StartsWith(expensesAccount.Number) || d.Account.Number.StartsWith(RevenuesAccount.Number))
-            , d => new {accountId = d.AccountId , AccountNumber = d.Account.Number , AccountName = d.Account.Name , balance = d.Debit - d.Credit}
-            , "Account", "Journal");
+            , d => new { accountId = d.AccountId, AccountNumber = d.Account.Number, AccountName = d.Account.Name, balance = d.Debit - d.Credit , d.Credit , d.Debit}
+            , "Account", "Journal"));
+
 
 
         var incomeStatement = journals.GroupBy(j => j.accountId)
-                .Select(d => new AccountBalanceDTO { AccountName = d.First().AccountName, Balance = d.Sum(d => d.balance).ToString("c") }).ToList();
+                .Select(d => new AccountSummaryDTO
+                {
+                    AccountName = d.First().AccountName,
+                    Balance = d.Sum(d => d.balance),
+                    AccountNumber = d.First().AccountNumber,
+                    Credit = d.Sum(d => d.Credit),
+                    Debit = d.Sum(d => d.Debit),
+                }).OrderByDescending(d => d.Balance).ToList();
+                
 
 
         var totalExpenses = journals.Where(a => a.AccountNumber.StartsWith(expensesAccount.Number)).Sum(a => a.balance);
@@ -112,25 +139,64 @@ public class ReportService : IReportService
 
         if (profit > 0)
         {
-            incomeStatement.Add(new AccountBalanceDTO
+            incomeStatement.Add(new AccountSummaryDTO
             {
+                AccountNumber = "",
                 AccountName = "Excess of Revenues Over Expenses",
-                Balance = profit.ToString("c")
+                Credit = journals.Sum(a => a.Credit),
+                Debit = journals.Sum(a => a.Debit),
+                Balance = profit,
             });
 
         }
         else
         {
-            incomeStatement.Add(new AccountBalanceDTO
+            incomeStatement.Add(new AccountSummaryDTO
             {
+                AccountNumber = "",
                 AccountName = "Excess of Expenses Over Revenues",
-                Balance = (profit * -1).ToString("c")
+                Credit = journals.Sum(a => a.Credit),
+                Debit = journals.Sum(a => a.Debit),
+                Balance = (profit * -1),
+
             });
         }
 
         return incomeStatement;
         }
 
+    public async Task<IEnumerable<AccountSummaryDTO>> GetAccountsSummary(DateTime from, DateTime to)
+    {
+
+        var journals = (await _uow.JournalDetail
+            .SelectAll(d => d.Journal.CreatedAt.Date >= from && d.Journal.CreatedAt.Date <= to
+            , d => new { accountId = d.AccountId, AccountNumber = d.Account.Number, AccountName = d.Account.Name, balance = d.Debit - d.Credit, d.Credit, d.Debit }
+            , "Account", "Journal"));
+
+        if (journals.Count() == 0)
+            return Enumerable.Empty<AccountSummaryDTO>();
+
+        var incomeStatement = journals.GroupBy(j => j.accountId)
+                .Select(d => new AccountSummaryDTO { 
+                    AccountName = d.First().AccountName, 
+                    AccountNumber = d.First().AccountNumber,
+                    Credit = d.Sum(d => d.Credit),
+                    Debit = d.Sum(d => d.Debit),
+                    Balance = d.Sum(d => d.balance),
+                
+                }).OrderByDescending(a => a.Balance).ToList();
+
+        incomeStatement.Add(new AccountSummaryDTO
+        {
+            AccountName = "Total",
+            AccountNumber = "",
+            Balance = journals.Sum(j => j.balance),
+            Credit = journals.Sum(j => j.Credit),
+            Debit = journals.Sum(j => j.Debit),
+        });
+
+        return incomeStatement;
+    }
     private AccountStatement GetEmptyAccountStatement()
     {
         return new AccountStatement()

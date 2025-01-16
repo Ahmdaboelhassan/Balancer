@@ -5,6 +5,8 @@
 html,
 body {
   height: 100%;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
 }
 body {
   padding: 0.5rem 0.25rem;
@@ -208,11 +210,11 @@ button.toast-close-button {
 
 /* Custom Styles */
 .daterange-result {
-  @apply min-h-[calc(100%-16rem)]  md:min-h-[calc(100%-7rem)];
+  @apply min-h-[calc(100%-15rem)]  lg:min-h-[calc(100%-6rem)];
 }
 
 .search-result {
-  @apply min-h-[calc(100%-10rem)]  md:min-h-[calc(100%-7rem)];
+  @apply min-h-[calc(100%-10rem)]  lg:min-h-[calc(100%-7rem)];
 }
 
 .full-page {

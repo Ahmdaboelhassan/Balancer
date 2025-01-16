@@ -1,15 +1,15 @@
 <header
-  class="bg-white rounded-xl flex justify-between text-center items-center flex-col md:flex-row h-32 md:h-20 py-3 px-10 shadow-sm"
+  class="bg-white rounded-xl flex justify-between text-center items-center flex-col lg:flex-row min-h-32 lg:min-h-20 py-3 px-10 shadow-sm"
 >
   <input
     #key
-    class="md:w-1/2 w-full form-control"
+    class="lg:w-1/2 w-full form-control"
     required
     placeholder="Seach"
   />
   @if(Amount){
   <input
-    class="md:w-1/5 w-full text-center my-1 bg-gray-50 border border-gray-300 font-bold text-lg rounded-lg focus-visible:ring-slate-700 focus-visible:border-slate-700 shadow-sm block p-2.5 outline-none"
+    class="lg:w-1/5 w-full text-center my-1 bg-gray-50 border border-gray-300 font-bold text-lg rounded-lg focus-visible:ring-slate-700 focus-visible:border-slate-700 shadow-sm block p-2.5 outline-none"
     required
     placeholder="Total Amount"
     [ngClass]="Amount <= 0 ? 'text-red-500' : 'text-green-500'"
@@ -20,8 +20,11 @@
   <button
     (click)="Seach(key)"
     type="button"
-    class="btn-primary w-full md:w-1/4"
+    class="btn-primary w-full lg:w-1/4 print:hidden"
   >
-    Search
+    <div class="flex justify-between items-center">
+      <span>Search</span>
+      <i class="fa-solid fa-magnifying-glass"></i>
+    </div>
   </button>
 </header>
