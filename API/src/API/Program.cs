@@ -1,6 +1,7 @@
 using Infrastructure;
 using Application;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -17,12 +18,18 @@ builder.Services
 
 var app = builder.Build();
 
-//app.UseSwagger();
-//app.UseSwaggerUI();
+if (builder.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
+
 app.UseAuthorization();
+
 app.UseCors( opt =>
     opt.AllowAnyOrigin()
        .AllowAnyHeader()

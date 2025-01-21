@@ -4,6 +4,7 @@ import { NavComponent } from './Components/nav/nav.component';
 import { RouterOutlet } from '@angular/router';
 import { LoadingComponent } from './Components/loading/loading.component';
 import { LoadingService } from './Services/loading.service';
+import { AuthService } from './Services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -11,8 +12,16 @@ import { LoadingService } from './Services/loading.service';
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })
-export class AppComponent {
-  isAuth = signal(true);
+export class AppComponent implements OnInit {
+  user = computed(() => this.authService.user());
   isLoad = computed(() => this.loadingService.isLoad());
-  constructor(private loadingService: LoadingService) {}
+
+  constructor(
+    private loadingService: LoadingService,
+    private authService: AuthService
+  ) {}
+
+  ngOnInit(): void {
+    this.authService.AutoLogin();
+  }
 }

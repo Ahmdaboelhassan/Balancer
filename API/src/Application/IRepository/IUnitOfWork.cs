@@ -10,6 +10,8 @@ public interface IUnitOfWork
      IJournalDetailRepo JournalDetail { get;}
      ICostCenterRepo CostCenter { get;}
      ISettingsRepo Settings { get; }
+     IUserRepo Users{ get; }
+     IDashboardAccountsRepo DashboardAccounts { get; }
 
     Task SaveChangesAync();
     IDbTransaction StartTransaction();

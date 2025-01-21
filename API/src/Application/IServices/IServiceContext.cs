@@ -7,4 +7,8 @@ public interface IServiceContext
     ICostCenterService CostCenterService { get; }
     IHomeService HomeService { get; }
     IReportService ReportService { get; }
+    IAuthService AuthService { get;}
+    IPasswordHasher PasswordHasher { get;}
+    ITokenService TokenService { get;}
 }
+

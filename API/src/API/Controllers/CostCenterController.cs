@@ -1,11 +1,13 @@
 ﻿using Application.DTO.Request;
 using Application.IServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 [Route("[controller]")]
 [ApiController]
+[Authorize]
 public class CostCenterController : ControllerBase
 {
     private readonly IServiceContext _serviceContext;

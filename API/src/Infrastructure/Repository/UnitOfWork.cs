@@ -13,7 +13,9 @@ public class UnitOfWork : IUnitOfWork
     public IJournalRepo Journal { get; private set; }
     public IJournalDetailRepo JournalDetail { get; private set; }
     public ICostCenterRepo CostCenter { get; private set; }
-    public ISettingsRepo Settings { get; }
+    public ISettingsRepo Settings { get; private set; }
+    public IUserRepo Users { get; private set; }
+    public IDashboardAccountsRepo DashboardAccounts { get; private set; }
 
     public UnitOfWork(AppDbContext context)
     {
@@ -24,6 +26,8 @@ public class UnitOfWork : IUnitOfWork
         JournalDetail = new JournalDetailRepo(context);
         CostCenter = new CostCenterRepo(context);
         Settings = new SettingsRepo(context);
+        Users = new UserRepo(context);
+        DashboardAccounts = new DashboardAccountsRepo(context);
     }
    
 

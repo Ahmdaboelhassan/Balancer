@@ -12,6 +12,8 @@ namespace Infrastructure.Data
         public DbSet<JournalDetail> JournalDetails { get; set; }
         public DbSet<CostCenter> CostCenters { get; set; }
         public DbSet<Settings> Settings { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<DashboardAccounts> DashbourdAccounts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -18,16 +18,16 @@ public class HomeService : IHomeService
     public async Task<GetHomeDTO> GetHome()
     {
         // Statistics
-        var settings = await _unitOfWork.Settings.GetFirst();
-        if (settings == null)
+        var dashboard = await _unitOfWork.DashboardAccounts.GetFirst();
+        if (dashboard == null)
             return GetEmptyHome();
 
         var accountIds = new[]
         {
-            settings.DrawersAccount,
-            settings.BanksAccount,
-            settings.CurrentAssetsAccount,
-            settings.LiabilitiesAccount
+            dashboard.Account1,
+            dashboard.Account2,
+            dashboard.Account3,
+            dashboard.Account4,
         };
 
         var accounts = (await _unitOfWork.Accounts.GetAll(x => accountIds.Contains(x.Id))) ;

@@ -1,7 +1,7 @@
 {
   "name": "Balancer",
   "short_name": "Balancer",
-  "theme_color": "#1976d2",
+  "theme_color": "#1e293b",
   "background_color": "#fafafa",
   "display": "standalone",
   "scope": "./",

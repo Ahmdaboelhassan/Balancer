@@ -1,4 +1,8 @@
-import { ApplicationConfig, provideZoneChangeDetection, isDevMode } from '@angular/core';
+import {
+  ApplicationConfig,
+  provideZoneChangeDetection,
+  isDevMode,
+} from '@angular/core';
 import { provideRouter, withHashLocation } from '@angular/router';
 import { provideToastr } from 'ngx-toastr';
 import { routes } from './app.routes';
@@ -7,6 +11,7 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { loadingInterceptor } from './Inerceptors/loading.interceptor';
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 import { provideServiceWorker } from '@angular/service-worker';
+import { authInterceptor } from './Inerceptors/auth.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -21,13 +26,15 @@ export const appConfig: ApplicationConfig = {
       timeOut: 5000,
       positionClass: 'toast-top-right',
     }),
-    provideHttpClient(withInterceptors([loadingInterceptor])),
-    provideCharts(withDefaultRegisterables()), provideServiceWorker('ngsw-worker.js', {
-            enabled: !isDevMode(),
-            registrationStrategy: 'registerWhenStable:30000'
-          }), provideServiceWorker('ngsw-worker.js', {
-            enabled: !isDevMode(),
-            registrationStrategy: 'registerWhenStable:30000'
-          }),
+    provideHttpClient(withInterceptors([loadingInterceptor, authInterceptor])),
+    provideCharts(withDefaultRegisterables()),
+    provideServiceWorker('ngsw-worker.js', {
+      enabled: !isDevMode(),
+      registrationStrategy: 'registerWhenStable:30000',
+    }),
+    provideServiceWorker('ngsw-worker.js', {
+      enabled: !isDevMode(),
+      registrationStrategy: 'registerWhenStable:30000',
+    }),
   ],
 };

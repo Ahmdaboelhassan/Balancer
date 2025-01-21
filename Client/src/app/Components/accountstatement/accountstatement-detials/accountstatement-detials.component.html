@@ -42,9 +42,12 @@
           [title]="item.notes"
           class="py-4 px-3 whitespace-nowrap overflow-hidden text-ellipsis"
         >
-          {{ item.notes | slice : 0 : 50 }}..
+          @if (item.notes.length > 50) {
+          {{ item.notes | slice : 0 : 50 }}.. } @else {
+          {{ item.notes }}
+          }
         </td>
-        <td class="py-4 px-3 text-right print:hidden">
+        <td class="py-4 px-3 text-center lg:text-right print:hidden">
           @if(item.journalId > 0 && item.periodId > 0){
           <a
             [routerLink]="['/Journal/Edit/', item.journalId]"
