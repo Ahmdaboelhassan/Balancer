@@ -1,6 +1,7 @@
 **obj/
 **bin/
 **Debug/
+**Properties/
 .vs/
 .vscode/
 Conwi/.vs/
