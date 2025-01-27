@@ -44,7 +44,7 @@ export class HomeComponent implements OnInit {
   pieChart = signal({});
   ngOnInit(): void {
     this.GetEstimatedMonthNeed();
-    this.titleService.setTitle('Home');
+    this.titleService.setTitle('Balancer');
     this.homeService.GetHome().subscribe({
       next: (result) => {
         this.balances.set(result.accountsSummary);

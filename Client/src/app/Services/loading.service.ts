@@ -1,16 +1,24 @@
 import { Injectable, signal } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class LoadingService {
   isLoad = signal(false);
+  private isDisabled = false;
 
   LoadingStarted() {
-    this.isLoad.set(true);
+    if (!this.isDisabled) {
+      this.isLoad.set(true);
+    }
   }
   LoadingFinsihed() {
     this.isLoad.set(false);
+  }
+  DisableLoading() {
+    this.isDisabled = true;
+  }
+  EnableLoading() {
+    this.isDisabled = false;
   }
 }
