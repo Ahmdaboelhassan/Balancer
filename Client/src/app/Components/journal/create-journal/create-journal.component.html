@@ -1,4 +1,4 @@
-<div class="bg-white rounded-lg p-10 mb-3">
+<div class="bg-white rounded-lg p-7 lg:p-10 mb-3">
   <div>
     <h1 class="text-slate-800 font-bold text-3xl mb-4">
       {{ isEdit ? "Edit Journal" : "Create Journal" }}
@@ -30,11 +30,10 @@
             class="form-control w-full"
           />
         </div>
-        <div class="col-span-4 lg:col-span-1">
+        <div class="col-span-4 lg:col-span-2">
           <label for="credit"> From Account </label>
 
           <select
-            (change)="GetCreditBalance()"
             class="form-control w-full"
             id="credit"
             formControlName="credit"
@@ -47,18 +46,18 @@
             </option>
           </select>
         </div>
-        <div class="col-span-4 lg:col-span-1">
+        <!-- Credit Balance -->
+        <!-- <div class="col-span-4 lg:col-span-1">
           <label for="credit balance"> Source Current Balance </label>
           <input
             type="number"
             class="form-control w-full"
             formControlName="creditBalance"
           />
-        </div>
-        <div class="col-span-4 lg:col-span-1">
+        </div> -->
+        <div class="col-span-4 lg:col-span-2">
           <label for="debit"> To Account</label>
           <select
-            (change)="GetDebitBalance()"
             class="form-control w-full"
             id="debit"
             formControlName="debit"
@@ -71,14 +70,15 @@
             </option>
           </select>
         </div>
-        <div class="col-span-4 lg:col-span-1">
+        <!-- Debit Balance -->
+        <!-- <div class="col-span-4 lg:col-span-1">
           <label for="detail"> Distination Current Balance </label>
           <input
             type="number"
             class="form-control w-full"
             formControlName="debitBalance"
           />
-        </div>
+        </div> -->
         <div class="col-span-4 lg:col-span-1">
           <label for="costCenter"> Cost Center </label>
           <select

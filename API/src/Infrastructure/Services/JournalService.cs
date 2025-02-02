@@ -272,7 +272,7 @@ internal class JournalService : IJournalService
                     return new ConfirmationResponse { Message = "Invalid Journal" };
 
                 // Reset Period Value 
-                if (journal.Type != (byte)JournalTypes.Due)
+                if (journal.Type != (byte)JournalTypes.Due && journal.Type != (byte)JournalTypes.Forward)
                     await ResetPeriodValueBeforeJournal(journal.PeriodId, journal.Amount);
 
                 var credit = await _uow.Accounts.Get(model.CreditAccountId);

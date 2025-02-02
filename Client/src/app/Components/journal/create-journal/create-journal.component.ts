@@ -79,8 +79,8 @@ export class CreateJournalComponent {
       creditBalance: new FormControl({ disabled: true, value: 0 }),
       debitBalance: new FormControl({ disabled: true, value: 0 }),
     });
-    this.GetCreditBalance();
-    this.GetDebitBalance();
+    // this.GetCreditBalance();
+    // this.GetDebitBalance();
   }
 
   GetCreditBalance() {
@@ -157,8 +157,8 @@ export class CreateJournalComponent {
               created: this.GetLocaleDateTime(new Date()),
               costCenter: null,
             });
-            this.GetCreditBalance();
-            this.GetDebitBalance();
+            // this.GetCreditBalance();
+            // this.GetDebitBalance();
           });
         },
         error: (error) => {

@@ -4,6 +4,7 @@ import { BaseChartDirective } from 'ng2-charts';
 import { AccountsBalance } from '../../Interfaces/Response/AccountsBalance';
 import { HomeService } from '../../Services/home.service';
 import { Title } from '@angular/platform-browser';
+import { CdkObserveContent } from '@angular/cdk/observers';
 
 @Component({
   selector: 'app-home',
@@ -120,5 +121,13 @@ export class HomeComponent implements OnInit {
     }).format(money);
 
     this.timeLeft = { periods: periods, days: days };
+  }
+
+  ToggleBalance($event) {
+    const el = $event.currentTarget as HTMLElement;
+    const cover = el.querySelector('.cover');
+    if (cover) {
+      cover.classList.toggle('opacity-0');
+    }
   }
 }

@@ -1,11 +1,17 @@
 <div class="grid grid-cols-4 gap-3 select-none">
   @for (item of balances(); track $index) {
   <div
-    class="bg-white rounded-lg flex justify-between items-center shadow-sm p-5 hover:shadow-lg transition-all col-span-5 lg:col-span-1"
+    class="bg-white rounded-lg flex justify-between items-center shadow-sm p-5 cursor-pointer lg:hover:shadow-lg transition-all col-span-5 lg:col-span-1"
+    (click)="ToggleBalance($event)"
   >
     <div class="info">
       <p class="text-sm text-gray-500">{{ item.accountName }}</p>
-      <p class="text-xl font-bold">{{ item.balance }}</p>
+      <p class="text-xl font-bold relative">
+        {{ item.balance }}
+        <span
+          class="cover absolute w-full h-full bg-gray-200 left-0 rounded-md bottom-0 transition"
+        ></span>
+      </p>
     </div>
     <div
       class="rounded-3xl {{
@@ -34,34 +40,36 @@
         <canvas baseChart [data]="pieChart()" [type]="'pie'"> </canvas>
         }
       </div>
-      <a
-        routerLink="/Journal/Create"
-        class="bg-white hover:bg-gray-100 cursor-pointer flex justify-between items-center rounded-xl p-4 mb-2 transition-all hover:ps-7"
-      >
-        Create Journal
-        <i class="fa-solid fa-arrow-right fa-lg text-gray-700"></i>
-      </a>
-      <a
-        routerLink="/Period/Create"
-        class="bg-white hover:bg-gray-100 cursor-pointer flex justify-between items-center rounded-xl p-4 mb-2 transition-all hover:ps-7"
-      >
-        Create Period
-        <i class="fa-solid fa-arrow-right fa-lg text-gray-700"></i>
-      </a>
-      <a
-        routerLink="/AccountStatement"
-        class="bg-white hover:bg-gray-100 cursor-pointer flex justify-between items-center rounded-xl p-4 mb-2 transition-all hover:ps-7"
-      >
-        Account Statement
-        <i class="fa-solid fa-arrow-right fa-lg text-gray-700"></i>
-      </a>
+      <div class="hidden lg:block">
+        <a
+          routerLink="/Journal/Create"
+          class="bg-white hover:bg-gray-100 cursor-pointer flex justify-between items-center rounded-xl p-4 mb-2 transition-all hover:ps-7"
+        >
+          Create Journal
+          <i class="fa-solid fa-arrow-right fa-lg text-gray-700"></i>
+        </a>
+        <a
+          routerLink="/Period/Create"
+          class="bg-white hover:bg-gray-100 cursor-pointer flex justify-between items-center rounded-xl p-4 mb-2 transition-all hover:ps-7"
+        >
+          Create Period
+          <i class="fa-solid fa-arrow-right fa-lg text-gray-700"></i>
+        </a>
+        <a
+          routerLink="/AccountStatement"
+          class="bg-white hover:bg-gray-100 cursor-pointer flex justify-between items-center rounded-xl p-4 mb-2 transition-all hover:ps-7"
+        >
+          Account Statement
+          <i class="fa-solid fa-arrow-right fa-lg text-gray-700"></i>
+        </a>
+      </div>
     </div>
   </div>
 </div>
 
 <div class="grid grid-cols-2 gap-3 mt-3">
   <div
-    class="bg-white rounded-lg col-span-2 lg:col-span-1 flex justify-between items-center shadow-sm p-5 hover:shadow-lg transition-all"
+    class="bg-white rounded-lg col-span-2 lg:col-span-1 flex justify-between items-center shadow-sm p-5 lg:hover:shadow-lg transition-all"
   >
     <div class="info">
       <p class="text-sm text-gray-600 mb-2">Time Left For The Month</p>
@@ -83,7 +91,7 @@
     </div>
   </div>
   <div
-    class="bg-white rounded-lg flex col-span-2 lg:col-span-1 justify-between items-center shadow-sm p-5 hover:shadow-lg transition-all"
+    class="bg-white rounded-lg flex col-span-2 lg:col-span-1 justify-between items-center shadow-sm p-5 lg:hover:shadow-lg transition-all"
   >
     <div class="info">
       <p class="text-sm text-gray-600 mb-2">Estimated Money Need</p>
