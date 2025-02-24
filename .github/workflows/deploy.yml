@@ -2,9 +2,9 @@ name: Deploy to Monster ASP
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - master  
+  #push:
+    #branches:
+      #- master  
 
 jobs:
   build-and-deploy:
