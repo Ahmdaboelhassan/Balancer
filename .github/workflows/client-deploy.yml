@@ -30,10 +30,10 @@ jobs:
       - name: Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
-          server: "${{ secrets.FTP_SERVER }}"
-          username: "${{ secrets.FTP_USERNAME }}"
-          password: "${{ secrets.FTP_PASSWORD }}"
-          local-dir: "./frontend/dist/"  # Ensure this matches your build output path
-          server-dir: "/wwwroot/"  # Change this to your Monster ASP deployment path
+          server: "site16185.siteasp.net"
+          username: "${{ secrets.NG_FTP_USERNAME }}"
+          password: "${{ secrets.NG_FTP_PASSWORD }}"
+          local-dir: "./Client/dist/client/browser" 
+          server-dir: "/wwwroot/"  
           passive: true
           dangerous-clean-slate: true  # Deletes old files before upload
