@@ -34,7 +34,7 @@ jobs:
           server: "site16185.siteasp.net"
           username: "${{ secrets.NG_FTP_USERNAME }}"
           password: "${{ secrets.NG_FTP_PASSWORD }}"
-          local-dir: "./Client/dist/client/browser" 
+          local-dir: "./Client/dist/client/browser/" 
           server-dir: "/wwwroot/"  
           passive: true
           dangerous-clean-slate: true  # Deletes old files before upload
