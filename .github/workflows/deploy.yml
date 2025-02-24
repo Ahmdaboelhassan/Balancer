@@ -2,9 +2,9 @@ name: Deploy API
 
 on:
   workflow_dispatch:
-  #push:
-    #branches:
-      #- master  
+  push:
+    branches:
+      - master  
 
 jobs:
   build-and-deploy:
