@@ -2,7 +2,7 @@
   "name": "Balancer",
   "short_name": "Balancer",
   "theme_color": "#1e293b",
-  "background_color": "#fafafa",
+  "background_color": "#1e293b",
   "display": "standalone",
   "scope": "./",
   "start_url": "./",
