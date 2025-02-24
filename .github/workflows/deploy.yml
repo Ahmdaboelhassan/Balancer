@@ -1,4 +1,4 @@
-name: Deploy to Monster ASP
+name: Deploy API
 
 on:
   workflow_dispatch:
@@ -38,4 +38,5 @@ jobs:
          password: ${{ secrets.FTP_PASSWORD }}
          local-dir: "./publish/"
          server-dir: "/wwwroot/"
+         passive: true
          dangerous-clean-slate: true
