@@ -18,7 +18,17 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '20'  # Change this based on your Angular requirements
+          
+      - name : log 
+        run : ls
+        working-directory: ./Client
 
+      - name : log2 
+        run : ls
+        
+      - name : log2 
+        run : ls
+        working-directory: ./Client/src
         
       - name: Install Dependencies
         run: npm install
