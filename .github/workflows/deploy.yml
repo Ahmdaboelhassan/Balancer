@@ -22,6 +22,9 @@ jobs:
       - name: Restore Dependencies
         run: dotnet restore
         working-directory: ./API/src/API
+        
+      - name: Restore appsettings.json
+        run: echo '${{ secrets.APPSETTINGS_JSON }}' > ./API/src/API/appsettings.json
 
       - name: Build and Publish
         run: dotnet publish -c Release -o ../../../publish
