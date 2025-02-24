@@ -1,9 +1,9 @@
 name: Deploy Angular to Monster ASP via FTP
 
 on:
-  push:
-    branches:
-      - master  # Change if your deployment branch is different
+  #push:
+   # branches:
+      #- main  # Change if your deployment branch is different
   workflow_dispatch:  # Allows manual triggering
 
 jobs:
@@ -20,20 +20,20 @@ jobs:
           node-version: '20'  # Change this based on your Angular requirements
 
       - name: Install Dependencies
-        run: npm ci  # Ensures a clean and fast install
-        working-directory: ./Client/  
-        
+        run: npm install
+        working-directory: ./Client  # Adjust based on your project structure
+
       - name: Build Angular App
-        run: npm run build -- --output-path=dist
-        working-directory: ./Client/
+        run: npm run build -- --output-path=dist 
+        working-directory: ./Client  # Adjust based on your project structure
 
       - name: Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
-          server: "site16186.siteasp.net"
-          username: "${{ secrets.NG_FTP_USERNAME }}"
-          password: "${{ secrets.NG_FTP_PASSWORD }}"
-          local-dir: "./dist/"  # This is where the Angular build is stored
+          server: "${{ secrets.FTP_SERVER }}"
+          username: "${{ secrets.FTP_USERNAME }}"
+          password: "${{ secrets.FTP_PASSWORD }}"
+          local-dir: "./frontend/dist/"  # Ensure this matches your build output path
           server-dir: "/wwwroot/"  # Change this to your Monster ASP deployment path
-          passive: true  # Enable passive mode if needed
+          passive: true
           dangerous-clean-slate: true  # Deletes old files before upload
