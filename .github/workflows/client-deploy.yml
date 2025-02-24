@@ -1,9 +1,9 @@
 name: Deploy Client
 
 on:
-  #push:
-   # branches:
-      #- main  # Change if your deployment branch is different
+  push:
+    branches:
+      - master  # Change if your deployment branch is different
   workflow_dispatch:  # Allows manual triggering
 
 jobs:
@@ -28,21 +28,13 @@ jobs:
         run: npm run build -- --output-path=dist 
         working-directory: ./Client
 
-      - name : log 
-        run : ls
-        working-directory: ./Client/dist
-
-      - name : log 
-        run : ls
-        working-directory: ./Client/dist/client
-        
       - name: Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
           server: "site16185.siteasp.net"
           username: "${{ secrets.NG_FTP_USERNAME }}"
           password: "${{ secrets.NG_FTP_PASSWORD }}"
-          local-dir: "./Client/dist/" 
+          local-dir: "./Client/dist/browser/" 
           server-dir: "/wwwroot/"  
           passive: true
           dangerous-clean-slate: true  # Deletes old files before upload
