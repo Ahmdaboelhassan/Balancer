@@ -1,9 +1,9 @@
-name: Deploy Angular to Monster ASP via FTP
+name: Deploy Client
 
 on:
-  #push:
-   # branches:
-      #- main  # Change if your deployment branch is different
+  push:
+    branches:
+      - master  # Change if your deployment branch is different
   workflow_dispatch:  # Allows manual triggering
 
 jobs:
@@ -19,19 +19,9 @@ jobs:
         with:
           node-version: '20'  # Change this based on your Angular requirements
           
-      - name : log 
-        run : ls
-        working-directory: ./Client
-
-      - name : log2 
-        run : ls
-        
-      - name : log2 
-        run : ls
-        working-directory: ./Client/src
         
       - name: Install Dependencies
-        run: npm install
+        run: npm install --legacy-peer-deps
         working-directory: ./Client
 
       - name: Build Angular App
@@ -44,7 +34,7 @@ jobs:
           server: "site16185.siteasp.net"
           username: "${{ secrets.NG_FTP_USERNAME }}"
           password: "${{ secrets.NG_FTP_PASSWORD }}"
-          local-dir: "./Client/dist/client/browser" 
+          local-dir: "./Client/dist/browser/" 
           server-dir: "/wwwroot/"  
           passive: true
           dangerous-clean-slate: true  # Deletes old files before upload
