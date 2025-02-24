@@ -184,7 +184,7 @@ internal class PeriodService : IPeriodService
     }
     private async Task<int> GetPeriodNumber(DateTime FromDate)
     {
-        int periodsInSameMonth = await _uow.Periods.Count(p => p.From.Month <= FromDate.Month && p.From.Year <= FromDate.Year);
+        int periodsInSameMonth = await _uow.Periods.Count(p => p.From.Month == FromDate.Month && p.From.Year == FromDate.Year);
         return periodsInSameMonth == 0 ? 1 : periodsInSameMonth + 1;
     }
 
