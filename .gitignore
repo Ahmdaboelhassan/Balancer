@@ -6,7 +6,8 @@
 .vscode/
 Conwi/.vs/
 .github/
-**.json
+appsettings.json
+appsettings.Development.json
 Users.txt
 
 # See http://help.github.com/ignore-files/ for more about ignoring files.
