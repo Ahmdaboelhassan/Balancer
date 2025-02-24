@@ -19,14 +19,11 @@ jobs:
         with:
           dotnet-version: '8.0.x'  # Change to your .NET version
           
-      - name: Navigate to Project Directory
-        run: cd './API/src/API'
-        
       - name: Restore Dependencies
-        run: dotnet restore
+        run: dotnet restore './API/src/API/API.csproj'
 
       - name: Build and Publish
-        run: dotnet publish -c Release -o ./publish
+        run: dotnet publish './API/src/API/API.csproj' -c Release -o ./publish
 
       - name: Deploy to Monster ASP
         uses: azure/webapps-deploy@v2
