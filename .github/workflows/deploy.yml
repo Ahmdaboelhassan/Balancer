@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - main  
+      - master  
 
 jobs:
   build-and-deploy:
@@ -17,20 +17,25 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '8.0.x'  # Change to your .NET version
+          dotnet-version: '8.0.x'  # Change this to match your .NET version
           
-      - name: Navigate to Project Directory
-        run: cd './API/src/API'
-        
       - name: Restore Dependencies
         run: dotnet restore
+        working-directory: ./API/src/API
+        
+      - name: Restore appsettings.json
+        run: echo '${{ secrets.APPSETTINGS_JSON }}' > ./API/src/API/appsettings.json
 
       - name: Build and Publish
-        run: dotnet publish -c Release -o ./publish
+        run: dotnet publish -c Release -o ../../../publish
+        working-directory: ./API/src/API
 
-      - name: Deploy to Monster ASP
-        uses: azure/webapps-deploy@v2
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
-          app-name: "balancerapi"  
-          publish-profile: ${{ secrets.PUBLISH_PROFILE }}
-          package: ./publish
+         server: "site16186.siteasp.net"  # Your Monster ASP FTP server
+         username: ${{ secrets.FTP_USERNAME }}
+         password: ${{ secrets.FTP_PASSWORD }}
+         local-dir: "./publish/"
+         server-dir: "/wwwroot/"
+         dangerous-clean-slate: true
