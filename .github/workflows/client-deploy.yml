@@ -1,4 +1,4 @@
-name: Deploy Angular to Monster ASP via FTP
+name: Deploy Client
 
 on:
   #push:
@@ -19,19 +19,9 @@ jobs:
         with:
           node-version: '20'  # Change this based on your Angular requirements
           
-      - name : log 
-        run : ls
-        working-directory: ./Client
-
-      - name : log2 
-        run : ls
-        
-      - name : log2 
-        run : ls
-        working-directory: ./Client/src
         
       - name: Install Dependencies
-        run: npm install
+        run: npm install --legacy-peer-deps
         working-directory: ./Client
 
       - name: Build Angular App
