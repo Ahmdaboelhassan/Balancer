@@ -17,13 +17,15 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '8.0.x'  # Change to your .NET version
+          dotnet-version: '8.0.x'  # Change this to match your .NET version
           
       - name: Restore Dependencies
-        run: dotnet restore './API/src/API/API.csproj'
+        run: dotnet restore
+        working-directory: ./API/src/API
 
       - name: Build and Publish
-        run: dotnet publish './API/src/API/API.csproj' -c Release -o ./publish
+        run: dotnet publish -c Release -o ../../../publish
+        working-directory: ./API/src/API
 
       - name: Deploy to Monster ASP
         uses: azure/webapps-deploy@v2
