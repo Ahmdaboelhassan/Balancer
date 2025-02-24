@@ -28,7 +28,7 @@ jobs:
         working-directory: ./API/src/API
 
       - name: Deploy via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
          server: "site16186.siteasp.net"  # Your Monster ASP FTP server
          username: ${{ secrets.FTP_USERNAME }}
