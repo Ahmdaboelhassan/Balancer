@@ -13,9 +13,9 @@
     <tr class="text-xs text-white uppercase bg-slate-800 rounded-xl">
       <th scope="col" class="py-3 px-5" style="width: 20%">Detail</th>
       <th scope="col" class="p-3" style="width: 10%">Date</th>
+      <th scope="col" class="p-3" style="width: 10%">Balance</th>
       <th scope="col" class="p-3" style="width: 10%">Debit</th>
       <th scope="col" class="p-3" style="width: 10%">Credit</th>
-      <th scope="col" class="p-3" style="width: 10%">Balance</th>
       <th scope="col" class="p-3" style="width: 10%">Cost Center</th>
       <th scope="col" class="p-3 w-2" style="width: 5%">Notes</th>
       <th scope="col" class="p-3 print:hidden text-center" style="width: 10%">
@@ -34,9 +34,9 @@
           {{ item.detail }}
         </th>
         <td class="py-4 px-3">{{ item.date }}</td>
+        <td class="py-4 px-3 font-bold">{{ item.balance | currency }}</td>
         <td class="py-4 px-3 font-bold">{{ item.debit | currency }}</td>
         <td class="py-4 px-3 font-bold">{{ item.credit | currency }}</td>
-        <td class="py-4 px-3 font-bold">{{ item.balance | currency }}</td>
         <td class="py-4 px-3">{{ item.costCenter }}</td>
         <td
           [title]="item.notes"

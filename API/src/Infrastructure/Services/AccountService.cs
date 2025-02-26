@@ -56,7 +56,7 @@ public class AccountService : IAccountService
     }
     public async Task<IEnumerable<SelectItemDTO>> GetSelectList()
     {
-        return (await _uow.Accounts.SelectAll(a => true, a => new SelectItemDTO { Id = a.Id, Name = $"{a.Name} | {a.Number}" })).OrderBy(a => a.Name); 
+        return (await _uow.Accounts.SelectAll(a => true, a => new SelectItemDTO { Id = a.Id, Name = a.Name })).OrderBy(a => a.Name); 
     }
     public async Task<GetAccountDTO?> GetById(int id)
     {
@@ -65,7 +65,7 @@ public class AccountService : IAccountService
         if (account is null || id == 0)
             return new GetAccountDTO();
 
-        var accounts = await _uow.Accounts.SelectAll(a => a.Id != id, a => new SelectItemDTO { Id = a.Id, Name = a.Name });
+        var accounts = (await _uow.Accounts.SelectAll(a => a.Id != id, a => new SelectItemDTO { Id = a.Id, Name = a.Name })).OrderBy(a => a.Name);
         return new GetAccountDTO
         {
             Id = account.Id,
@@ -294,13 +294,4 @@ public class AccountService : IAccountService
         return new GetAccountNumberAndLevelResponse { IsSucceed = true, Message = "Account Number Generated Successfully"  , AccountLevel = accountLevel , AccountNumber = accountNumber};
 
     }
-
-    
-}
-
-class accountchild
-{
-    public string account { get; set; }
-    public string[] childs { get; set; }
-
 }

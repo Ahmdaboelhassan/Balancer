@@ -37,14 +37,35 @@
       }
     </div>
   </div>
-  <p
+  <div
+    class="mb-1 text-gray-500 font-medium max-w-full overflow-hidden text-nowrap text-ellipsis text-sm lg:text-base flex flex-col lg:flex-row"
+  >
+    <div class="me-2">
+      <span [title]="journal.notes"
+        ><i class="fa-solid fa-paperclip"></i> {{ journal.notes }}
+        <span># Period {{ journal.periodId }} # Code {{ journal.code }} </span>
+      </span>
+    </div>
+    <div>
+      <i class="fa-regular fa-clock"></i>
+      {{ journal.createdAt }}
+    </div>
+  </div>
+
+  <!-- <p
     class="mb-1 text-gray-500 font-medium max-w-full overflow-hidden text-nowrap text-ellipsis text-sm lg:text-base"
   >
+
+  <div>
     <i class="fa-regular fa-clock"></i>
-    {{ journal.createdAt }} # Code {{ journal.code }} # Period
-    {{ journal.periodId }}
+    {{ journal.createdAt }}
+  </div>
+    
+    <div>
     <span [title]="journal.notes"
       ><i class="fa-solid fa-paperclip"></i> {{ journal.notes }}</span
     >
-  </p>
+    <span># Code {{ journal.code }} # Period {{ journal.periodId }}</span>
+  </div>
+  </p> -->
 </a>

@@ -197,6 +197,7 @@ public class ReportService : IReportService
 
         return incomeStatement;
     }
+
     private AccountStatement GetEmptyAccountStatement()
     {
         return new AccountStatement()

@@ -3,10 +3,10 @@
   <table class="w-full text-sm text-left rtl:text-right text-gray-500">
     <tr class="text-xs text-white uppercase bg-slate-800">
       <th scope="col" class="px-8 py-3">Account</th>
-      <th scope="col" class="px-8 py-3">Number</th>
+      <!-- <th scope="col" class="px-8 py-3">Number</th> -->
+      <th scope="col" class="px-5 py-3">Balance</th>
       <th scope="col" class="px-8 py-3">Debit</th>
       <th scope="col" class="px-8 py-3">Credit</th>
-      <th scope="col" class="px-5 py-3">Balance</th>
     </tr>
     @if(accounts.length > 0){
     <tbody>
@@ -19,12 +19,12 @@
         >
           {{ account.accountName }}
         </th>
-        <td class="px-8 py-4 font-bold">{{ account.accountNumber }}</td>
+        <!-- <td class="px-8 py-4 font-bold">{{ account.accountNumber }}</td> -->
+        <td class="px-8 py-4 font-bold">{{ account.balance | currency }}</td>
         <td class="px-8 py-4 font-bold">
           {{ account.debit | currency }}
         </td>
         <td class="px-8 py-4 font-bold">{{ account.credit | currency }}</td>
-        <td class="px-8 py-4 font-bold">{{ account.balance | currency }}</td>
       </tr>
       }
     </tbody>

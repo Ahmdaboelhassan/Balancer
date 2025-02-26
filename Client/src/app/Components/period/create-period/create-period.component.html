@@ -100,7 +100,14 @@
         <button type="submit" class="btn-save me-2">Save</button>
         <a routerLink="/Period/List" class="btn-primary me-2">List</a>
         @if(isEdit){
-        <button (click)="DeletePeriod()" class="btn-danger me-2">Delete</button>
+        <button
+          role="button"
+          type="button"
+          (click)="DeletePeriod()"
+          class="btn-danger me-2"
+        >
+          Delete
+        </button>
         <a
           [routerLink]="['/Journal', 'Create']"
           [queryParams]="{ periodId: period.id }"
