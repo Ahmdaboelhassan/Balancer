@@ -13,7 +13,7 @@ namespace Infrastructure
     {
         public static IServiceCollection AddInfrastructureLayer(this IServiceCollection services, IConfiguration Config)
         {
-            string? ConnectionString = Config.GetConnectionString("Development");
+            string? ConnectionString = Config.GetConnectionString("Production");
             if (ConnectionString == null)
                 throw new InvalidOperationException();
 
