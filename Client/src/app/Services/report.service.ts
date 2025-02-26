@@ -35,4 +35,9 @@ export class ReportService {
 
     return this.http.get<AccountSummary[]>(url);
   }
+  GetAccountsOverview(from, to) {
+    let url = this.url + `/AccountsOverview?from=${from}&to=${to}`;
+
+    return this.http.get<AccountSummary[]>(url);
+  }
 }

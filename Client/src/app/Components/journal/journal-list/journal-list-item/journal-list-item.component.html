@@ -2,8 +2,8 @@
   [routerLink]="['/Journal', 'Edit', journal.id]"
   class="p-5 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 block"
 >
-  <div class="flex justify-between items-center mb-2">
-    <h4 class="text-xl lg:text-2xl font-bold tracking-tight text-gray-900 me-3">
+  <div class="flex justify-between items-center mb-3">
+    <h4 class="text-lg lg:text-2xl font-bold tracking-tight text-gray-900 me-3">
       {{ journal.detail }}
     </h4>
     <div>
@@ -38,34 +38,17 @@
     </div>
   </div>
   <div
-    class="mb-1 text-gray-500 font-medium max-w-full overflow-hidden text-nowrap text-ellipsis text-sm lg:text-base flex flex-col lg:flex-row"
+    class="text-gray-500 font-medium max-w-full text-xs lg:text-base flex flex-col lg:flex-row"
   >
-    <div class="me-2">
-      <span [title]="journal.notes"
-        ><i class="fa-solid fa-paperclip"></i> {{ journal.notes }}
-        <span># Period {{ journal.periodId }} # Code {{ journal.code }} </span>
-      </span>
-    </div>
+    <p class="overflow-hidden text-nowrap text-ellipsis me-2">
+      <span
+        ><i class="fa-solid fa-paperclip mb-1"></i> {{ journal.notes }}</span
+      >
+      <span># Period {{ journal.periodId }} # Code {{ journal.code }}</span>
+    </p>
     <div>
       <i class="fa-regular fa-clock"></i>
       {{ journal.createdAt }}
     </div>
   </div>
-
-  <!-- <p
-    class="mb-1 text-gray-500 font-medium max-w-full overflow-hidden text-nowrap text-ellipsis text-sm lg:text-base"
-  >
-
-  <div>
-    <i class="fa-regular fa-clock"></i>
-    {{ journal.createdAt }}
-  </div>
-    
-    <div>
-    <span [title]="journal.notes"
-      ><i class="fa-solid fa-paperclip"></i> {{ journal.notes }}</span
-    >
-    <span># Code {{ journal.code }} # Period {{ journal.periodId }}</span>
-  </div>
-  </p> -->
 </a>

@@ -1,0 +1,33 @@
+<app-date-range (dates)="GetAccountsOverview($event)"></app-date-range>
+<div class="daterange-result bg-white mt-2 rounded-xl overflow-auto">
+  <table class="w-full text-sm text-left rtl:text-right text-gray-500">
+    <tr class="text-xs text-white uppercase bg-slate-800">
+      <th scope="col" class="px-8 py-3">Account</th>
+      <!-- <th scope="col" class="px-8 py-3">Number</th> -->
+      <th scope="col" class="px-5 py-3">Balance</th>
+      <th scope="col" class="px-8 py-3">Debit</th>
+      <th scope="col" class="px-8 py-3">Credit</th>
+    </tr>
+    @if(accounts.length > 0){
+    <tbody>
+      @for(account of accounts ;track $index){
+
+      <tr class="bg-white border-b hover:bg-gray-50 dark:hover:bg-gray-50">
+        <th
+          scope="row"
+          class="px-6 py-4 font-bold text-base text-gray-900 whitespace-nowrap"
+        >
+          {{ account.accountName }}
+        </th>
+        <!-- <td class="px-8 py-4 font-bold">{{ account.accountNumber }}</td> -->
+        <td class="px-8 py-4 font-bold">{{ account.balance | currency }}</td>
+        <td class="px-8 py-4 font-bold">
+          {{ account.debit | currency }}
+        </td>
+        <td class="px-8 py-4 font-bold">{{ account.credit | currency }}</td>
+      </tr>
+      }
+    </tbody>
+    }
+  </table>
+</div>

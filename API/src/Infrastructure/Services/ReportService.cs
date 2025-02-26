@@ -2,6 +2,8 @@
 using Application.IRepository;
 using Application.IServices;
 using Domain.Models;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.Diagnostics;
 using System.Runtime.InteropServices.Marshalling;
 using System.Text;
 
@@ -196,6 +198,45 @@ public class ReportService : IReportService
         });
 
         return incomeStatement;
+    }
+
+    public async Task<IEnumerable<AccountSummaryDTO>> GetAccountsOverview(DateTime from, DateTime to)
+    {
+        var currentJournalAccounts = (await _uow.JournalDetail
+            .SelectAll(d => d.Journal.CreatedAt.Date >= from && d.Journal.CreatedAt.Date <= to
+            , d => new { accountId = d.AccountId, AccountNumber = d.Account.Number, AccountName = d.Account.Name, balance = d.Debit - d.Credit, d.Credit, d.Debit }
+            , "Account", "Journal"))
+            .GroupBy(x => x.AccountNumber)
+            .Select(j => new {AccountNumber = j.Key , Debit = j.Sum(a => a.Debit) , Credit = j.Sum(a => a.Credit)});
+
+        if (!currentJournalAccounts.Any())
+            return Enumerable.Empty<AccountSummaryDTO>();
+
+        var accounts = await _uow.Accounts.GetAll();
+
+        var accountsSummaries = new LinkedList<AccountSummaryDTO>();
+
+        foreach (var account in accounts)
+        {
+            var debit = currentJournalAccounts.Where(j => j.AccountNumber.StartsWith(account.Number)).Sum(d => d.Debit);
+            var credit = currentJournalAccounts.Where(j => j.AccountNumber.StartsWith(account.Number)).Sum(d => d.Credit);
+
+            var balance = debit - credit;
+            if (balance != 0)
+            {
+                accountsSummaries.AddLast(
+                    new AccountSummaryDTO()
+                    {
+                        AccountName = account.Name,
+                        AccountNumber = account.Number,
+                        Debit = debit,
+                        Credit = credit,
+                        Balance = balance
+                    });
+            }
+        }
+
+        return  accountsSummaries.OrderBy(s => s.AccountNumber);
     }
 
     private AccountStatement GetEmptyAccountStatement()
