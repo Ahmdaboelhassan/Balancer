@@ -222,12 +222,13 @@ public class ReportService : IReportService
             var credit = currentJournalAccounts.Where(j => j.AccountNumber.StartsWith(account.Number)).Sum(d => d.Credit);
 
             var balance = debit - credit;
+
             if (balance != 0)
-            {
+            { //string.Concat(Enumerable.Repeat("ahmed" , account.Level * 2))
                 accountsSummaries.AddLast(
                     new AccountSummaryDTO()
                     {
-                        AccountName = account.Name,
+                        AccountName = string.Concat(new string(' ',(account.Level - 1) * 5) , account.Name),
                         AccountNumber = account.Number,
                         Debit = debit,
                         Credit = credit,

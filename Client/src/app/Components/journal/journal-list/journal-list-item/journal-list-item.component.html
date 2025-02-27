@@ -41,14 +41,17 @@
     class="text-gray-500 font-medium max-w-full text-xs lg:text-base flex flex-col lg:flex-row"
   >
     <p class="overflow-hidden text-nowrap text-ellipsis me-2">
-      <span
-        ><i class="fa-solid fa-paperclip mb-1"></i> {{ journal.notes }}</span
+      <span class="mb-2"
+        ><i class="fa-solid fa-paperclip"></i> {{ journal.notes }}</span
       >
-      <span># Period {{ journal.periodId }} # Code {{ journal.code }}</span>
+      <span> #{{ journal.code }}</span>
     </p>
-    <div>
-      <i class="fa-regular fa-clock"></i>
-      {{ journal.createdAt }}
-    </div>
+    <p class="overflow-hidden text-nowrap text-ellipsis">
+      <span>
+        <i class="fa-regular fa-clock"></i>
+        {{ journal.createdAt }}
+      </span>
+      <span> | P-{{ journal.periodId }}</span>
+    </p>
   </div>
 </a>
