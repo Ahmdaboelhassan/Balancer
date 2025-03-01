@@ -13,7 +13,7 @@ namespace Infrastructure
     {
         public static IServiceCollection AddInfrastructureLayer(this IServiceCollection services, IConfiguration Config)
         {
-            string? ConnectionString = Config.GetConnectionString("Production");
+            string? ConnectionString = Config.GetConnectionString("Development");
             if (ConnectionString == null)
                 throw new InvalidOperationException();
 
@@ -22,6 +22,7 @@ namespace Infrastructure
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IPeriodService, PeriodService>();
             services.AddScoped<IAccountService, AccountService>();
+            services.AddScoped<IAccountNumberService, AccountNumberService>();
             services.AddScoped<IJournalService, JournalService>();
             services.AddScoped<ICostCenterService, CostCenterService>();
             services.AddScoped<IHomeService, HomeService>();

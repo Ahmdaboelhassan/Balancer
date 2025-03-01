@@ -1,4 +1,4 @@
-﻿using Infrastructure.Services;
+﻿using Application.DTO.Response;
 
 namespace Application.IServices;
 public interface IHomeService

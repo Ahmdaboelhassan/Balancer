@@ -9,10 +9,15 @@ using Domain.Models;
 namespace Infrastructure.Services;
 internal class JournalService : IJournalService
 {
-    public readonly IUnitOfWork _uow;
-    public JournalService(IUnitOfWork uow)
+    private readonly IUnitOfWork _uow;
+    private readonly IAccountService _accountService;
+    private readonly ICostCenterService _costCenterService;
+
+    public JournalService(IUnitOfWork uow, IAccountService accountService, ICostCenterService costCenterService)
     {
         _uow = uow;
+        _accountService = accountService;
+        _costCenterService = costCenterService;
     }
     public async Task<GetJournalDTO?> New(int? periodId)
     {
@@ -29,16 +34,11 @@ internal class JournalService : IJournalService
             jouranlPeriod = lastPeriod.Id;
         }
 
-
-        var code = await GetNextCode();
-        var accounts = (await  _uow.Accounts.SelectAll(a => !a.IsParent, a => new SelectItemDTO { Id = a.Id, Name = a.Name })).OrderBy(a => a.Name);
-        var costCenters = (await _uow.CostCenter.SelectAll(c => true, c => new SelectItemDTO { Id = c.Id, Name = c.Name })).OrderBy(a => a.Name);
-
         return new GetJournalDTO()
         {
-            Accounts = accounts,
-            CostCenters = costCenters,
-            Code = code,
+            Accounts = await _accountService.GetSelectList(a => !a.IsParent),
+            CostCenters = await _costCenterService.GetAllSelectList(),
+            Code = await GetNextCode(),
             DebitAccountId = settings.DefaultDebitAccount.GetValueOrDefault(),
             CreditAccountId = settings.DefaultCreditAccount.GetValueOrDefault(),
             PeriodId = jouranlPeriod.Value,
@@ -56,9 +56,6 @@ internal class JournalService : IJournalService
             return await New(periodId);
         }
 
-        var accounts = (await _uow.Accounts.SelectAll(a => !a.IsParent, a => new SelectItemDTO { Id = a.Id, Name = a.Name })).OrderBy(a => a.Name);
-        var costCenters = (await _uow.CostCenter.SelectAll(c => true, c => new SelectItemDTO { Id = c.Id, Name = c.Name })).OrderBy(a => a.Name);
-
         return new GetJournalDTO()
         {
             Id = journal.Id,
@@ -74,8 +71,8 @@ internal class JournalService : IJournalService
             PeriodId = journal.PeriodId,
             Detail = journal.Detail,
             Description = journal.Description,
-            CostCenters = costCenters,
-            Accounts = accounts,
+            CostCenters = await _costCenterService.GetAllSelectList(),
+            Accounts = await _accountService.GetSelectList(a => !a.IsParent),
         };
 
     }
@@ -125,8 +122,7 @@ internal class JournalService : IJournalService
             
         });
 
-
-        return journals.OrderByDescending(j => j.Id);
+        return journals.OrderByDescending(j => j.CreatedAt);
     }
     public async Task<PeriodJournals> GetPeriodJournals(int periodId)
     {

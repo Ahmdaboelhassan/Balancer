@@ -8,7 +8,6 @@ public interface IServiceContext
     IHomeService HomeService { get; }
     IReportService ReportService { get; }
     IAuthService AuthService { get;}
-    IPasswordHasher PasswordHasher { get;}
-    ITokenService TokenService { get;}
+  
 }
 

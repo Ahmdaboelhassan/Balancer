@@ -1,8 +1,4 @@
-﻿using Application.IRepository;
-using Application.IServices;
-using Application.Models;
-using Infrastructure.Repository;
-using Microsoft.Extensions.Options;
+﻿using Application.IServices;
 
 namespace Infrastructure.Services;
 public class ServiceContext : IServiceContext
@@ -14,9 +10,8 @@ public class ServiceContext : IServiceContext
            ICostCenterService costCenterService,
            IHomeService homeService,
            IReportService reportService,
-           IAuthService authService,
-           IPasswordHasher passwordHasher,
-           ITokenService tokenService)
+           IAuthService authService
+           )
     {
         PeriodService = periodService;
         AccountService = accountService;
@@ -25,8 +20,6 @@ public class ServiceContext : IServiceContext
         HomeService = homeService;
         ReportService = reportService;
         AuthService = authService;
-        PasswordHasher = passwordHasher;
-        TokenService = tokenService;
     }
     public IPeriodService PeriodService { get; private set; }
     public IAccountService AccountService { get; private set; }
@@ -35,6 +28,4 @@ public class ServiceContext : IServiceContext
     public IHomeService HomeService { get; private set; }
     public IReportService ReportService { get; private set; }
     public IAuthService AuthService { get; private set; }
-    public IPasswordHasher PasswordHasher { get; private set; }
-    public ITokenService TokenService{ get; private set; }
 }

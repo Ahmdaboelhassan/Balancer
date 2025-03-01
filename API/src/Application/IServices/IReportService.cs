@@ -1,5 +1,4 @@
 ﻿using Application.DTO.Response;
-using Infrastructure.Services;
 
 namespace Application.IServices;
 public interface IReportService 
