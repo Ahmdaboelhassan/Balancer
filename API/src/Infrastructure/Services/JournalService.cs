@@ -78,7 +78,8 @@ internal class JournalService : IJournalService
     }
     public async Task<IEnumerable<JournalListItemDTO>> Search(string criteria)
     {
-        var journals =  await _uow.Journal.SelectAll(a => a.Detail.Contains(criteria) || a.Code.ToString().Contains(criteria), a =>  new JournalListItemDTO
+        return (await _uow.Journal.GetAll(a => a.Detail.Contains(criteria) || a.Code.ToString().Contains(criteria)))
+            .OrderByDescending(j => j.CreatedAt).Select(a =>  new JournalListItemDTO
         {
             Id = a.Id,
             Amount = a.Amount,
@@ -89,8 +90,6 @@ internal class JournalService : IJournalService
             Notes = a.Notes,
             periodId = a.PeriodId,
         });
-
-        return journals.OrderByDescending(j => j.Id);
     }
     public async Task<IEnumerable<JournalListItemDTO>> GetAll(int page)
     {
@@ -109,7 +108,8 @@ internal class JournalService : IJournalService
     }
     public async Task<IEnumerable<JournalListItemDTO>> GetAll(DateTime from, DateTime to)
     {
-        var journals = await _uow.Journal.SelectAll(a => a.CreatedAt.Date >= from.Date && a.CreatedAt.Date <= to.Date  , a => new JournalListItemDTO
+        return (await _uow.Journal.GetAll(a => a.CreatedAt.Date >= from.Date && a.CreatedAt.Date <= to.Date))
+            .OrderByDescending(j => j.CreatedAt).Select( a => new JournalListItemDTO
         {
             Id = a.Id,
             Amount = a.Amount,
@@ -121,8 +121,6 @@ internal class JournalService : IJournalService
             periodId = a.PeriodId,
             
         });
-
-        return journals.OrderByDescending(j => j.CreatedAt);
     }
     public async Task<PeriodJournals> GetPeriodJournals(int periodId)
     {
@@ -137,7 +135,8 @@ internal class JournalService : IJournalService
             To = period.To.ToShortDateString(),
             Id = period.Id,
             Name = period.Name,
-            Journals = period.Journals.Select(j => new JournalListItemDTO
+            Journals = period.Journals.OrderByDescending(j => j.CreatedAt)
+            .Select(j => new JournalListItemDTO
             {
                 Id = j.Id,
                 Amount = j.Amount,
@@ -148,7 +147,7 @@ internal class JournalService : IJournalService
                 Notes = j.Notes,
                 periodId = j.PeriodId
                 
-            }).OrderByDescending(j => j.CreatedAt)
+            })
         };
         
     }
