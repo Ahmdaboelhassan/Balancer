@@ -24,4 +24,18 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
     this.authService.AutoLogin();
   }
+
+  handleNavbarDispaly(
+    isDispaly: boolean,
+    navBarHolder: HTMLElement,
+    appBody: HTMLElement
+  ) {
+    if (isDispaly) {
+      navBarHolder.classList.remove('lg:absolute');
+      appBody.classList.add('lg:col-span-4');
+    } else {
+      navBarHolder.classList.add('lg:absolute');
+      appBody.classList.remove('lg:col-span-4');
+    }
+  }
 }

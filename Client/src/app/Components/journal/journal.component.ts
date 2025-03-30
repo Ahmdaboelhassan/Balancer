@@ -7,7 +7,7 @@ import { JournalService } from '../../Services/journal.service';
 
 @Component({
   selector: 'app-journal',
-  imports: [DateRangeComponent, JournalListComponent],
+  imports: [DateRangeComponent, JournalListComponent, DateRangeComponent],
   templateUrl: './journal.component.html',
   styleUrl: './journal.component.css',
 })

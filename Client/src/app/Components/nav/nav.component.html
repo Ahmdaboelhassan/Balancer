@@ -3,8 +3,17 @@
     #nav
     class="bg-slate-800 min-h-[calc(100vh-1.5rem)] mb-2 py-3 rounded-xl shadow-md transition-all absolute z-20 -translate-x-[102%] lg:relative lg:translate-x-0 w-3/4 lg:w-full"
   >
+    <div>
+      <span
+        (click)="hideNavBar()"
+        class="p-2 bg-slate-800/85 hover:bg-slate-800 text-white rounded-full absolute hidden lg:inline-block right-2 z-10 transition-all cursor-pointer"
+        ><i class="fa-solid fa-arrow-left"></i
+      ></span>
+    </div>
     <div class="text-center p-5 flex justify-center">
-      <img src="favicon.ico" alt="Logo" class="w-28 h-28 md:w-40 md:h-40" />
+      <span (click)="hideNavBar()">
+        <img src="favicon.ico" alt="Logo" class="w-28 h-28 md:w-40 md:h-40"
+      /></span>
     </div>
     <div class="p-5">
       <a
@@ -234,7 +243,8 @@
 </nav>
 
 <span
-  (click)="showNavBar(nav)"
+  #toggleButton
+  (click)="toggleNavBar()"
   class="p-4 bg-slate-800/85 hover:bg-slate-800 text-white rounded-lg fixed inline-block bottom-4 right-2 z-10 lg:hidden transition-all cursor-pointer"
   ><i class="fa-solid fa-bars fa-xl"></i
 ></span>

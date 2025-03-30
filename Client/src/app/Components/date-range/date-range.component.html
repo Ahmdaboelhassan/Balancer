@@ -9,7 +9,7 @@
     [value]="from"
   />
   <label
-    class="w-20 text-slate-900 font-bold text-lg print:text-lg hidden lg:inline-block"
+    class="text-slate-900 font-bold text-lg print:text-lg hidden lg:inline-block"
     >To</label
   >
   <input
@@ -18,14 +18,35 @@
     #toDate
     [value]="to"
   />
-  <button
-    type="button"
-    class="btn-primary w-full lg:w-2/12 print:hidden"
-    (click)="EmitDatesValue(fromDate, toDate)"
+  <div
+    class="lg:flex justify-between w-full gap-3 items-center lg:w-1/4 print:hidden"
   >
-    <div class="flex justify-between items-center">
-      <span>Search</span>
-      <i class="fa-solid fa-magnifying-glass"></i>
+    <div class="flex w-full justify-center lg:w-4/12 lg:m-0 my-2" role="group">
+      <button
+        type="button"
+        class="px-4 py-2.5 w-1/2 text-gray-900 bg-white border border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-blue-700"
+        (click)="DecrementMonth()"
+      >
+        <i class="fa-solid fa-rotate-left"></i>
+      </button>
+      <button
+        type="button"
+        class="px-4 py-2.5 w-1/2 text-gray-900 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-blue-700"
+        (click)="IncrementMonth()"
+      >
+        <i class="fa-solid fa-rotate-right"></i>
+      </button>
     </div>
-  </button>
+
+    <button
+      type="button"
+      class="btn-primary w-full lg:w-8/12"
+      (click)="EmitDatesValue(fromDate, toDate)"
+    >
+      <div class="flex justify-between items-center">
+        <span>Search</span>
+        <i class="fa-solid fa-magnifying-glass"></i>
+      </div>
+    </button>
+  </div>
 </header>

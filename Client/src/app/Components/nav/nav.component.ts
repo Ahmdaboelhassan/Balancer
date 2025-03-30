@@ -2,7 +2,9 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
+  EventEmitter,
   HostListener,
+  Output,
   ViewChild,
   viewChild,
 } from '@angular/core';
@@ -34,6 +36,8 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 export class NavComponent {
   accordion = viewChild.required(MatAccordion);
   @ViewChild('nav', { static: true }) navbar: ElementRef;
+  @ViewChild('toggleButton', { static: true }) toggleButton: ElementRef;
+  @Output() navbarEvent = new EventEmitter<boolean>();
 
   constructor(private elementRef: ElementRef) {}
 
@@ -52,7 +56,19 @@ export class NavComponent {
     }
   }
 
-  showNavBar(nav: HTMLElement) {
-    this.navbar.nativeElement.classList.toggle('-translate-x-[102%]');
+  toggleNavBar() {
+    if (!this.navbar.nativeElement.classList.contains('lg:translate-x-0')) {
+      this.navbar.nativeElement.classList.add('lg:translate-x-0');
+      this.toggleButton.nativeElement.classList.add('lg:hidden');
+      this.navbarEvent.emit(true);
+    } else {
+      this.navbar.nativeElement.classList.toggle('-translate-x-[102%]');
+    }
+  }
+
+  hideNavBar() {
+    this.navbar.nativeElement.classList.remove('lg:translate-x-0');
+    this.toggleButton.nativeElement.classList.remove('lg:hidden');
+    this.navbarEvent.emit(false);
   }
 }

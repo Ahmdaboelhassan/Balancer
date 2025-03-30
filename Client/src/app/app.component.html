@@ -1,9 +1,15 @@
 @if (user()) {
 <div class="holder grid grid-cols-5">
-  <div class="print:hidden col-span-5 overflow-auto lg:block lg:col-span-1">
-    <app-nav></app-nav>
+  <div
+    #navBarHolder
+    class="print:hidden col-span-5 overflow-auto lg:block lg:col-span-1"
+  >
+    <app-nav
+      (navbarEvent)="handleNavbarDispaly($event, navBarHolder, appBody)"
+    ></app-nav>
   </div>
   <div
+    #appBody
     class="col-span-5 print:col-span-5 lg:col-span-4 mx-1 lg:mx-6 relative h-[calc(100vh-1.5rem)] print:overflow-visible overflow-auto [&::-webkit-scrollbar]:w-0"
   >
     <router-outlet></router-outlet>

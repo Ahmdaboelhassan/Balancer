@@ -1,8 +1,27 @@
 <div class="bg-white rounded-lg p-10 mb-3">
-  <div>
-    <h1 class="text-slate-800 font-bold text-3xl mb-4">Account Statement</h1>
-    <hr />
+  <div class="lg:flex justify-between items-center">
+    <h1 class="text-slate-800 font-bold text-3xl mb-4 lg:w-4/5">
+      Account Statement
+    </h1>
+    <div class="flex w-full justify-center lg:w-1/5 lg:m-0 my-2" role="group">
+      <hr />
+      <button
+        type="button"
+        class="px-3 py-1 w-1/2 text-gray-900 bg-white border border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-blue-700"
+        (click)="DecrementMonth()"
+      >
+        <i class="fa-solid fa-rotate-left"></i>
+      </button>
+      <button
+        type="button"
+        class="px-3 py-1 w-1/2 text-gray-900 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-blue-700"
+        (click)="IncrementMonth()"
+      >
+        <i class="fa-solid fa-rotate-right"></i>
+      </button>
+    </div>
   </div>
+  <hr />
   <div class="py-5">
     <form #myForm="ngForm" (ngSubmit)="GetAccountStatement(myForm)">
       <div class="grid grid-cols-2 gap-4">
@@ -33,7 +52,17 @@
               {{ acc.name }}
             </option>
           </select>
-          <label class="inline-flex items-center cursor-pointer mt-3">
+        </div>
+        <div class="form-group col-span-2 lg:col-span-1">
+          <label> Cost Center </label>
+          <select class="form-control w-full" ngModel name="costCenter">
+            <option *ngFor="let cost of costCenters" [value]="cost.id">
+              {{ cost.name }}
+            </option>
+          </select>
+        </div>
+        <div class="form-group col-span-2 lg:col-span-1">
+          <label class="inline-flex items-center cursor-pointer w-full">
             <input
               type="checkbox"
               [(ngModel)]="openingBalance"
@@ -47,14 +76,6 @@
               >Opening Balance</span
             >
           </label>
-        </div>
-        <div class="form-group col-span-2 lg:col-span-1">
-          <label> Cost Center </label>
-          <select class="form-control w-full" ngModel name="costCenter">
-            <option *ngFor="let cost of costCenters" [value]="cost.id">
-              {{ cost.name }}
-            </option>
-          </select>
         </div>
       </div>
 

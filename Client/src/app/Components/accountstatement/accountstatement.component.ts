@@ -58,4 +58,24 @@ export class AccountstatementComponent {
     const fullUrl = `${baseUrl}/${hashRoute}`;
     window.open(fullUrl, '_blank');
   }
+  DecrementMonth() {
+    let f = new Date(this.from());
+    f.setMonth(f.getMonth() - 1);
+
+    const firstDay = new Date(f.getFullYear(), f.getMonth(), 2);
+    const lastDay = new Date(f.getFullYear(), f.getMonth() + 1, 1);
+
+    this.from.set(firstDay.toISOString().split('T')[0]);
+    this.to.set(lastDay.toISOString().split('T')[0]);
+  }
+  IncrementMonth() {
+    let f = new Date(this.from());
+    f.setMonth(f.getMonth() + 1);
+
+    const firstDay = new Date(f.getFullYear(), f.getMonth(), 2);
+    const lastDay = new Date(f.getFullYear(), f.getMonth() + 1, 1);
+
+    this.from.set(firstDay.toISOString().split('T')[0]);
+    this.to.set(lastDay.toISOString().split('T')[0]);
+  }
 }
