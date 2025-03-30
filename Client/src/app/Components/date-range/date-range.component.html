@@ -19,19 +19,19 @@
     [value]="to"
   />
   <div
-    class="lg:flex justify-between w-full gap-3 items-center lg:w-1/4 print:hidden"
+    class="lg:flex justify-between w-full items-center lg:w-1/4 print:hidden"
   >
-    <div class="flex w-full justify-center lg:w-4/12 lg:m-0 my-2" role="group">
+    <div class="flex w-full justify-center lg:w-4/12 lg:m-0 mb-1" role="group">
       <button
         type="button"
-        class="px-4 py-2.5 w-1/2 text-gray-900 bg-white border border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-blue-700"
+        class="px-4 py-0.5 lg:py-2.5 w-1/2 text-gray-900 bg-white border border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-blue-700"
         (click)="DecrementMonth()"
       >
         <i class="fa-solid fa-rotate-left"></i>
       </button>
       <button
         type="button"
-        class="px-4 py-2.5 w-1/2 text-gray-900 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-blue-700"
+        class="px-4 py-0.5 lg:py-2.5 lg:me-3 w-1/2 text-gray-900 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-blue-700"
         (click)="IncrementMonth()"
       >
         <i class="fa-solid fa-rotate-right"></i>
