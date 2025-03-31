@@ -136,7 +136,7 @@ export class CreateJournalComponent {
       this.journalService.EditJournal(journal).subscribe({
         next: (result) => {
           this.toastr.success(result.message, 'Edit Journal');
-          this.router.navigate(['/Journal', 'List']);
+          this.router.navigate(['/Journal', 'Edit', form.id]);
         },
         error: (error) => {
           console.log(error),
@@ -154,7 +154,6 @@ export class CreateJournalComponent {
               details: '',
               description: '',
               code: this.JournalForm.get('code').value + 1,
-              created: this.GetLocaleDateTime(new Date()),
               costCenter: null,
             });
             // this.GetCreditBalance();
