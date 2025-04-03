@@ -136,7 +136,7 @@ export class CreateJournalComponent {
       this.journalService.EditJournal(journal).subscribe({
         next: (result) => {
           this.toastr.success(result.message, 'Edit Journal');
-          this.router.navigate(['/Journal', 'Edit', form.id]);
+          this.router.navigate(['/Journal', 'List']);
         },
         error: (error) => {
           console.log(error),

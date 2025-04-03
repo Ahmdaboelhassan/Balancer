@@ -1,7 +1,6 @@
-﻿using Application.IRepository;
+﻿using Domain.IRepository;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.EntityFrameworkCore.Query;
 using System.Data;
 using System.Linq.Expressions;
