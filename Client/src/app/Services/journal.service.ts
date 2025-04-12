@@ -37,7 +37,8 @@ export class JournalService {
       .set('to', keys.to || '')
       .set('orderBy', keys.orderBy || '')
       .set('type', keys.type || '')
-      .set('dateFilter', keys.dateFilter || false);
+      .set('filterByDate', keys.filterByDate || false)
+      .set('filterByKey', keys.filterByKey || false);
 
     return this.http.get<JournalListItem[]>(`${this.url}/AdvancedSearch`, {
       params,

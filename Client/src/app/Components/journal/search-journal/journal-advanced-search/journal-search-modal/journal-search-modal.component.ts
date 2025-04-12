@@ -42,12 +42,31 @@ export class JournalSearchModalComponent implements OnInit {
     );
 
     this.journalForm = this.fb.group({
-      key: [''],
-      dateFilter: [true],
+      key: [{ value: '', disabled: true }],
+      filterByDate: [true],
+      filterByKey: [false],
       from: firstDay.toISOString().split('T')[0],
       to: lastDay.toISOString().split('T')[0],
       orderBy: ['1'],
       type: ['0'],
     });
+  }
+
+  ChangeFilterByDate() {
+    if (this.journalForm.get('filterByDate').value) {
+      this.journalForm.get('from')?.enable();
+      this.journalForm.get('to')?.enable();
+    } else {
+      this.journalForm.get('from')?.disable();
+      this.journalForm.get('to')?.disable();
+    }
+  }
+
+  ChangeFilterByKey() {
+    if (this.journalForm.get('filterByKey').value) {
+      this.journalForm.get('key')?.enable();
+    } else {
+      this.journalForm.get('key')?.disable();
+    }
   }
 }

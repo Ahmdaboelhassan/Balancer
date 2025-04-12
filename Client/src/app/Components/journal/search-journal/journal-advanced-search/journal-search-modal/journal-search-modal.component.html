@@ -15,7 +15,7 @@
             id="key"
             class="form-control w-full"
             formControlName="key"
-            placeholder="Search By Detail Or Code Leave It Empty For All"
+            placeholder="Search By Detail Or Code Leave"
           />
         </div>
         <div class="col-span-2 lg:col-span-1">
@@ -66,23 +66,40 @@
             <option value="4">Forward</option>
           </select>
         </div>
-        <div class="col-span-2 mb-6">
+        <div class="col-span-2 lg:col-span-1">
           <label class="inline-flex items-center cursor-pointer w-full">
             <input
               type="checkbox"
-              formControlName="dateFilter"
-              name="dateFilter"
+              formControlName="filterByDate"
+              name="filterByDate"
               class="sr-only peer"
+              (change)="ChangeFilterByDate()"
             />
             <div
               class="relative w-11 h-6 bg-gray-200 rounded-full peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"
             ></div>
             <span class="ms-3 text-sm font-medium text-gray-900"
-              >Date Filter</span
+              >Filter By Date</span
             >
           </label>
         </div>
-
+        <div class="col-span-2 lg:col-span-1 mb-6">
+          <label class="inline-flex items-center cursor-pointer w-full">
+            <input
+              type="checkbox"
+              formControlName="filterByKey"
+              name="filterByKey"
+              class="sr-only peer"
+              (change)="ChangeFilterByKey()"
+            />
+            <div
+              class="relative w-11 h-6 bg-gray-200 rounded-full peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"
+            ></div>
+            <span class="ms-3 text-sm font-medium text-gray-900"
+              >Filter By Key</span
+            >
+          </label>
+        </div>
         <div class="col-span-2 lg:flex lg:gap-2">
           <button
             type="button"

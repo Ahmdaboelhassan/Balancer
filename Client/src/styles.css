@@ -238,5 +238,5 @@ button.toast-close-button {
   @apply my-1 inline-block text-white bg-slate-700 hover:bg-slate-800 font-medium rounded-lg text-sm px-7 py-3;
 }
 .form-control {
-  @apply my-1 inline-block bg-gray-50 border border-gray-300 text-gray-900 text-lg rounded-lg focus-visible:ring-slate-700 focus-visible:border-slate-700 shadow-sm block p-2.5 outline-none;
+  @apply my-1 inline-block bg-gray-50 border border-gray-300 text-gray-900 text-lg rounded-lg focus-visible:ring-slate-700 focus-visible:border-slate-700 shadow-sm block p-2.5 outline-none disabled:bg-gray-100;
 }

@@ -18,12 +18,22 @@ import { IncomeStatementComponent } from './Components/income-statement/income-s
 import { AccountingTreeComponent } from './Components/accounting-tree/accounting-tree.component';
 import { AccountsSummaryComponent } from './Components/accounts-summary/accounts-summary.component';
 import { AccountsOverviewComponent } from './Components/accounts-overview/accounts-overview.component';
+import { authGuard } from './Guards/auth.guard';
 
 export const routes: Routes = [
-  { path: 'Home', loadComponent: () => HomeComponent },
-  { path: 'Auth', loadComponent: () => AuthComponent },
+  {
+    path: 'Home',
+    loadComponent: () => HomeComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'Auth',
+    loadComponent: () => AuthComponent,
+    canActivate: [authGuard],
+  },
   {
     path: 'Journal',
+    canActivate: [authGuard],
     children: [
       { path: '', redirectTo: 'List', pathMatch: 'full' },
       { path: 'Create', loadComponent: () => CreateJournalComponent },
@@ -35,6 +45,7 @@ export const routes: Routes = [
   },
   {
     path: 'Period',
+    canActivate: [authGuard],
     children: [
       { path: '', redirectTo: 'List', pathMatch: 'full' },
       { path: 'Create', loadComponent: () => CreatePeriodComponent },
@@ -49,6 +60,8 @@ export const routes: Routes = [
   },
   {
     path: 'Account',
+    canActivate: [authGuard],
+
     children: [
       { path: '', redirectTo: 'List', pathMatch: 'full' },
       { path: 'Create', loadComponent: () => CreateAccountComponent },
@@ -58,6 +71,7 @@ export const routes: Routes = [
   },
   {
     path: 'CostCenter',
+    canActivate: [authGuard],
     children: [
       { path: '', redirectTo: 'List', pathMatch: 'full' },
       { path: 'Create', loadComponent: () => CreateCostcenterComponent },
@@ -67,6 +81,7 @@ export const routes: Routes = [
   },
   {
     path: 'AccountStatement',
+    canActivate: [authGuard],
     children: [
       { path: '', loadComponent: () => AccountstatementComponent },
       { path: 'Get', loadComponent: () => AccountstatementDetialsComponent },
@@ -74,18 +89,22 @@ export const routes: Routes = [
   },
   {
     path: 'IncomeStatement',
+    canActivate: [authGuard],
     loadComponent: () => IncomeStatementComponent,
   },
   {
     path: 'AccountingTree',
+    canActivate: [authGuard],
     loadComponent: () => AccountingTreeComponent,
   },
   {
     path: 'AccountsSummary',
+    canActivate: [authGuard],
     loadComponent: () => AccountsSummaryComponent,
   },
   {
     path: 'AccountsOverview',
+    canActivate: [authGuard],
     loadComponent: () => AccountsOverviewComponent,
   },
   { path: '**', loadComponent: () => HomeComponent, pathMatch: 'full' },

@@ -10,7 +10,7 @@ public interface IJournalService
     public Task<PeriodJournals> GetPeriodJournals(int periodId);
     public Task<IEnumerable<JournalListItemDTO>> GetAll(DateTime from , DateTime to);
     public Task<IEnumerable<JournalListItemDTO>> Search(string criteria);
-    public Task<IEnumerable<JournalListItemDTO>> AdvancedSearch(string? key, DateTime from, DateTime to, bool dateFilter, int orderBy, int type);
+    public Task<IEnumerable<JournalListItemDTO>> AdvancedSearch(JournalAdvancedSearchDTO DTO);
     public Task<int> GetNextCode();
     public Task<ConfirmationResponse> Create(CreateJournalDTO model);
     public Task<ConfirmationResponse> Edit(CreateJournalDTO model);

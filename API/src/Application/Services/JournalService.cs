@@ -83,20 +83,20 @@ internal class JournalService : IJournalService
             periodId = a.PeriodId,
         });
     }
-    public async Task<IEnumerable<JournalListItemDTO>> AdvancedSearch(string? key ,DateTime from, DateTime to, bool dateFilter, int orderBy, int type)
+    public async Task<IEnumerable<JournalListItemDTO>> AdvancedSearch(JournalAdvancedSearchDTO DTO)
     {
         var query = _uow.Journal.AsQueryable();
 
-        if (!string.IsNullOrEmpty(key))
-            query = query.Where(j => j.Detail.Contains(key) || j.Code.ToString().Contains(key));
+        if (DTO.filterByKey)
+            query = query.Where(j => j.Detail.Contains(DTO.key) || j.Code.ToString().Contains(DTO.key));
 
-        if (type != 0)
-            query = query.Where(j => j.Type == type);
+        if (DTO.type != 0)
+            query = query.Where(j => j.Type == DTO.type);
 
-        if (dateFilter)
-            query = query.Where(j => j.CreatedAt.Date >= from.Date && j.CreatedAt.Date <= to.Date);
+        if (DTO.filterByDate)
+            query = query.Where(j => j.CreatedAt.Date >= DTO.from.Date && j.CreatedAt.Date <= DTO.to.Date);
 
-        switch (orderBy)
+        switch (DTO.orderBy)
         {   
             case 1: // By CreatedAt ASC
                 query = query.OrderBy(j => j.CreatedAt);
