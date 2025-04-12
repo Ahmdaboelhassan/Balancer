@@ -36,6 +36,11 @@ public class JournalController : ControllerBase
     {
         return Ok(await _serviceContext.JournalService.Search(criteria));
     }
+    [HttpGet("AdvancedSearch")]
+    public async Task<IActionResult> JournalsFilter(string? key , DateTime from , DateTime to ,bool dateFilter ,  int orderBy , int Type )
+    {
+        return Ok(await _serviceContext.JournalService.AdvancedSearch(key ,from, to, dateFilter ,orderBy,Type));
+    }
     [HttpGet("GetAll/{page}")]
     public async Task<IActionResult> GetAll(int page)
     {

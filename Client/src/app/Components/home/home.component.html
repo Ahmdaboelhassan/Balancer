@@ -36,32 +36,14 @@
     </div>
     <div class="col-span-4 lg:col-span-1">
       <div class="bg-white rounded-xl mb-2 p-5">
-        @if(pieChart){
-        <canvas baseChart [data]="pieChart()" [type]="'pie'"> </canvas>
+        @if(lineChart()){
+        <canvas baseChart [data]="lineChart()" [type]="'line'"> </canvas>
         }
       </div>
-      <div class="hidden lg:block">
-        <a
-          routerLink="/Journal/Create"
-          class="bg-white hover:bg-gray-100 cursor-pointer flex justify-between items-center rounded-xl p-4 mb-2 transition-all hover:ps-7"
-        >
-          Create Journal
-          <i class="fa-solid fa-arrow-right fa-lg text-gray-700"></i>
-        </a>
-        <a
-          routerLink="/Period/Create"
-          class="bg-white hover:bg-gray-100 cursor-pointer flex justify-between items-center rounded-xl p-4 mb-2 transition-all hover:ps-7"
-        >
-          Create Period
-          <i class="fa-solid fa-arrow-right fa-lg text-gray-700"></i>
-        </a>
-        <a
-          routerLink="/AccountStatement"
-          class="bg-white hover:bg-gray-100 cursor-pointer flex justify-between items-center rounded-xl p-4 mb-2 transition-all hover:ps-7"
-        >
-          Account Statement
-          <i class="fa-solid fa-arrow-right fa-lg text-gray-700"></i>
-        </a>
+      <div class="bg-white rounded-xl mb-2 p-5">
+        @if(pieChart()){
+        <canvas baseChart [data]="pieChart()" [type]="'pie'"> </canvas>
+        }
       </div>
     </div>
   </div>

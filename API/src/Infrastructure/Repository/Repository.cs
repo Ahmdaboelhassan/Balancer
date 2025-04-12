@@ -106,6 +106,16 @@ public class Repository<T> : IRepository<T> where T : class
             .ToListAsync();
 
     }
+
+    public IQueryable<T> AsQueryable()
+    {
+        return _set.AsQueryable();
+    }
+
+    public async Task<IEnumerable<O>> TakeLastOrderBy<O ,K>(int takeCount , Expression<Func<T, O>> columns, Expression<Func<T, K>> orderBy)
+    {
+        return await _set.OrderByDescending(orderBy).Take(takeCount).Select(columns).ToListAsync();
+    }
     public async Task<bool> Exists(Expression<Func<T, bool>> criteria = null)
     {
         if (criteria == null)
@@ -146,4 +156,5 @@ public class Repository<T> : IRepository<T> where T : class
     {
        await _set.Where(criteria).ExecuteUpdateAsync(update);
     }
+
 }

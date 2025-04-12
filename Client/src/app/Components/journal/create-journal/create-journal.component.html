@@ -86,6 +86,7 @@
             formControlName="costCenter"
             class="form-control w-full"
           >
+            <option selected value="">Without Cost Center</option>
             <option
               *ngFor="let account of Journal().costCenters"
               [value]="account.id"
@@ -131,7 +132,8 @@
           <textarea
             class="form-control w-full resize-none"
             formControlName="description"
-            placeholder="New Journal"
+            placeholder="Describe What This Transaction For..."
+            rows="4"
           ></textarea>
         </div>
       </div>

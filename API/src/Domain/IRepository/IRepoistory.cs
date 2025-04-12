@@ -16,6 +16,8 @@ public interface IRepository<T>
     Task<List<T>> GetAll(Expression<Func<T, bool>> criteria, params string[]? includes);
     Task<IEnumerable<O>> SelectAll<O>(Expression<Func<T, bool>> criteria, Expression<Func<T, O>> columns, params string[]? includes);
     Task<IEnumerable<O>> SelectSome<O,K>(Expression<Func<T, bool>> criteria, Expression<Func<T, O>> columns , Expression<Func<T, K>> orderBy, int pageNum, int pageSize, params string[]? includes);
+    Task<IEnumerable<O>> TakeLastOrderBy<O, K>(int takeCount, Expression<Func<T, O>> columns, Expression<Func<T, K>> orderBy);
+    IQueryable<T> AsQueryable();
     Task<bool> Exists(Expression<Func<T, bool>>? criteria = null);
     Task<int> Count(Expression<Func<T, bool>> criteria);
     Task<decimal> Sum(Expression<Func<T, decimal>> criteria);

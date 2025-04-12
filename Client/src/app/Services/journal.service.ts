@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { Periodjournals } from '../Interfaces/Response/Periodjournals';
@@ -6,12 +6,14 @@ import { JournalListItem } from '../Interfaces/Response/JournalListItem';
 import { Journal } from '../Interfaces/Response/Journal';
 import { CreateJournal } from '../Interfaces/Request/CreateJournal';
 import { ConfirmationRespose } from '../Interfaces/Response/ConfirmationRespose';
+import { Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class JournalService {
   url = environment.baseUrl + 'Journal';
+  advancedSearch$ = new Subject();
 
   constructor(private http: HttpClient) {}
 
@@ -27,6 +29,21 @@ export class JournalService {
     const url = this.url + `/Search?criteria=${key}`;
     return this.http.get<JournalListItem[]>(url);
   }
+
+  AvancedSearchJournals(keys) {
+    const params = new HttpParams()
+      .set('key', keys.key || '')
+      .set('from', keys.from || '')
+      .set('to', keys.to || '')
+      .set('orderBy', keys.orderBy || '')
+      .set('type', keys.type || '')
+      .set('dateFilter', keys.dateFilter || false);
+
+    return this.http.get<JournalListItem[]>(`${this.url}/AdvancedSearch`, {
+      params,
+    });
+  }
+
   GetNewJournal(periodId?: number) {
     let url = this.url + '/New';
 

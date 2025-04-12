@@ -65,7 +65,7 @@ export class CreateJournalComponent {
       amount: new FormControl(journal.amount, Validators.min(1)),
       debit: new FormControl(journal.debitAccountId),
       credit: new FormControl(journal.creditAccountId),
-      costCenter: new FormControl(journal.costCenterId),
+      costCenter: new FormControl(journal.costCenterId ?? ''),
       code: new FormControl({ disabled: true, value: journal.code }),
       created: new FormControl(
         this.GetLocaleDateTime(new Date(journal.createdAt))
@@ -125,7 +125,7 @@ export class CreateJournalComponent {
       id: form.id,
       amount: form.amount,
       detail: form.details,
-      costCenterId: form.costCenter,
+      costCenterId: form.costCenter == '' ? null : form.costCenter,
       creditAccountId: form.credit,
       debitAccountId: form.debit,
       description: form.description,
@@ -154,7 +154,7 @@ export class CreateJournalComponent {
               details: '',
               description: '',
               code: this.JournalForm.get('code').value + 1,
-              costCenter: null,
+              costCenter: '',
             });
             // this.GetCreditBalance();
             // this.GetDebitBalance();

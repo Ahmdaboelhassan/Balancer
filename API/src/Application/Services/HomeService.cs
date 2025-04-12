@@ -31,16 +31,16 @@ public class HomeService : IHomeService
             dashboard.Account4,
         };
 
-        var accounts = await _unitOfWork.Accounts.GetAll(x => accountIds.Contains(x.Id)) ;
+        var accounts = (await _unitOfWork.Accounts.GetAll(x => accountIds.Contains(x.Id))).ToDictionary(a => a.Id , a => a) ;
         if (accounts.Count() < accountIds.Length)
             return GetEmptyHome();
 
         var accountsList = new[]
         {
-          accounts.First(a => a.Id == accountIds[0]),
-          accounts.First(a => a.Id == accountIds[1]),
-          accounts.First(a => a.Id == accountIds[2]),
-          accounts.First(a => a.Id == accountIds[3]),
+          accounts[accountIds[0]],
+          accounts[accountIds[1]],
+          accounts[accountIds[2]],
+          accounts[accountIds[3]],
         };
 
         var balances = new List<AccountBalanceDTO>();
@@ -55,22 +55,24 @@ public class HomeService : IHomeService
         }
 
 
+        // Line Chart
+        var lastFourPeriods = await _unitOfWork.Periods.TakeLastOrderBy(4, p => p.TotalAmount, p => p.From.Date);
+
         // Pie Chart
         var current = DateTime.Now.Date;
+
         var lastMonth = current.AddMonths(-1);
 
-        var currentExpensesSum =(await _unitOfWork.Journal
-               .GetAll(j => j.CreatedAt.Date.Month == current.Month && j.CreatedAt.Date.Year == current.Year  && j.Type == (byte)JournalTypes.Subtract)).Sum(j => j.Amount * -1);
+        var currentExpensesSum = (await _unitOfWork.Journal
+               .GetAll(j => j.CreatedAt.Date.Month == current.Month && j.CreatedAt.Date.Year == current.Year && j.Type == (byte)JournalTypes.Subtract)).Sum(j => j.Amount * -1);
 
         var lastExpensesSum = (await _unitOfWork.Journal
-               .GetAll(j => j.CreatedAt.Date.Month == lastMonth.Month && j.CreatedAt.Date.Year == lastMonth.Year  && j.Type == (byte)JournalTypes.Subtract)).Sum(j => j.Amount * -1);
+               .GetAll(j => j.CreatedAt.Date.Month == lastMonth.Month && j.CreatedAt.Date.Year == lastMonth.Year && j.Type == (byte)JournalTypes.Subtract)).Sum(j => j.Amount * -1);
 
 
-        var currentAndLastMonthExpenses = new List<decimal> { lastExpensesSum, currentExpensesSum };
-
-
+        var currentAndLastMonthExpenses = new List<decimal> {currentExpensesSum ,lastExpensesSum };
+        
         // Bar Chart 
-
         List<decimal> currentYearExpenses = new List<decimal>();
         List<decimal> currentYearRevenue = new List<decimal>();
 
@@ -79,27 +81,29 @@ public class HomeService : IHomeService
 
         var expensesMonthlyGrouped = currentYearJournal.Where(j => j.Type == (byte)JournalTypes.Subtract)
                                                        .GroupBy(j => j.CreatedAt.Month)
-                                                       .Select(j => new { j.Key, Total = j.Sum(j => j.Amount * -1) });
+                                                       .Select(j => new { j.Key, Total = j.Sum(j => j.Amount * -1) })
+                                                       .ToDictionary(j => j.Key , j => j.Total);
 
 
         var revenuesMonthlyGrouped = currentYearJournal.Where(j => j.Type == (byte)JournalTypes.Add)
                                                        .GroupBy(j => j.CreatedAt.Month)
-                                                       .Select(j => new { j.Key, Total = j.Sum(j => j.Amount )});
+                                                       .Select(j => new { j.Key, Total = j.Sum(j => j.Amount )})
+                                                       .ToDictionary(j => j.Key, j => j.Total);
 
-
-        for(int i = 1; i <= 12; i++)
+        for (int i = 1; i <= 12; i++)
         {
-            currentYearExpenses.Add(expensesMonthlyGrouped.FirstOrDefault(e => e.Key == i)?.Total ?? 0);
+            currentYearExpenses.Add(expensesMonthlyGrouped.TryGetValue(i, out decimal expensesValue) ? expensesValue : 0);
 
-            currentYearRevenue.Add(revenuesMonthlyGrouped.FirstOrDefault(e => e.Key == i)?.Total ?? 0);
+            currentYearRevenue.Add(revenuesMonthlyGrouped.TryGetValue(i, out decimal revenueValue) ? revenueValue : 0);
         }
 
         return new GetHomeDTO
         {
             AccountsSummary = balances,
-            CurrentAndLastMonthExpenses = currentAndLastMonthExpenses,
+            LastFourPeriods = lastFourPeriods,
             CurrentYearExpenses = currentYearExpenses,
             CurrentYearRevenues = currentYearRevenue,
+            CurrentAndLastMonthExpenses = currentAndLastMonthExpenses,
         };
     }
 
@@ -113,7 +117,7 @@ public class HomeService : IHomeService
                  new AccountBalanceDTO { AccountName = "No Account", Balance = "0" },
                  new AccountBalanceDTO { AccountName = "No Account", Balance = "0" },
             },
-            CurrentAndLastMonthExpenses = new List<decimal> { 0 , 0},
+            LastFourPeriods = new List<decimal> { 0 , 0},
             CurrentYearExpenses = new List<decimal> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
             CurrentYearRevenues = new List<decimal> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
         };

@@ -17,7 +17,7 @@ export class AccountsOverviewComponent {
     private reportService: ReportService,
     private titleServive: Title
   ) {
-    this.titleServive.setTitle('Income Statement');
+    this.titleServive.setTitle('Accounts Overview');
   }
 
   GetAccountsOverview(dates: any) {

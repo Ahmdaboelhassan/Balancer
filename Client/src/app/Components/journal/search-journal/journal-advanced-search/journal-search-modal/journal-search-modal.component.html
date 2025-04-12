@@ -1,0 +1,109 @@
+<div class="p-10">
+  <div class="modal-header pb-4">
+    <h3 class="text-slate-800 font-bold lg:text-2xl text-xl mb-4">
+      Journal Advanced Search
+    </h3>
+    <hr />
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="journalForm">
+      <div class="grid grid-cols-2 gap-3">
+        <div class="col-span-2">
+          <label for="key"> Detail Or Code </label>
+          <input
+            type="text"
+            id="key"
+            class="form-control w-full"
+            formControlName="key"
+            placeholder="Search By Detail Or Code Leave It Empty For All"
+          />
+        </div>
+        <div class="col-span-2 lg:col-span-1">
+          <label for="from"> From </label>
+          <input
+            type="date"
+            id="from"
+            class="form-control w-full"
+            formControlName="from"
+          />
+        </div>
+
+        <div class="col-span-2 lg:col-span-1">
+          <label for="to"> To </label>
+          <input
+            type="date"
+            id="to"
+            class="form-control w-full"
+            formControlName="to"
+          />
+        </div>
+
+        <div class="col-span-2 lg:col-span-1">
+          <label for="orderBy"> Order By</label>
+          <select
+            id="orderBy"
+            class="form-control w-full"
+            formControlName="orderBy"
+          >
+            <option value="1">Created Date [ASC]</option>
+            <option value="2">Created Date [DESC]</option>
+            <option value="3">Last Update [ASC]</option>
+            <option value="4">Last Update [DESC]</option>
+            <option value="5">Amount [ASC]</option>
+            <option value="6">Amount [DESC]</option>
+            <option value="7">Code [ASC]</option>
+            <option value="8">Code [DESC]</option>
+          </select>
+        </div>
+
+        <div class="col-span-2 lg:col-span-1">
+          <label for="type">Journal Type</label>
+          <select id="type" class="form-control w-full" formControlName="type">
+            <option value="0">All</option>
+            <option value="1">Add</option>
+            <option value="2">Subtract</option>
+            <option value="3">Due</option>
+            <option value="4">Forward</option>
+          </select>
+        </div>
+        <div class="col-span-2 mb-6">
+          <label class="inline-flex items-center cursor-pointer w-full">
+            <input
+              type="checkbox"
+              formControlName="dateFilter"
+              name="dateFilter"
+              class="sr-only peer"
+            />
+            <div
+              class="relative w-11 h-6 bg-gray-200 rounded-full peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"
+            ></div>
+            <span class="ms-3 text-sm font-medium text-gray-900"
+              >Date Filter</span
+            >
+          </label>
+        </div>
+
+        <div class="col-span-2 lg:flex lg:gap-2">
+          <button
+            type="button"
+            class="btn-primary w-full lg:w-3/4"
+            (click)="Search()"
+          >
+            <div class="flex justify-between items-center">
+              <span>Search</span>
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </div>
+          </button>
+          <button
+            mat-dialog-close
+            cdkFocusInitial
+            type="button"
+            class="btn-danger w-full lg:w-1/4"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

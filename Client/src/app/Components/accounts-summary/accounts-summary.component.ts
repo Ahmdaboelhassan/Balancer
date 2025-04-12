@@ -17,7 +17,7 @@ export class AccountsSummaryComponent {
     private reportService: ReportService,
     private titleServive: Title
   ) {
-    this.titleServive.setTitle('Income Statement');
+    this.titleServive.setTitle('Accounts Summary');
   }
 
   GetAccountsSummary(dates: any) {

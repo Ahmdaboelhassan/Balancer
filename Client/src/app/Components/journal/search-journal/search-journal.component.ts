@@ -1,24 +1,35 @@
-import { Component, inject } from '@angular/core';
-import { SearchComponent } from '../../search/search.component';
+import { Component, inject, OnInit } from '@angular/core';
+
 import { JournalListComponent } from '../journal-list/journal-list.component';
 import { JournalService } from '../../../Services/journal.service';
 import { ToastrService } from 'ngx-toastr';
 import { Title } from '@angular/platform-browser';
+import { JournalAdvancedSearchComponent } from './journal-advanced-search/journal-advanced-search.component';
 
 @Component({
   selector: 'app-search-journal',
-  imports: [SearchComponent, JournalListComponent],
+  imports: [JournalAdvancedSearchComponent, JournalListComponent],
   templateUrl: './search-journal.component.html',
   styleUrl: './search-journal.component.css',
 })
-export class SearchJournalComponent {
+export class SearchJournalComponent implements OnInit {
   journals: any;
   summary: number = 0;
-  journalService = inject(JournalService);
-  toestr = inject(ToastrService);
 
-  constructor(private titleService: Title) {
-    titleService.setTitle('Journal Search');
+  constructor(
+    private titleService: Title,
+    private journalService: JournalService,
+    private toestr: ToastrService
+  ) {
+    this.titleService.setTitle('Journal Search');
+  }
+
+  ngOnInit(): void {
+    this.journalService.advancedSearch$.subscribe({
+      next: (keys) => {
+        this.AdvancedSearchJournals(keys);
+      },
+    });
   }
 
   SearchJournals(key: string) {
@@ -27,6 +38,19 @@ export class SearchJournalComponent {
       return;
     }
     this.journalService.SearchJournals(key).subscribe({
+      next: (result) => {
+        this.journals = result;
+        this.summary = this.journals.reduce(
+          (acc, journal) => acc + journal.amount,
+          0
+        );
+      },
+    });
+  }
+
+  AdvancedSearchJournals(keys: any) {
+    debugger;
+    this.journalService.AvancedSearchJournals(keys).subscribe({
       next: (result) => {
         this.journals = result;
         this.summary = this.journals.reduce(

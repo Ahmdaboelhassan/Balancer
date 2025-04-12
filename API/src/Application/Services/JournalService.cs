@@ -4,6 +4,7 @@ using Domain.Entities;
 using Domain.Enums;
 using Domain.IRepository;
 using Domain.IServices;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.ObjectModel;
 
 namespace Application.Services;
@@ -25,15 +26,6 @@ internal class JournalService : IJournalService
         if (settings is null)
             return null;
 
-        var jouranlPeriod = periodId;
-        if (jouranlPeriod == null || jouranlPeriod == 0)
-        {
-            var lastPeriod = await _uow.Periods.GetLastOrderBy(p => p.From);
-            if (lastPeriod is null) return null;
-            
-            jouranlPeriod = lastPeriod.Id;
-        }
-
         return new GetJournalDTO()
         {
             Accounts = await _accountService.GetSelectList(a => !a.IsParent),
@@ -41,7 +33,7 @@ internal class JournalService : IJournalService
             Code = await GetNextCode(),
             DebitAccountId = settings.DefaultDebitAccount.GetValueOrDefault(),
             CreditAccountId = settings.DefaultCreditAccount.GetValueOrDefault(),
-            PeriodId = jouranlPeriod.Value,
+            PeriodId = periodId.GetValueOrDefault(),
             CreatedAt = DateTime.Now,
         };
     }
@@ -90,6 +82,63 @@ internal class JournalService : IJournalService
             Notes = a.Notes,
             periodId = a.PeriodId,
         });
+    }
+    public async Task<IEnumerable<JournalListItemDTO>> AdvancedSearch(string? key ,DateTime from, DateTime to, bool dateFilter, int orderBy, int type)
+    {
+        var query = _uow.Journal.AsQueryable();
+
+        if (!string.IsNullOrEmpty(key))
+            query = query.Where(j => j.Detail.Contains(key) || j.Code.ToString().Contains(key));
+
+        if (type != 0)
+            query = query.Where(j => j.Type == type);
+
+        if (dateFilter)
+            query = query.Where(j => j.CreatedAt.Date >= from.Date && j.CreatedAt.Date <= to.Date);
+
+        switch (orderBy)
+        {   
+            case 1: // By CreatedAt ASC
+                query = query.OrderBy(j => j.CreatedAt);
+                break;
+            case 2: // By CreatedAt DESC
+                query = query.OrderByDescending(j => j.CreatedAt);
+                break;
+            case 3: // By Last Update ASC
+                query = query.OrderBy(j => j.LastUpdatedAt);
+                break;
+            case 4: // By Last Update DESC
+                query = query.OrderByDescending(j => j.LastUpdatedAt);
+                break;
+            case 5: // By Amount ASC
+                query = query.OrderBy(j => j.Amount);
+                break;
+            case 6: // By Amount DESC
+                query = query.OrderByDescending(j => j.Amount);
+                break;
+            case 7: // By Code ASC
+                query = query.OrderBy(j => j.Code);
+                break;
+            case 8: // By Code DESC
+                query = query.OrderByDescending(j => j.Code);
+                break;
+            default:
+                query = query.OrderByDescending(j => j.CreatedAt);
+                break;
+        }
+
+      return await query.Select(a => new JournalListItemDTO
+        {
+            Id = a.Id,
+            Amount = a.Amount,
+            Type = a.Type,
+            Code = a.Code,
+            CreatedAt = a.CreatedAt.ToString("D"),
+            Detail = a.Detail,
+            Notes = a.Notes,
+            periodId = a.PeriodId,
+        }).ToListAsync();
+
     }
     public async Task<IEnumerable<JournalListItemDTO>> GetAll(int page)
     {
@@ -168,7 +217,8 @@ internal class JournalService : IJournalService
 
                 var credit = await _uow.Accounts.Get(model.CreditAccountId);
                 var debit = await _uow.Accounts.Get(model.DebitAccountId);
-                var period = await _uow.Periods.Get(model.PeriodId);
+
+                Period? period = model.PeriodId == 0 ? await _uow.Periods.GetLastOrderBy(p => p.From) : await _uow.Periods.Get(model.PeriodId);
 
                 if (credit == null || debit == null)
                     return new ConfirmationResponse { Message = "Credit Account or Debit Account is Wrong" };
@@ -198,50 +248,49 @@ internal class JournalService : IJournalService
                 }
 
                 period.LastUpdatedAt = DateTime.Now;
+
                 await _uow.SaveChangesAync();
 
+                var costCenter = model.CostCenterId == 0 ? null : model.CostCenterId;
                 var newJournal = new Journal
                 {
                     Code = code,
                     Notes = notes,
                     CreatedAt = model.CreatedAt,
-                    PeriodId = model.PeriodId,
+                    PeriodId = period.Id,
                     Detail = model.Detail,
                     Amount = journalAmount,
                     Type = (byte)journalType,
                     Description = model.Description,
-                    
+                    LastUpdatedAt = DateTime.Now
+                };
+
+                newJournal.JournalDetails = new Collection<JournalDetail>
+                {
+                    new JournalDetail
+                    {
+                        AccountId = model.DebitAccountId,
+                        CostCenterId = costCenter,
+                        Credit = 0,
+                        Debit = model.Amount,
+                        JournalId = newJournal.Id,
+                        Notes = notes,
+                    },
+                    new JournalDetail
+                    {
+                        AccountId = model.CreditAccountId,
+                        CostCenterId = costCenter,
+                        Credit = model.Amount,
+                        Debit = 0,
+                        JournalId = newJournal.Id,
+                        Notes = notes,
+                    }
                 };
 
                 // Add Journal 
                 await _uow.Journal.AddAsync(newJournal);
                 await _uow.SaveChangesAync();
 
-                var costCenter = model.CostCenterId == 0 ? null : model.CostCenterId;
-
-                // Add Details 
-                await _uow.JournalDetail.AddAsync(new JournalDetail
-                {
-                    AccountId = model.DebitAccountId,
-                    CostCenterId = costCenter,
-                    Credit = 0,
-                    Debit = model.Amount,
-                    JournalId = newJournal.Id,
-                    Notes = notes,
-                });
-
-                await _uow.JournalDetail.AddAsync(new JournalDetail
-                {
-                    AccountId = model.CreditAccountId,
-                    CostCenterId = costCenter,
-                    Credit = model.Amount,
-                    Debit = 0,
-                    JournalId = newJournal.Id,
-                    Notes = notes,
-                });
-
-
-                await _uow.SaveChangesAync();
                 transaction.Commit();
 
                 return new ConfirmationResponse { Message = "Journal Has Been Created Successfully", IsSucceed = true };
@@ -299,9 +348,8 @@ internal class JournalService : IJournalService
                 {
                     await _uow.Periods.ExecuteUpdateAsync(p => p.Id == model.PeriodId, e => e.SetProperty(p => p.TotalAmount, p => p.TotalAmount + journalAmount));
                 }
-
                 period.LastUpdatedAt = DateTime.Now;
-                await _uow.SaveChangesAync();
+
 
                 journal.Notes = notes;
                 journal.PeriodId = model.PeriodId;
@@ -312,34 +360,36 @@ internal class JournalService : IJournalService
                 journal.Description = model.Description;
                 journal.CreatedAt = model.CreatedAt;
 
-                // Add Journal 
+                // Delete Old Details
                 _uow.JournalDetail.DeleteRange(journal.JournalDetails);
                 await _uow.SaveChangesAync();
 
-                _uow.Journal.Update(journal);
-
+                // Add New Details 
                 var costCenter = model.CostCenterId == 0 ? null : model.CostCenterId;
 
-                // Add Details 
-                await _uow.JournalDetail.AddAsync(new JournalDetail
+                journal.JournalDetails = new Collection<JournalDetail>
                 {
-                    AccountId = model.DebitAccountId,
-                    CostCenterId = costCenter,
-                    Credit = 0,
-                    Debit = model.Amount,
-                    JournalId = journal.Id,
-                    Notes = notes,
-                });
+                    new JournalDetail
+                    {
+                        AccountId = model.DebitAccountId,
+                        CostCenterId = costCenter,
+                        Credit = 0,
+                        Debit = model.Amount,
+                        JournalId = journal.Id,
+                        Notes = notes,
+                    },
+                    new JournalDetail
+                    {
+                        AccountId = model.CreditAccountId,
+                        CostCenterId = costCenter,
+                        Credit = model.Amount,
+                        Debit = 0,
+                        JournalId = journal.Id,
+                        Notes = notes,
+                    }
+                };
 
-                await _uow.JournalDetail.AddAsync(new JournalDetail
-                {
-                    AccountId = model.CreditAccountId,
-                    CostCenterId = costCenter,
-                    Credit = model.Amount,
-                    Debit = 0,
-                    JournalId = journal.Id,
-                    Notes = notes,
-                });
+                _uow.Journal.Update(journal);
 
                 await _uow.SaveChangesAync();
 
@@ -420,5 +470,7 @@ internal class JournalService : IJournalService
 
         return journalType;
     }
+
+    
 }
 

@@ -4,11 +4,10 @@ import { BaseChartDirective } from 'ng2-charts';
 import { AccountsBalance } from '../../Interfaces/Response/AccountsBalance';
 import { HomeService } from '../../Services/home.service';
 import { Title } from '@angular/platform-browser';
-import { CdkObserveContent } from '@angular/cdk/observers';
 
 @Component({
   selector: 'app-home',
-  imports: [BaseChartDirective, RouterLink],
+  imports: [BaseChartDirective],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })
@@ -41,14 +40,18 @@ export class HomeComponent implements OnInit {
     'fa-solid fa-hourglass-start',
     'fa-solid fa-wallet',
   ];
+
   barChart = signal({});
   pieChart = signal({});
+  lineChart = signal({});
+
   ngOnInit(): void {
     this.GetEstimatedMonthNeed();
     this.titleService.setTitle('Balancer');
     this.homeService.GetHome().subscribe({
       next: (result) => {
         this.balances.set(result.accountsSummary);
+        this.IntializeLineChart(result.lastFourPeriods);
         this.IntializePieChart(result.currentAndLastMonthExpenses);
         this.IntializeBarChart(
           result.currentYearRevenues,
@@ -90,17 +93,31 @@ export class HomeComponent implements OnInit {
   }
 
   IntializePieChart(data: number[]) {
+    debugger;
     this.pieChart.set({
-      labels: ['Last Month', 'Current Month'],
+      labels: ['Current', 'Last'],
       datasets: [
         {
-          label: 'Number',
+          label: 'Amount',
           data: data,
         },
       ],
     });
   }
-
+  IntializeLineChart(data: number[]) {
+    this.lineChart.set({
+      labels: ['Current', '#1 Ago', '#2 Ago', '3# Ago'], // These become x-axis labels
+      datasets: [
+        {
+          label: 'Last Four Periods',
+          data: data,
+          fill: false,
+          borderColor: 'rgb(75, 192, 192)',
+          tension: 0.5,
+        },
+      ],
+    });
+  }
   GetEstimatedMonthNeed() {
     const currentDate = new Date();
 

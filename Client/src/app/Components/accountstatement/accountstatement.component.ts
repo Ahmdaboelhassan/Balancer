@@ -6,6 +6,7 @@ import { CostcenterService } from '../../Services/costcenter.service';
 import { AccountSelectList } from '../../Interfaces/Response/AccountSelectList';
 import { CostCenterSelectList } from '../../Interfaces/Response/CostCenterSelectList';
 import { NgFor } from '@angular/common';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-accountstatement',
@@ -23,7 +24,8 @@ export class AccountstatementComponent {
   constructor(
     private router: Router,
     private accountService: AccountService,
-    private costCenterService: CostcenterService
+    private costCenterService: CostcenterService,
+    private titleServive: Title
   ) {
     this.GetDefaultDate();
     this.accountService
@@ -32,6 +34,7 @@ export class AccountstatementComponent {
     this.costCenterService
       .GetAllCostCenterSelectList()
       .subscribe({ next: (costCenters) => (this.costCenters = costCenters) });
+    this.titleServive.setTitle('Account Statement');
   }
 
   GetDefaultDate() {
