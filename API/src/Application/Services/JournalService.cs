@@ -93,8 +93,8 @@ internal class JournalService : IJournalService
         if (DTO.type != 0)
             query = query.Where(j => j.Type == DTO.type);
 
-        if (DTO.filterByDate)
-            query = query.Where(j => j.CreatedAt.Date >= DTO.from.Date && j.CreatedAt.Date <= DTO.to.Date);
+        if (DTO.filterByDate && DTO.from.HasValue && DTO.to.HasValue)
+            query = query.Where(j => j.CreatedAt.Date >= DTO.from.Value.Date && j.CreatedAt.Date <= DTO.to.Value.Date);
 
         switch (DTO.orderBy)
         {   

@@ -9,8 +9,8 @@ namespace Domain.DTO.Request
     public class JournalAdvancedSearchDTO
     {
         public string? key { get; set; }
-        public DateTime from { get; set; }
-        public DateTime to { get; set; }
+        public DateTime? from { get; set; }
+        public DateTime? to { get; set; }
         public int orderBy { get; set; }
         public int type { get; set; }
         public bool filterByDate { get; set; }
