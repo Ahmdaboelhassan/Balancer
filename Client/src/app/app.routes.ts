@@ -29,7 +29,6 @@ export const routes: Routes = [
   {
     path: 'Auth',
     loadComponent: () => AuthComponent,
-    canActivate: [authGuard],
   },
   {
     path: 'Journal',
