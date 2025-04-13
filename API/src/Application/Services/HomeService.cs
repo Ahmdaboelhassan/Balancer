@@ -56,7 +56,10 @@ public class HomeService : IHomeService
 
 
         // Line Chart
-        var lastFourPeriods = await _unitOfWork.Periods.TakeLastOrderBy(4, p => p.TotalAmount, p => p.From.Date);
+        var lastPeriods = (await _unitOfWork.Periods.
+                TakeLastOrderBy(4, p => new { p.From, p.TotalAmount }, p => p.From.Date))
+                .OrderBy(p => p.From).Select(p => p.TotalAmount);
+                
 
         // Pie Chart
         var current = DateTime.Now.Date;
@@ -100,7 +103,7 @@ public class HomeService : IHomeService
         return new GetHomeDTO
         {
             AccountsSummary = balances,
-            LastFourPeriods = lastFourPeriods,
+            LastPeriods = lastPeriods,
             CurrentYearExpenses = currentYearExpenses,
             CurrentYearRevenues = currentYearRevenue,
             CurrentAndLastMonthExpenses = currentAndLastMonthExpenses,
@@ -117,9 +120,11 @@ public class HomeService : IHomeService
                  new AccountBalanceDTO { AccountName = "No Account", Balance = "0" },
                  new AccountBalanceDTO { AccountName = "No Account", Balance = "0" },
             },
-            LastFourPeriods = new List<decimal> { 0 , 0},
+            LastPeriods = new List<decimal> { 0 , 0 , 0 , 0},
+            CurrentAndLastMonthExpenses = new List<decimal> { 0, 0},
             CurrentYearExpenses = new List<decimal> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
             CurrentYearRevenues = new List<decimal> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+           
         };
     }
 

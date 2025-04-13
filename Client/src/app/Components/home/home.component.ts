@@ -51,7 +51,7 @@ export class HomeComponent implements OnInit {
     this.homeService.GetHome().subscribe({
       next: (result) => {
         this.balances.set(result.accountsSummary);
-        this.IntializeLineChart(result.lastFourPeriods);
+        this.InitializeLineChart(result.lastPeriods);
         this.IntializePieChart(result.currentAndLastMonthExpenses);
         this.IntializeBarChart(
           result.currentYearRevenues,
@@ -93,7 +93,6 @@ export class HomeComponent implements OnInit {
   }
 
   IntializePieChart(data: number[]) {
-    debugger;
     this.pieChart.set({
       labels: ['Current', 'Last'],
       datasets: [
@@ -104,20 +103,24 @@ export class HomeComponent implements OnInit {
       ],
     });
   }
-  IntializeLineChart(data: number[]) {
+  InitializeLineChart(data: number[]) {
     this.lineChart.set({
-      labels: ['Current', '#1 Ago', '#2 Ago', '3# Ago'], // These become x-axis labels
+      labels: ['', '', '', 'Current'], // x-axis labels
       datasets: [
         {
-          label: 'Last Four Periods',
+          label: 'Last Periods',
           data: data,
           fill: false,
           borderColor: 'rgb(75, 192, 192)',
           tension: 0.5,
+          pointStyle: 'circle',
+          pointRadius: 5,
+          pointHoverRadius: 10,
         },
       ],
     });
   }
+
   GetEstimatedMonthNeed() {
     const currentDate = new Date();
 

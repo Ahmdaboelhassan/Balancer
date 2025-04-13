@@ -15,7 +15,10 @@ export class JournalAdvancedSearchComponent {
   readonly dialog = inject(MatDialog);
 
   openDialog() {
-    this.dialog.open(JournalSearchModalComponent);
+    this.dialog.open(JournalSearchModalComponent, {
+      maxHeight: '90vh',
+      autoFocus: false,
+    });
   }
 
   Seach(key: HTMLInputElement) {
