@@ -244,7 +244,7 @@ internal class JournalService : IJournalService
 
                 if (journalType != JournalTypes.Due && journalType != JournalTypes.Forward)
                 {
-                    await _uow.Periods.ExecuteUpdateAsync(p => p.Id == model.PeriodId, e => e.SetProperty(p => p.TotalAmount, p => p.TotalAmount + journalAmount));
+                    await _uow.Periods.ExecuteUpdateAsync(p => p.Id == period.Id, e => e.SetProperty(p => p.TotalAmount, p => p.TotalAmount + journalAmount));
                 }
 
                 period.LastUpdatedAt = DateTime.Now;
