@@ -13,7 +13,7 @@ public class ReportService : IReportService
     private readonly IUnitOfWork _uow;
     public ReportService(IUnitOfWork uow) => _uow = uow;
 
-    public async Task<AccountStatement> GetAccountStatement(DateTime from, DateTime to, int accountId, int? costCenterId , bool openingBalance)
+    public async Task<AccountStatement> GetAccountStatement(DateTime? from, DateTime? to, int accountId, int? costCenterId, bool openingBalance)
     {
         var account = await _uow.Accounts.Get(accountId);
         if (account == null)
@@ -22,22 +22,22 @@ public class ReportService : IReportService
         var journals = (await _uow.JournalDetail
                    .GetAll(d =>
                         d.Account.Number.StartsWith(account.Number)
-                     && d.Journal.CreatedAt.Date >= from.Date
-                     && d.Journal.CreatedAt.Date <= to.Date
-                     && (costCenterId.HasValue ? d.CostCenterId == costCenterId : true)
+                     && (!from.HasValue || d.Journal.CreatedAt.Date >= from.Value.Date)
+                     && (!to.HasValue || d.Journal.CreatedAt.Date <= to.Value.Date)
+                     && (!costCenterId.HasValue || d.CostCenterId == costCenterId)
                    , "CostCenter", "Account", "Journal")).OrderBy(d => d.Journal.CreatedAt);
 
 
         var journalsLinkedList = new LinkedList<AccountStatementDetail>();
 
         decimal balance = 0;
-        if (openingBalance)
+        if (openingBalance && from.HasValue)
         {
             var openingJournals = await _uow.JournalDetail
                     .GetAll(d =>
                          d.Account.Number.StartsWith(account.Number)
-                       && d.Journal.CreatedAt < from.Date
-                      && (costCenterId.HasValue ? d.CostCenterId == costCenterId : true)
+                       && d.Journal.CreatedAt < from.Value.Date
+                      && (!costCenterId.HasValue ||  d.CostCenterId == costCenterId )
                     , "Account", "Journal");
 
             if (openingJournals.Count > 0)
@@ -94,8 +94,8 @@ public class ReportService : IReportService
             AccountType = balance > 0 ? "Debit" : "Credit",
             Details = journalsLinkedList,
             AccountName = account.Name,
-            From = from.ToString("d"),
-            To = to.ToString("d"),
+            From = from?.ToString("d") ?? "",
+            To = to?.ToString("d") ?? "",
             Amount = Math.Abs(balance).ToString("c")
         };
     }

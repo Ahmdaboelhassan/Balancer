@@ -20,6 +20,8 @@ export class AccountstatementComponent {
   accounts: AccountSelectList[];
   costCenters: CostCenterSelectList[];
   openingBalance: boolean = true;
+  ignoreTo: boolean = false;
+  ignoreFrom: boolean = false;
 
   constructor(
     private router: Router,
@@ -56,8 +58,25 @@ export class AccountstatementComponent {
 
   GetAccountStatement(form: NgForm) {
     const baseUrl = window.location.origin;
-    const queryParams = new URLSearchParams(form.value).toString();
+    const formValue = form.value;
+
+    const params = {
+      account: formValue.account,
+      openingBalance: formValue.openingBalance,
+    };
+
+    if (formValue.costCenter) {
+      params['costCenter'] = formValue.costCenter;
+    }
+    if (formValue.from && !formValue.ignoreDates) {
+      params['from'] = formValue.from;
+    }
+    if (formValue.to && !formValue.ignoreDates) {
+      params['to'] = formValue.to;
+    }
+    const queryParams = new URLSearchParams(params).toString();
     const hashRoute = `#/AccountStatement/Get?${queryParams}`;
+
     const fullUrl = `${baseUrl}/${hashRoute}`;
     window.open(fullUrl, '_blank');
   }

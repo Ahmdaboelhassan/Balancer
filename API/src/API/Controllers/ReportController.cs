@@ -17,7 +17,7 @@ public class ReportController : ControllerBase
     }
 
     [HttpGet("AccountStatement")]
-    public async Task<IActionResult> AccountStatement(DateTime from , DateTime to, int account , int? costCenter , bool openingBalance)
+    public async Task<IActionResult> AccountStatement(DateTime? from , DateTime? to, int account , int? costCenter , bool openingBalance)
     {
         return Ok(await _serviceContext.ReportService.GetAccountStatement(from , to , account , costCenter , openingBalance));
     }

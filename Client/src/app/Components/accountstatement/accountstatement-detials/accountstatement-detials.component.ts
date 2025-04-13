@@ -21,10 +21,10 @@ export class AccountstatementDetialsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const from = this.route.snapshot.queryParams['from'];
-    const to = this.route.snapshot.queryParams['to'];
+    const from = this.route.snapshot.queryParams['from'] || '';
+    const to = this.route.snapshot.queryParams['to'] || '';
     const account = this.route.snapshot.queryParams['account'];
-    const costcenter = this.route.snapshot.queryParams['costCenter'];
+    const costcenter = this.route.snapshot.queryParams['costCenter'] || '';
     const openingbalance = this.route.snapshot.queryParams['openingBalance'];
 
     if (!account) {
