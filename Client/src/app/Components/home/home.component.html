@@ -49,9 +49,9 @@
   </div>
 </div>
 
-<div class="grid grid-cols-2 gap-3 mt-3">
+<div class="grid grid-cols-3 gap-3 mt-3">
   <div
-    class="bg-white rounded-lg col-span-2 lg:col-span-1 flex justify-between items-center shadow-sm p-5 lg:hover:shadow-lg transition-all"
+    class="bg-white rounded-lg col-span-3 lg:col-span-1 flex justify-between items-center shadow-sm p-5 lg:hover:shadow-lg transition-all"
   >
     <div class="info">
       <p class="text-sm text-gray-600 mb-2">Time Left For The Month</p>
@@ -73,7 +73,7 @@
     </div>
   </div>
   <div
-    class="bg-white rounded-lg flex col-span-2 lg:col-span-1 justify-between items-center shadow-sm p-5 lg:hover:shadow-lg transition-all"
+    class="bg-white rounded-lg flex col-span-3 lg:col-span-1 justify-between items-center shadow-sm p-5 lg:hover:shadow-lg transition-all"
   >
     <div class="info">
       <p class="text-sm text-gray-600 mb-2">Estimated Money Need</p>
@@ -89,6 +89,44 @@
       style="height: 60px; width: 60px"
     >
       <i class="{{ icons[5] }} fa-2xl"></i>
+    </div>
+  </div>
+  <div
+    class="bg-white rounded-lg flex col-span-3 lg:col-span-1 justify-between items-center shadow-sm p-5 lg:hover:shadow-lg transition-all"
+  >
+    <div class="info flex-1">
+      <div class="flex items-center">
+        <div class="me-5">
+          <p class="text-sm mb-2 text-gray-600">Expenses</p>
+          <span
+            class="bg-indigo-100 text-indigo-800 text-sm font-medium px-3 py-1.5 rounded-sm"
+            >{{ Expenses }}</span
+          >
+        </div>
+        <div class="me-5">
+          <p class="text-sm mb-2 text-gray-600">Available</p>
+          <span
+            class="bg-purple-100 text-purple-800 text-sm font-medium px-3 py-1.5 rounded-sm"
+            >{{ Available }}</span
+          >
+        </div>
+
+        <div>
+          <p class="text-sm mb-2 text-gray-600">Savings Target</p>
+          <span
+            class="bg-pink-100 text-pink-800 text-sm font-medium px-3 py-1.5 rounded-sm"
+            >{{ savingsTarget }}</span
+          >
+        </div>
+      </div>
+    </div>
+    <div
+      class="rounded-3xl ms-5 {{
+        colors[6]
+      }}  flex justify-center items-center text-white"
+      style="height: 60px; width: 60px"
+    >
+      <i class="{{ icons[6] }} fa-2xl"></i>
     </div>
   </div>
 </div>

@@ -12,9 +12,14 @@ import { Title } from '@angular/platform-browser';
   styleUrl: './home.component.css',
 })
 export class HomeComponent implements OnInit {
-  // Number Can Change In Time
+  // Start Static Numbers
   periodDays = 7;
   dayRate = 90;
+  Expenses = '2,000';
+  Available = '1,300';
+  savingsTarget = '2,500';
+
+  // End Static Numbers
 
   timeLeft: { periods: number; days: number } = {
     periods: 0,
@@ -26,11 +31,12 @@ export class HomeComponent implements OnInit {
   balances = signal<AccountsBalance[]>([]);
   colors = [
     'bg-green-500',
-    ' bg-blue-400',
+    'bg-blue-400',
     'bg-purple-500',
     'bg-red-500',
     'bg-yellow-500',
     'bg-orange-500',
+    'bg-rose-500',
   ];
   icons = [
     'fa-solid fa-vault',
@@ -38,6 +44,7 @@ export class HomeComponent implements OnInit {
     'fa-solid fa-house',
     'fa-solid fa-calendar-days',
     'fa-solid fa-hourglass-start',
+    'fa-solid fa-square-root-variable',
     'fa-solid fa-wallet',
   ];
 
@@ -110,8 +117,9 @@ export class HomeComponent implements OnInit {
         {
           label: 'Last Periods',
           data: data,
-          fill: false,
+          fill: true,
           borderColor: 'rgb(75, 192, 192)',
+          backgroundColor: 'rgba(75, 192, 192, 0.15)',
           tension: 0.5,
           pointStyle: 'circle',
           pointRadius: 5,
