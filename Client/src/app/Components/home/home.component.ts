@@ -1,9 +1,16 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import {
+  Component,
+  inject,
+  OnInit,
+  signal,
+  WritableSignal,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { BaseChartDirective } from 'ng2-charts';
 import { AccountsBalance } from '../../Interfaces/Response/AccountsBalance';
 import { HomeService } from '../../Services/home.service';
 import { Title } from '@angular/platform-browser';
+import { Home } from '../../Interfaces/Response/Home';
 
 @Component({
   selector: 'app-home',
@@ -12,23 +19,19 @@ import { Title } from '@angular/platform-browser';
   styleUrl: './home.component.css',
 })
 export class HomeComponent implements OnInit {
-  // Start Static Numbers
-  periodDays = 7;
-  dayRate = 90;
-  Expenses = '2,000';
-  Available = '1,300';
-  savingsTarget = '2,500';
-
-  // End Static Numbers
+  home: Home;
+  barChart = signal({});
+  pieChart = signal({});
+  lineChart = signal({});
+  balances = signal<AccountsBalance[]>([]);
 
   timeLeft: { periods: number; days: number } = {
     periods: 0,
     days: 0,
   };
+
   moneyNeed: string = '0';
-  homeService = inject(HomeService);
-  titleService = inject(Title);
-  balances = signal<AccountsBalance[]>([]);
+
   colors = [
     'bg-green-500',
     'bg-blue-400',
@@ -41,22 +44,19 @@ export class HomeComponent implements OnInit {
   icons = [
     'fa-solid fa-vault',
     'fa-solid fa-building-columns',
-    'fa-solid fa-house',
+    'fa-solid fa-wallet',
     'fa-solid fa-calendar-days',
     'fa-solid fa-hourglass-start',
-    'fa-solid fa-square-root-variable',
-    'fa-solid fa-wallet',
+    'fa-solid fa-sack-dollar',
+    'fa-solid fa-house',
   ];
 
-  barChart = signal({});
-  pieChart = signal({});
-  lineChart = signal({});
-
+  constructor(private homeService: HomeService, private titleService: Title) {}
   ngOnInit(): void {
-    this.GetEstimatedMonthNeed();
     this.titleService.setTitle('Balancer');
     this.homeService.GetHome().subscribe({
       next: (result) => {
+        this.home = result;
         this.balances.set(result.accountsSummary);
         this.InitializeLineChart(result.lastPeriods);
         this.IntializePieChart(result.currentAndLastMonthExpenses);
@@ -64,6 +64,7 @@ export class HomeComponent implements OnInit {
           result.currentYearRevenues,
           result.currentYearExpenses
         );
+        this.GetEstimatedMonthNeed(result.periodDays, result.dayRate);
       },
     });
   }
@@ -129,7 +130,7 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  GetEstimatedMonthNeed() {
+  GetEstimatedMonthNeed(periodDays, dayRate) {
     const currentDate = new Date();
 
     const lastDay = new Date(
@@ -140,8 +141,8 @@ export class HomeComponent implements OnInit {
 
     const timeDifference = lastDay.getTime() - currentDate.getTime();
     const days = Math.ceil(timeDifference / 1000 / 60 / 60 / 24);
-    const periods = Math.floor(days / this.periodDays);
-    const money = days * this.dayRate;
+    const periods = Math.floor(days / periodDays);
+    const money = days * dayRate;
 
     this.moneyNeed = new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -157,5 +158,10 @@ export class HomeComponent implements OnInit {
     if (cover) {
       cover.classList.toggle('opacity-0');
     }
+  }
+
+  ScrollHorizontally(event, scrollContainer: HTMLElement) {
+    event.preventDefault();
+    scrollContainer.scrollLeft += event.deltaY;
   }
 }

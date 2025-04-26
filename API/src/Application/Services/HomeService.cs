@@ -20,7 +20,8 @@ public class HomeService : IHomeService
     {
         // Statistics
         var dashboard = await _unitOfWork.DashboardAccounts.GetFirst();
-        if (dashboard == null)
+        var settings = await _unitOfWork.Settings.GetFirst();
+        if (dashboard == null || settings == null)
             return GetEmptyHome();
 
         var accountIds = new[]
@@ -29,10 +30,15 @@ public class HomeService : IHomeService
             dashboard.Account2,
             dashboard.Account3,
             dashboard.Account4,
+            dashboard.CurrentCashAccount,
+            dashboard.GamieaLiabilitiesAccount,
+            dashboard.PeriodsExpensesAccount,
+            settings.ExpensesAccount.GetValueOrDefault(),
         };
 
-        var accounts = (await _unitOfWork.Accounts.GetAll(x => accountIds.Contains(x.Id))).ToDictionary(a => a.Id , a => a) ;
-        if (accounts.Count() < accountIds.Length)
+        var accounts = (await _unitOfWork.Accounts.GetAll(x => accountIds.Contains(x.Id))).ToDictionary(a => a.Id , a => a);
+
+        if (accounts.Count() < 4)
             return GetEmptyHome();
 
         var accountsList = new[]
@@ -100,6 +106,20 @@ public class HomeService : IHomeService
             currentYearRevenue.Add(revenuesMonthlyGrouped.TryGetValue(i, out decimal revenueValue) ? revenueValue : 0);
         }
 
+
+        // Get Month Budget Details 
+        var currentMonthJournals = (await _unitOfWork.JournalDetail
+            .GetAll(j => (j.Journal.CreatedAt.Month == current.Month && j.Journal.CreatedAt.Year == current.Year) && ( j.Journal.Type != (byte)JournalTypes.Due && j.Journal.Type != (byte)JournalTypes.Forward), "Journal", "Account"))
+            .GroupBy(j => j.Account.Number)
+            .Select(j => new { AccountNumber = j.Key, Total = j.Sum(j => j.Debit - j.Credit) });
+
+        var currentCashAmount = currentMonthJournals.Where(d => d.AccountNumber.StartsWith(accounts[accountIds[4]].Number)).Sum(x => x.Total);
+        var gamieaPaidAmount = currentMonthJournals.Where(d => d.AccountNumber.StartsWith(accounts[accountIds[5]].Number)).Sum(x => x.Total);
+        var currentPeriodExpenses = currentMonthJournals.Where(d => d.AccountNumber.StartsWith(accounts[accountIds[6]].Number)).Sum(x => x.Total);
+        var otherExpenses = currentMonthJournals.Where(d => d.AccountNumber.StartsWith(accounts[accountIds[7]].Number) && d.AccountNumber != accounts[accountIds[6]].Number).Sum(x => x.Total);
+
+
+
         return new GetHomeDTO
         {
             AccountsSummary = balances,
@@ -107,6 +127,17 @@ public class HomeService : IHomeService
             CurrentYearExpenses = currentYearExpenses,
             CurrentYearRevenues = currentYearRevenue,
             CurrentAndLastMonthExpenses = currentAndLastMonthExpenses,
+            PeriodExpensesAmount = currentPeriodExpenses,
+            PeriodExpensesTarget = dashboard.PeriodExpensesTarget,
+            OtherExpensesAmount = otherExpenses,
+            OtherExpensesTarget = dashboard.OtherExpensesTarget,
+            GamieaLiabilitiesAmount = gamieaPaidAmount,
+            GamieaLiabilitiesTarget = dashboard.GamieaLiabilitiesTarget,
+            MonthlySavingsAmount = currentCashAmount,
+            MonthlySavingsTarget = dashboard.MonthlySavingsTarget,
+            AvailableFunds = dashboard.OtherExpensesTarget - otherExpenses,
+            DayRate = dashboard.DayRate,
+            PeriodDays = settings.DefaultPeriodDays.GetValueOrDefault(),
         };
     }
 
@@ -136,4 +167,13 @@ public class HomeService : IHomeService
         return (await _unitOfWork.JournalDetail.SelectAll(d => d.Account.Number.StartsWith(account.Number), d => d.Debit - d.Credit, "Account")).Sum();
         
     }
+}
+
+
+class de
+{
+
+
+
+
 }
