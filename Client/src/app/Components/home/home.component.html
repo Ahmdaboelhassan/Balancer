@@ -26,12 +26,24 @@
 </div>
 
 @if (home){
+
 <div class="mt-4">
   <div class="grid grid-cols-4 gap-3">
     <div class="col-span-3 hidden lg:block">
-      <div class="bg-white rounded-lg p-5">
-        @if(barChart){
-        <canvas baseChart [data]="barChart()" [type]="'bar'"> </canvas>
+      <div class="bg-white rounded-lg p-5 relative">
+        <button
+          class="absolute top-2 right-2 transition-all hover:text-lg"
+          (click)="SwitchRevenueAndExpensesChartType()"
+        >
+          <i class="fa-solid fa-rotate-left"></i>
+        </button>
+        @if(RevenuesAndExpensesChart()){
+        <canvas
+          baseChart
+          [data]="RevenuesAndExpensesChart()"
+          [type]="RevenuesAndExpensesChartType()"
+        >
+        </canvas>
         }
       </div>
     </div>
@@ -41,88 +53,129 @@
         <canvas baseChart [data]="lineChart()" [type]="'line'"> </canvas>
         }
       </div>
-      <div class="bg-white rounded-xl mb-2 p-5">
-        @if(pieChart()){
+      <div
+        class="bg-white relative transition-all overflow-y-auto hide-scrollbar rounded-xl mb-2 p-5 h-[323px]"
+      >
+        <button
+          class="absolute top-2 right-2 hover:text-lg"
+          (click)="TogglePieChart()"
+        >
+          <i class="fa-solid fa-rotate-left"></i>
+        </button>
+        @if(pieChart() && showPieChat()){
         <canvas baseChart [data]="pieChart()" [type]="'pie'"> </canvas>
+        } @else{
+        <div
+          class="info flex-1 flex flex-nowrap focus-visible:outline-none focus:outline-none"
+        >
+          <div class="flex flex-col text-nowrap font-medium w-full">
+            <div class="my-6">
+              <div class="flex justify-between items-center">
+                <p
+                  class="text-sm text-indigo-800 rounded-sm ps-1 pe-4 py-.5 w-full"
+                >
+                  Current Funds
+                </p>
+                <p class="text-end m-0 text-xl py-1.5 rounded-sm">
+                  {{ home.otherExpensesAmount }}
+                  <span class="text-xs text-gray-500">
+                    /{{ home.otherExpensesTarget }}</span
+                  >
+                </p>
+              </div>
+
+              <p class="h-1 mt-2 w-full bg-gray-200 relative">
+                <span
+                  class="absolute transition-all left-0 top-0 bg-indigo-500 h-full budget-value"
+                  style="width: 2%"
+                  BudgetBalue
+                  [amount]="home.otherExpensesAmount"
+                  [target]="home.otherExpensesTarget"
+                ></span>
+              </p>
+            </div>
+            <div class="mb-6">
+              <div class="flex justify-between items-center">
+                <p class="text-sm text-pink-800 rounded-sm ps-1 pe-4 py-.5">
+                  Savings Target
+                </p>
+                <p class="text-end m-0 text-xl py-1.5 rounded-sm">
+                  {{ home.monthlySavingsAmount }}
+                  <span class="text-xs text-gray-500">
+                    /{{ home.monthlySavingsTarget }}</span
+                  >
+                </p>
+              </div>
+              <p class="h-1 mt-2 w-full bg-gray-200 relative">
+                <span
+                  class="absolute transition-all left-0 top-0 bg-pink-500 h-full budget-value"
+                  style="width: 1%"
+                  BudgetBalue
+                  [amount]="home.monthlySavingsAmount"
+                  [target]="home.monthlySavingsTarget"
+                ></span>
+              </p>
+            </div>
+            <div class="mb-6">
+              <div class="flex justify-between items-center">
+                <p class="text-sm text-purple-800 rounded-sm ps-1 pe-4 py-.5">
+                  Periods Expenses
+                </p>
+                <p class="text-end m-0 text-xl py-1.5 rounded-sm">
+                  {{ home.periodExpensesAmount }}
+                  <span class="text-xs text-gray-500">
+                    /{{ home.periodExpensesTarget }}</span
+                  >
+                </p>
+              </div>
+              <p class="h-1 mt-2 w-full bg-gray-200 relative">
+                <span
+                  class="absolute transition-all left-0 top-0 bg-purple-500 h-full budget-value"
+                  style="width: 1%"
+                  BudgetBalue
+                  [amount]="home.periodExpensesAmount"
+                  [target]="home.periodExpensesTarget"
+                ></span>
+              </p>
+            </div>
+            <div class="mb-6">
+              <div class="flex justify-between items-center">
+                <p class="text-sm text-blue-800 rounded-sm ps-1 pe-4 py-.5">
+                  Gameia
+                </p>
+                <p class="text-end m-0 text-xl py-1.5 rounded-sm">
+                  {{ home.gamieaLiabilitiesAmount }}
+                  <span class="text-xs text-gray-500">
+                    /{{ home.gamieaLiabilitiesTarget }}</span
+                  >
+                </p>
+              </div>
+              <p class="h-1 mt-1 w-full bg-gray-200 relative">
+                <span
+                  class="absolute transition-all left-0 top-0 bg-blue-500 h-full budget-value"
+                  style="width: 1%"
+                  BudgetBalue
+                  [amount]="home.gamieaLiabilitiesAmount"
+                  [target]="home.gamieaLiabilitiesTarget"
+                ></span>
+              </p>
+            </div>
+          </div>
+        </div>
         }
       </div>
     </div>
   </div>
 </div>
 
-<div class="grid grid-cols-8 gap-3 mt-3">
+<div class="grid grid-cols-3 gap-3 mt-3">
   <div
-    class="bg-white rounded-lg flex col-span-8 lg:col-span-4 justify-between items-center shadow-sm p-5 lg:hover:shadow-lg transition-all"
+    class="bg-white rounded-lg flex col-span-3 lg:col-span-1 justify-between items-center shadow-sm p-5 lg:hover:shadow-lg transition-all w-full"
   >
-    <div
-      #c
-      (wheel)="ScrollHorizontally($event, c)"
-      class="info flex-1 flex flex-nowrap overflow-x-auto overflow-y-hidden hide-scrollbar focus-visible:outline-none focus:outline-none"
-    >
-      <div class="flex text-nowrap font-medium">
-        <div class="me-5">
-          <p
-            class="text-sm mb-2 bg-green-100 text-green-800 rounded-sm ps-1 pe-4 py-.5"
-          >
-            Available Funds
-          </p>
-          <span class="text-xl py-1.5 rounded-sm"
-            >{{ home.availableFunds }}
-          </span>
-        </div>
-        <div class="me-5">
-          <p
-            class="text-sm mb-2 bg-indigo-100 text-indigo-800 rounded-sm ps-1 pe-4 py-.5"
-          >
-            Current Funds
-          </p>
-          <span class="text-xl py-1.5 rounded-sm"
-            >{{ home.otherExpensesAmount }}
-            <span class="text-xs text-gray-500">
-              /{{ home.otherExpensesTarget }}</span
-            >
-          </span>
-        </div>
-        <div class="me-5">
-          <p
-            class="text-sm mb-2 bg-pink-100 text-pink-800 rounded-sm ps-1 pe-4 py-.5"
-          >
-            Savings Target
-          </p>
-          <span class="text-xl py-1.5 rounded-sm"
-            >{{ home.monthlySavingsAmount }}
-            <span class="text-xs text-gray-500">
-              /{{ home.monthlySavingsTarget }}</span
-            >
-          </span>
-        </div>
-        <div class="me-5">
-          <p
-            class="text-sm mb-2 bg-purple-100 text-purple-800 rounded-sm ps-1 pe-4 py-.5"
-          >
-            Periods Expenses
-          </p>
-          <span class="text-xl py-1.5 rounded-sm"
-            >{{ home.periodExpensesAmount }}
-            <span class="text-xs text-gray-500">
-              /{{ home.periodExpensesTarget }}</span
-            >
-          </span>
-        </div>
-        <div class="me-5">
-          <p
-            class="text-sm mb-2 bg-blue-100 text-blue-800 rounded-sm ps-1 pe-4 py-.5"
-          >
-            Gameia
-          </p>
-          <span class="text-xl py-1.5 rounded-sm"
-            >{{ home.gamieaLiabilitiesAmount }}
-            <span class="text-xs text-gray-500">
-              /{{ home.gamieaLiabilitiesTarget }}</span
-            >
-          </span>
-        </div>
-      </div>
+    <div class="info">
+      <p class="text-sm text-gray-600 mb-2">Available Money To Funds</p>
+      <span class="text-2xl font-bold"> {{ home.availableFunds }} </span>
+      <span class="text-sm text-gray-500">Current Month</span>
     </div>
     <div
       class="rounded-3xl ms-5 {{
@@ -133,26 +186,9 @@
       <i class="{{ icons[6] }} fa-2xl"></i>
     </div>
   </div>
-  <div
-    class="bg-white rounded-lg flex col-span-8 lg:col-span-2 justify-between items-center shadow-sm p-5 lg:hover:shadow-lg transition-all"
-  >
-    <div class="info">
-      <p class="text-sm text-gray-600 mb-2">Estimated Money Need</p>
-      <span class="text-2xl font-bold"> {{ moneyNeed }} </span>
-      <span class="text-sm text-gray-500">${{ home.dayRate }} Per Day</span>
-    </div>
-    <div
-      class="rounded-3xl {{
-        colors[5]
-      }}  flex justify-center items-center text-white"
-      style="height: 60px; width: 60px"
-    >
-      <i class="{{ icons[5] }} fa-2xl"></i>
-    </div>
-  </div>
 
   <div
-    class="bg-white rounded-lg col-span-8 lg:col-span-2 flex justify-between items-center shadow-sm p-5 lg:hover:shadow-lg transition-all"
+    class="bg-white rounded-lg col-span-3 lg:col-span-1 flex justify-between items-center shadow-sm p-5 lg:hover:shadow-lg transition-all"
   >
     <div class="info">
       <p class="text-sm text-gray-600 mb-2">Time Left For The Month</p>
@@ -171,6 +207,23 @@
       style="height: 60px; width: 60px"
     >
       <i class="{{ icons[4] }} fa-2xl"></i>
+    </div>
+  </div>
+  <div
+    class="bg-white rounded-lg flex col-span-3 lg:col-span-1 justify-between items-center shadow-sm p-5 lg:hover:shadow-lg transition-all"
+  >
+    <div class="info">
+      <p class="text-sm text-gray-600 mb-2">Estimated Money Need</p>
+      <span class="text-2xl font-bold"> {{ moneyNeed }} </span>
+      <span class="text-sm text-gray-500">${{ home.dayRate }} Per Day</span>
+    </div>
+    <div
+      class="rounded-3xl {{
+        colors[5]
+      }}  flex justify-center items-center text-white"
+      style="height: 60px; width: 60px"
+    >
+      <i class="{{ icons[5] }} fa-2xl"></i>
     </div>
   </div>
 </div>

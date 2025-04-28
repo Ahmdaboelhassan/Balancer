@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   Component,
   inject,
   OnInit,
@@ -11,16 +12,19 @@ import { AccountsBalance } from '../../Interfaces/Response/AccountsBalance';
 import { HomeService } from '../../Services/home.service';
 import { Title } from '@angular/platform-browser';
 import { Home } from '../../Interfaces/Response/Home';
+import { BudgetBarDirective } from '../../directive/budget-bar.directive';
 
 @Component({
   selector: 'app-home',
-  imports: [BaseChartDirective],
+  imports: [BaseChartDirective, BudgetBarDirective],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })
 export class HomeComponent implements OnInit {
   home: Home;
-  barChart = signal({});
+  RevenuesAndExpensesChartType = signal<string>('bar');
+  RevenuesAndExpensesChart = signal({});
+  showPieChat = signal(true);
   pieChart = signal({});
   lineChart = signal({});
   balances = signal<AccountsBalance[]>([]);
@@ -60,7 +64,7 @@ export class HomeComponent implements OnInit {
         this.balances.set(result.accountsSummary);
         this.InitializeLineChart(result.lastPeriods);
         this.IntializePieChart(result.currentAndLastMonthExpenses);
-        this.IntializeBarChart(
+        this.IntializeRevenuesAndExpensesChart(
           result.currentYearRevenues,
           result.currentYearExpenses
         );
@@ -69,10 +73,11 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  IntializeBarChart(revenues: number[], expenses: number[]) {
-    if (!revenues && !expenses) return;
+  IntializeRevenuesAndExpensesChart(revenues: number[], expenses: number[]) {
+    revenues = revenues ? revenues.map((x) => (x === 0 ? null : x)) : [];
+    expenses = expenses ? expenses.map((x) => (x === 0 ? null : x)) : [];
 
-    this.barChart.set({
+    this.RevenuesAndExpensesChart.set({
       labels: [
         'Jan',
         'Feb',
@@ -91,10 +96,12 @@ export class HomeComponent implements OnInit {
         {
           label: 'Revenues',
           data: revenues,
+          tension: 0.3,
         },
         {
           label: 'Expenses',
           data: expenses,
+          tension: 0.3,
         },
       ],
     });
@@ -163,5 +170,15 @@ export class HomeComponent implements OnInit {
   ScrollHorizontally(event, scrollContainer: HTMLElement) {
     event.preventDefault();
     scrollContainer.scrollLeft += event.deltaY;
+  }
+
+  SwitchRevenueAndExpensesChartType() {
+    this.RevenuesAndExpensesChartType.update((x) =>
+      x == 'bar' ? 'line' : 'bar'
+    );
+  }
+
+  TogglePieChart() {
+    this.showPieChat.update((x) => !x);
   }
 }

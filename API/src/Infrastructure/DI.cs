@@ -1,6 +1,7 @@
 ﻿using Domain.DTO.Response;
 using Domain.IRepository;
 using Domain.IServices;
+using Domain.Static;
 using Infrastructure.Data;
 using Infrastructure.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -16,8 +17,7 @@ namespace Infrastructure
     {
         public static IServiceCollection AddInfrastructureLayer(this IServiceCollection services, IConfiguration Config)
         {
-            string? ConnectionString = Config.GetConnectionString("Production");
-           // string? ConnectionString = Config.GetConnectionString("Development");
+           string? ConnectionString = Config.GetConnectionString(MagicStrings.Production);
             if (ConnectionString == null)
                 throw new InvalidOperationException();
 
