@@ -132,6 +132,7 @@ export class CreateJournalComponent {
       periodId: form.periodId,
       createdAt: form.created,
     };
+
     if (this.isEdit) {
       this.journalService.EditJournal(journal).subscribe({
         next: (result) => {
@@ -155,6 +156,9 @@ export class CreateJournalComponent {
               description: '',
               code: this.JournalForm.get('code').value + 1,
               costCenter: '',
+              created: this.GetDateTimePlusOneMinute(
+                this.JournalForm.get('created').value
+              ),
             });
             // this.GetCreditBalance();
             // this.GetDebitBalance();
@@ -175,6 +179,16 @@ export class CreateJournalComponent {
     });
   }
   GetLocaleDateTime(date: Date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  }
+  GetDateTimePlusOneMinute(dateString: string) {
+    const date = new Date(dateString);
+    date.setMinutes(date.getMinutes() + 1);
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');

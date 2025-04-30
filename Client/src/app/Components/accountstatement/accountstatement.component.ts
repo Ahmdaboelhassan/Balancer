@@ -19,7 +19,7 @@ export class AccountstatementComponent {
   to = signal('');
   accounts: AccountSelectList[];
   costCenters: CostCenterSelectList[];
-  openingBalance: boolean = true;
+  openingBalance: boolean = false;
   ignoreTo: boolean = false;
   ignoreFrom: boolean = false;
 

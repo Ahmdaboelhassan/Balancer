@@ -14,7 +14,9 @@ export class BudgetBarDirective implements OnChanges {
   @Input() amount: number;
   @Input() target: number;
 
-  constructor(private el: ElementRef) {}
+  constructor(private el: ElementRef) {
+    this.el.nativeElement.style.transition = 'width 1.5s ease-in-out';
+  }
 
   ngOnChanges(changes: SimpleChanges) {
     if (

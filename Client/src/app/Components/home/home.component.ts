@@ -1,34 +1,38 @@
-import {
-  AfterViewInit,
-  Component,
-  inject,
-  OnInit,
-  signal,
-  WritableSignal,
-} from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, OnInit, signal } from '@angular/core';
 import { BaseChartDirective } from 'ng2-charts';
 import { AccountsBalance } from '../../Interfaces/Response/AccountsBalance';
+import { NgClass } from '@angular/common';
 import { HomeService } from '../../Services/home.service';
 import { Title } from '@angular/platform-browser';
 import { Home } from '../../Interfaces/Response/Home';
 import { BudgetBarDirective } from '../../directive/budget-bar.directive';
+import { slideUpAnimation } from '../../Animations/slideUpAnimation';
+import { HomeBudget } from '../../Interfaces/Response/HomeBudget';
 
 @Component({
   selector: 'app-home',
-  imports: [BaseChartDirective, BudgetBarDirective],
+  imports: [BaseChartDirective, BudgetBarDirective, NgClass],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
+  animations: [slideUpAnimation],
 })
 export class HomeComponent implements OnInit {
   home: Home;
-  RevenuesAndExpensesChartType = signal<string>('bar');
-  RevenuesAndExpensesChart = signal({});
-  showPieChat = signal(true);
-  pieChart = signal({});
-  lineChart = signal({});
-  balances = signal<AccountsBalance[]>([]);
+  homeBudget: HomeBudget;
 
+  // Bar Chart
+  RevenuesAndExpensesChart = signal({});
+  RevenuesAndExpensesChartType = signal<string>('bar');
+  switchRevenuesAndExpensesIcon = signal<string>('fa-chart-line');
+  // Pie Chart
+  pieChart = signal({});
+  showPieChat = signal(true);
+  switchPieIcon = signal<string>('fa-bars-progress');
+  // Line Chart
+  lineChart = signal({});
+  // Balances
+  balances = signal<AccountsBalance[]>([]);
+  // Estimated Time
   timeLeft: { periods: number; days: number } = {
     periods: 0,
     days: 0,
@@ -61,6 +65,7 @@ export class HomeComponent implements OnInit {
     this.homeService.GetHome().subscribe({
       next: (result) => {
         this.home = result;
+        this.homeBudget = this.GetHomeBudget(result, false);
         this.balances.set(result.accountsSummary);
         this.InitializeLineChart(result.lastPeriods);
         this.IntializePieChart(result.currentAndLastMonthExpenses);
@@ -76,6 +81,13 @@ export class HomeComponent implements OnInit {
   IntializeRevenuesAndExpensesChart(revenues: number[], expenses: number[]) {
     revenues = revenues ? revenues.map((x) => (x === 0 ? null : x)) : [];
     expenses = expenses ? expenses.map((x) => (x === 0 ? null : x)) : [];
+    const difference = revenues.map((el, i) => {
+      if (el && expenses[i]) {
+        const dif = el - expenses[i];
+        return dif > 0 ? dif : 0;
+      }
+      return null;
+    });
 
     this.RevenuesAndExpensesChart.set({
       labels: [
@@ -96,12 +108,18 @@ export class HomeComponent implements OnInit {
         {
           label: 'Revenues',
           data: revenues,
-          tension: 0.3,
+          tension: 0.2,
         },
         {
           label: 'Expenses',
           data: expenses,
-          tension: 0.3,
+          tension: 0.2,
+        },
+        {
+          label: 'Profit',
+          data: difference,
+          tension: 0.2,
+          hidden: true,
         },
       ],
     });
@@ -176,9 +194,37 @@ export class HomeComponent implements OnInit {
     this.RevenuesAndExpensesChartType.update((x) =>
       x == 'bar' ? 'line' : 'bar'
     );
+    this.switchRevenuesAndExpensesIcon.update((x) =>
+      x == 'fa-chart-line' ? 'fa-chart-column' : 'fa-chart-line'
+    );
   }
 
   TogglePieChart() {
     this.showPieChat.update((x) => !x);
+    this.switchPieIcon.update((x) =>
+      x === 'fa-bars-progress' ? 'fa-chart-pie' : 'fa-bars-progress'
+    );
+
+    if (this.showPieChat()) {
+      this.homeBudget = this.GetHomeBudget(this.home, false);
+    } else {
+      setTimeout(() => {
+        this.homeBudget = this.GetHomeBudget(this.home, true);
+      }, 0);
+    }
+  }
+
+  GetHomeBudget(home: Home, fillAmount: boolean): HomeBudget {
+    return {
+      availableFunds: home.availableFunds,
+      periodExpensesAmount: fillAmount ? home.periodExpensesAmount : 0,
+      periodExpensesTarget: home.periodExpensesTarget,
+      gamieaLiabilitiesAmount: fillAmount ? home.gamieaLiabilitiesAmount : 0,
+      gamieaLiabilitiesTarget: home.gamieaLiabilitiesTarget,
+      otherExpensesAmount: fillAmount ? home.otherExpensesAmount : 0,
+      otherExpensesTarget: home.otherExpensesTarget,
+      monthlySavingsAmount: fillAmount ? home.monthlySavingsAmount : 0,
+      monthlySavingsTarget: home.monthlySavingsTarget,
+    };
   }
 }
