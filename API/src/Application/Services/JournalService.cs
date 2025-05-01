@@ -173,7 +173,15 @@ internal class JournalService : IJournalService
     }
     public async Task<PeriodJournals> GetPeriodJournals(int periodId)
     {
-        var period  = await _uow.Periods.Get(p => p.Id == periodId , "Journals");
+        var currentPeriodId = periodId;
+
+        if (currentPeriodId == 0)
+        {
+            var lastPeriod = await _uow.Periods.GetLastOrderBy(p => p.To);
+            currentPeriodId = lastPeriod?.Id ?? 0;
+        }
+   
+        var period  = await _uow.Periods.Get(p => p.Id == currentPeriodId, "Journals");
 
         if (period is null)
             return new PeriodJournals();

@@ -210,7 +210,7 @@ export class HomeComponent implements OnInit {
     } else {
       setTimeout(() => {
         this.homeBudget = this.GetHomeBudget(this.home, true);
-      }, 0);
+      }, 50);
     }
   }
 
