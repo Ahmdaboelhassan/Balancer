@@ -3,16 +3,17 @@ import { JournalListComponent } from '../../journal/journal-list/journal-list.co
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { JournalService } from '../../../Services/journal.service';
 import { Periodjournals } from '../../../Interfaces/Response/Periodjournals';
+import { NgClass } from '@angular/common';
 
 @Component({
   selector: 'app-period-journals',
-  imports: [JournalListComponent, RouterLink],
+  imports: [JournalListComponent, RouterLink, NgClass],
   templateUrl: './period-journals.component.html',
   styleUrl: './period-journals.component.css',
 })
 export class PeriodJournalsComponent implements OnInit {
-  periodId: number = 0;
   model: Periodjournals | any;
+  isCurrentPeriod = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -21,13 +22,14 @@ export class PeriodJournalsComponent implements OnInit {
 
   ngOnInit() {
     this.route.params.subscribe((params) => {
-      this.periodId = params['id'];
-      this.getPeriodJournals();
+      const periodId = params['id'];
+      this.getPeriodJournals(periodId);
+      this.isCurrentPeriod = periodId == 0;
     });
   }
 
-  getPeriodJournals() {
-    this.journalService.GetPeriodJournals(this.periodId).subscribe((result) => {
+  getPeriodJournals(periodId) {
+    this.journalService.GetPeriodJournals(periodId).subscribe((result) => {
       this.model = result;
     });
   }

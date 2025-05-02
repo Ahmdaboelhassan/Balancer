@@ -2,13 +2,22 @@
 <div class="bg-white rounded-xl p-5">
   <div class="flex flex-col lg:flex-row justify-between">
     <div class="title">
+      @if(!isCurrentPeriod){
       <h1 class="text-3xl text-slate-800 font-bold">
         Journals For {{ model.name }}
       </h1>
-      <h2 class="text-lg text-gray-500">
+      }
+      <h2
+        [ngClass]="[
+          isCurrentPeriod
+            ? 'text-xl text-slate-800 font-medium'
+            : 'text-lg text-gray-600'
+        ]"
+      >
         From {{ model.from }} To {{ model.to }}
       </h2>
     </div>
+    @if(!isCurrentPeriod){
     <div class="actions mt-2">
       <a
         [routerLink]="['/Journal', 'Create']"
@@ -17,6 +26,7 @@
         >Add Journal</a
       >
     </div>
+    }
   </div>
 </div>
 <div class="bg-white rounded-xl p-5 mt-4 min-h-[calc(100%-9rem)]">
