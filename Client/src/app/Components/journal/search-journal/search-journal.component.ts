@@ -15,6 +15,7 @@ import { JournalAdvancedSearchComponent } from './journal-advanced-search/journa
 export class SearchJournalComponent implements OnInit {
   journals: any;
   summary: number = 0;
+  count: number = 0;
 
   constructor(
     private titleService: Title,
@@ -40,10 +41,10 @@ export class SearchJournalComponent implements OnInit {
     this.journalService.SearchJournals(key).subscribe({
       next: (result) => {
         this.journals = result;
-        this.summary = this.journals.reduce(
-          (acc, journal) => acc + journal.amount,
-          0
-        );
+        this.summary = this.journals
+          .reduce((acc, journal) => acc + Number(journal.amount), 0)
+          .toFixed(2);
+        this.count = result.length;
       },
     });
   }
@@ -53,10 +54,10 @@ export class SearchJournalComponent implements OnInit {
     this.journalService.AvancedSearchJournals(keys).subscribe({
       next: (result) => {
         this.journals = result;
-        this.summary = this.journals.reduce(
-          (acc, journal) => acc + journal.amount,
-          0
-        );
+        this.summary = this.journals
+          .reduce((acc, journal) => acc + Number(journal.amount), 0)
+          .toFixed(2);
+        this.count = result.length;
       },
     });
   }

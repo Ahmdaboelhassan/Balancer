@@ -6,15 +6,13 @@
       <h1 class="text-3xl text-slate-800 font-bold">
         Journals For {{ model.name }}
       </h1>
+      } @else {
+      <h1 class="text-3xl text-slate-800 font-bold">
+        Journals For Current Period
+      </h1>
       }
-      <h2
-        [ngClass]="[
-          isCurrentPeriod
-            ? 'text-xl text-slate-800 font-medium'
-            : 'text-lg text-gray-600'
-        ]"
-      >
-        From {{ model.from }} To {{ model.to }}
+      <h2 [ngClass]="['text-lg text-gray-600']">
+        {{ model.from }} - {{ model.to }}
       </h2>
     </div>
     @if(!isCurrentPeriod){
@@ -23,7 +21,7 @@
         [routerLink]="['/Journal', 'Create']"
         [queryParams]="{ periodId: periodId }"
         class="btn-primary print:hidden"
-        >Add Journal</a
+        >Add Journal To Period ({{ periodId }})</a
       >
     </div>
     }

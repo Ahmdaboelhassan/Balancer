@@ -1,24 +1,24 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { BaseChartDirective } from 'ng2-charts';
 import { AccountsBalance } from '../../Interfaces/Response/AccountsBalance';
-import { NgClass } from '@angular/common';
+import { NgClass, NgStyle } from '@angular/common';
 import { HomeService } from '../../Services/home.service';
 import { Title } from '@angular/platform-browser';
 import { Home } from '../../Interfaces/Response/Home';
 import { BudgetBarDirective } from '../../directive/budget-bar.directive';
 import { slideUpAnimation } from '../../Animations/slideUpAnimation';
-import { HomeBudget } from '../../Interfaces/Response/HomeBudget';
+import { BudgetProgress } from '../../Interfaces/Response/BudgetProgress';
 
 @Component({
   selector: 'app-home',
-  imports: [BaseChartDirective, BudgetBarDirective, NgClass],
+  imports: [BaseChartDirective, BudgetBarDirective, NgClass, NgStyle],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
   animations: [slideUpAnimation],
 })
 export class HomeComponent implements OnInit {
   home: Home;
-  homeBudget: HomeBudget;
+  budgetProgresses: BudgetProgress[];
 
   // Bar Chart
   RevenuesAndExpensesChart = signal({});
@@ -65,7 +65,7 @@ export class HomeComponent implements OnInit {
     this.homeService.GetHome().subscribe({
       next: (result) => {
         this.home = result;
-        this.homeBudget = this.GetHomeBudget(result, false);
+        this.budgetProgresses = this.GetBudgetProgress(this.home, false);
         this.balances.set(result.accountsSummary);
         this.InitializeLineChart(result.lastPeriods);
         this.IntializePieChart(result.currentAndLastMonthExpenses);
@@ -206,25 +206,21 @@ export class HomeComponent implements OnInit {
     );
 
     if (this.showPieChat()) {
-      this.homeBudget = this.GetHomeBudget(this.home, false);
+      this.budgetProgresses = this.GetBudgetProgress(this.home, false);
     } else {
       setTimeout(() => {
-        this.homeBudget = this.GetHomeBudget(this.home, true);
+        this.budgetProgresses = this.GetBudgetProgress(this.home, true);
       }, 50);
     }
   }
 
-  GetHomeBudget(home: Home, fillAmount: boolean): HomeBudget {
-    return {
-      availableFunds: home.availableFunds,
-      periodExpensesAmount: fillAmount ? home.periodExpensesAmount : 0,
-      periodExpensesTarget: home.periodExpensesTarget,
-      gamieaLiabilitiesAmount: fillAmount ? home.gamieaLiabilitiesAmount : 0,
-      gamieaLiabilitiesTarget: home.gamieaLiabilitiesTarget,
-      otherExpensesAmount: fillAmount ? home.otherExpensesAmount : 0,
-      otherExpensesTarget: home.otherExpensesTarget,
-      monthlySavingsAmount: fillAmount ? home.monthlySavingsAmount : 0,
-      monthlySavingsTarget: home.monthlySavingsTarget,
-    };
+  GetBudgetProgress(home: Home, fillAmount: boolean): BudgetProgress[] {
+    return home.budgetProgress.map((el) => ({
+      budget: el.budget,
+      color: el.color,
+      displayName: el.displayName,
+      spent: fillAmount ? el.spent : 0,
+      percentage: fillAmount ? el.percentage : 0,
+    }));
   }
 }

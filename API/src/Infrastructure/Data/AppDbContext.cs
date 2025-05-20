@@ -13,7 +13,8 @@ namespace Infrastructure.Data
         public DbSet<CostCenter> CostCenters { get; set; }
         public DbSet<Settings> Settings { get; set; }
         public DbSet<User> Users { get; set; }
-        public DbSet<DashboardSettings> DashbourdAccounts { get; set; }
+        public DbSet<DashboardSettings> DashboardSettings { get; set; }
+        public DbSet<BudgetAccount> BudgetAccounts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

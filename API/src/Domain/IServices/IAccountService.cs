@@ -14,6 +14,7 @@ public interface IAccountService
     Task<IEnumerable<SelectItemDTO>> GetSelectList(Expression<Func<Account, bool>>? criteria = null);
     Task<GetAccountDTO?> GetById(int id);
     Task<decimal> GetBalance(int id);
+    Task<decimal> GetBalance(Account account);
     Task<ConfirmationResponse> Create(CreateAccountDTO DTO);
     Task<ConfirmationResponse> Edit(CreateAccountDTO DTO);
     Task<ConfirmationResponse> Delete(int id);

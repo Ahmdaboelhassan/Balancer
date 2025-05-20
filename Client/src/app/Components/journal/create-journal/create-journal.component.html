@@ -134,6 +134,7 @@
             formControlName="description"
             placeholder="Describe What This Transaction For..."
             rows="4"
+            style="resize: vertical"
           ></textarea>
         </div>
       </div>
@@ -164,6 +165,7 @@
         <a [routerLink]="['/Period', 'Create']" class="btn-add me-2"
           >New Period</a
         >
+
         <a
           [routerLink]="['/Period', 'PeriodJournals', Journal().periodId]"
           class="btn-add me-2"

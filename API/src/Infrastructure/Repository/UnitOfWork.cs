@@ -1,4 +1,5 @@
-﻿using Domain.IRepository;
+﻿using Domain.Entities;
+using Domain.IRepository;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -15,6 +16,7 @@ public class UnitOfWork : IUnitOfWork
     public ICostCenterRepo CostCenter { get; private set; }
     public ISettingsRepo Settings { get; private set; }
     public IUserRepo Users { get; private set; }
+    public IBudgetAccountRepo BudgetAccounts { get; private set; }
     public IDashboardAccountsRepo DashboardAccounts { get; private set; }
 
     public UnitOfWork(AppDbContext context)
@@ -27,6 +29,7 @@ public class UnitOfWork : IUnitOfWork
         CostCenter = new CostCenterRepo(context);
         Settings = new SettingsRepo(context);
         Users = new UserRepo(context);
+        BudgetAccounts = new BudgetAccountRepo(context);
         DashboardAccounts = new DashboardAccountsRepo(context);
     }
    

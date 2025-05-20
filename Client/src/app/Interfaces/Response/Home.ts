@@ -1,4 +1,5 @@
 import { AccountsBalance } from './AccountsBalance';
+import { BudgetProgress } from './BudgetProgress';
 
 export interface Home {
   accountsSummary: AccountsBalance[];
@@ -6,14 +7,7 @@ export interface Home {
   currentAndLastMonthExpenses: number[];
   currentYearExpenses: number[];
   currentYearRevenues: number[];
-  periodExpensesTarget: number;
-  otherExpensesTarget: number;
-  gamieaLiabilitiesTarget: number;
-  monthlySavingsTarget: number;
-  periodExpensesAmount: number;
-  otherExpensesAmount: number;
-  gamieaLiabilitiesAmount: number;
-  monthlySavingsAmount: number;
+  budgetProgress: BudgetProgress[];
   dayRate: number;
   periodDays: number;
   availableFunds: number;

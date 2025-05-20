@@ -14,6 +14,7 @@ import { NgClass } from '@angular/common';
 export class PeriodJournalsComponent implements OnInit {
   model: Periodjournals | any;
   isCurrentPeriod = false;
+  periodId = 0;
 
   constructor(
     private route: ActivatedRoute,
@@ -24,6 +25,7 @@ export class PeriodJournalsComponent implements OnInit {
     this.route.params.subscribe((params) => {
       const periodId = params['id'];
       this.getPeriodJournals(periodId);
+      this.periodId = periodId;
       this.isCurrentPeriod = periodId == 0;
     });
   }

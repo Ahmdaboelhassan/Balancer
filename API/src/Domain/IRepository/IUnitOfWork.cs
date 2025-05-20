@@ -12,7 +12,7 @@ public interface IUnitOfWork
      ISettingsRepo Settings { get; }
      IUserRepo Users{ get; }
      IDashboardAccountsRepo DashboardAccounts { get; }
-
+    IBudgetAccountRepo BudgetAccounts { get; }
     Task SaveChangesAync();
     IDbTransaction StartTransaction();
 }

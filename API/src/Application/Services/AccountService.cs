@@ -184,14 +184,22 @@ public class AccountService : IAccountService
 
         return new ConfirmationResponse { IsSucceed = true, Message = "Account Deleted Successfully" };
     }
-    public async Task<decimal> GetBalance(int accId){
+    public async Task<decimal> GetBalance(int accId)
+    {
         var account = await _uow.Accounts.Get(accId);
         if (account == null)
             return 0;
-        
-         var journals = await _uow.JournalDetail
-                    .SelectAll( d => d.Account.Number.StartsWith(account.Number) , d => d.Debit  - d.Credit , "Account");
-                    
+
+        var journals = await _uow.JournalDetail
+                   .SelectAll(d => d.Account.Number.StartsWith(account.Number), d => d.Debit - d.Credit, "Account");
+
         return journals.Sum();
+
+    }
+    public async Task<decimal> GetBalance(Account account)
+    {
+        if (account is null) return 0;
+
+        return (await _uow.JournalDetail.SelectAll(d => d.Account.Number.StartsWith(account.Number), d => d.Debit - d.Credit, "Account")).Sum();
     }
 }

@@ -3,6 +3,7 @@ using Domain.Entities;
 using Domain.Enums;
 using Domain.IRepository;
 using Domain.IServices;
+using System.Collections;
 using System.Text;
 
 namespace Application.Services;
@@ -10,10 +11,12 @@ namespace Application.Services;
 public class HomeService : IHomeService
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IAccountService _accountService;
 
-    public HomeService(IUnitOfWork unitOfWork)
+    public HomeService(IUnitOfWork unitOfWork, IAccountService accountService)
     {
         _unitOfWork = unitOfWork;
+        _accountService = accountService;
     }
 
     public async Task<GetHomeDTO> GetHome()
@@ -24,19 +27,17 @@ public class HomeService : IHomeService
         if (dashboard == null || settings == null)
             return GetEmptyHome();
 
+
         var accountIds = new[]
         {
             dashboard.Account1,
             dashboard.Account2,
             dashboard.Account3,
             dashboard.Account4,
-            dashboard.CurrentCashAccount,
-            dashboard.GamieaLiabilitiesAccount,
-            dashboard.PeriodsExpensesAccount,
             settings.ExpensesAccount.GetValueOrDefault(),
         };
 
-        var accounts = (await _unitOfWork.Accounts.GetAll(x => accountIds.Contains(x.Id))).ToDictionary(a => a.Id , a => a);
+        var accounts = (await _unitOfWork.Accounts.GetAll(x => accountIds.Contains(x.Id))).ToDictionary(a => a.Id, a => a);
 
         if (accounts.Count() < 4)
             return GetEmptyHome();
@@ -56,20 +57,88 @@ public class HomeService : IHomeService
             balances.Add(new AccountBalanceDTO
             {
                 AccountName = acc.Name,
-                Balance = (await GetBalance(acc)).ToString("c")
+                Balance = (await _accountService.GetBalance(acc)).ToString("c")
             });
         }
 
-
-        // Line Chart
-        var lastPeriods = (await _unitOfWork.Periods.
-                TakeLastOrderBy(4, p => new { p.From, p.TotalAmount }, p => p.From.Date))
-                .OrderBy(p => p.From).Select(p => p.TotalAmount);
-                
-
-        // Pie Chart
         var current = DateTime.Now.Date;
 
+        // Line Chart
+        var lastPeriods = await GetLastPeriodsBalancesAsync(4);
+
+        // Pie Chart
+        var currentAndLastMonthExpenses = await GetCurrentAndLastMonthExpensesAsync(current);
+
+        // Bar Chart
+        var currentYearJournal = await GetCurrentYearJournalAsync(current);
+
+        // Progress Bar 
+        var expensesNumber = accounts[accountIds[4]].Number;
+        (IEnumerable<BudgetAccountDTO> budgetProgress, decimal availableFunds) = await GetBudgetProgressAsync(dashboard.OtherExpensesTarget, expensesNumber, current);
+
+        return new GetHomeDTO
+        {
+            AccountsSummary = balances,
+            LastPeriods = lastPeriods,
+            CurrentYearExpenses = currentYearJournal.expenses,
+            CurrentYearRevenues = currentYearJournal.revenues,
+            CurrentAndLastMonthExpenses = currentAndLastMonthExpenses,
+            AvailableFunds = availableFunds,
+            BudgetProgress = budgetProgress,
+            DayRate = settings.DefaultDayRate,
+            PeriodDays = settings.DefaultPeriodDays.GetValueOrDefault(),
+        };
+    }
+
+    private async Task<(IEnumerable<BudgetAccountDTO> budgetProgress, decimal availableFunds)> GetBudgetProgressAsync(decimal otherExpensesTarget, string expensesNumber, DateTime current)
+    {
+        var currentMonthJournals = (await _unitOfWork.JournalDetail
+                   .GetAll(j => (j.Journal.CreatedAt.Month == current.Month && j.Journal.CreatedAt.Year == current.Year) && (j.Journal.Type == (byte)JournalTypes.Add || j.Journal.Type == (byte)JournalTypes.Subtract), "Journal", "Account"))
+                   .GroupBy(j => j.Account.Number)
+                   .Select(j => new { AccountNumber = j.Key, Total = j.Sum(j => j.Debit - j.Credit) });
+
+        var budgetAccounts = await _unitOfWork.BudgetAccounts.GetAll("Account");
+
+        var budgetProgress = budgetAccounts
+             .GroupJoin(currentMonthJournals,
+                 ba => ba.Account.Number,
+                 cmj => cmj.AccountNumber,
+                 (ba, cmjGroup) => new { ba, cmjGroup })
+             .SelectMany(
+                 x => x.cmjGroup.DefaultIfEmpty(),
+                 (x, cmj) =>
+                 {
+                     var totalSpent = currentMonthJournals
+                         .Where(d => d.AccountNumber.StartsWith(x.ba.Account.Number))
+                         .Sum(d => d.Total);
+
+                     return new BudgetAccountDTO
+                     {
+                         DisplayName = x.ba.DisplayName,
+                         Budget = x.ba.Budget,
+                         Spent = totalSpent,
+                         Percentage = (x.ba.Budget != 0) ? Math.Round((totalSpent / x.ba.Budget) * 100) : 0,
+                         Color = x.ba.Color
+                     };
+                 });
+
+        var expensesAccounts = budgetAccounts.Where(a => a.Account.Number.StartsWith(expensesNumber)).Select(x => x.Account.Number);
+
+        var otherExpenses = currentMonthJournals.Where(x => x.AccountNumber.StartsWith(expensesNumber) && !expensesAccounts.Any(a => x.AccountNumber.StartsWith(a))).Sum(x => x.Total);
+
+        var availableFunds = otherExpensesTarget - otherExpenses;
+
+        return (budgetProgress, availableFunds);
+    }
+    private async Task<IEnumerable<decimal>> GetLastPeriodsBalancesAsync(int count)
+    {
+        return (await _unitOfWork.Periods.
+                TakeLastOrderBy(count, p => new { p.From, p.TotalAmount }, p => p.From.Date))
+                .OrderBy(p => p.From).Select(p => p.TotalAmount);
+    }
+    private async Task<IEnumerable<decimal>> GetCurrentAndLastMonthExpensesAsync(DateTime current)
+    {
+        // Pie Chart
         var lastMonth = current.AddMonths(-1);
 
         var currentExpensesSum = (await _unitOfWork.Journal
@@ -78,9 +147,10 @@ public class HomeService : IHomeService
         var lastExpensesSum = (await _unitOfWork.Journal
                .GetAll(j => j.CreatedAt.Date.Month == lastMonth.Month && j.CreatedAt.Date.Year == lastMonth.Year && j.Type == (byte)JournalTypes.Subtract)).Sum(j => j.Amount * -1);
 
-
-        var currentAndLastMonthExpenses = new List<decimal> {currentExpensesSum ,lastExpensesSum };
-        
+        return new List<decimal> { currentExpensesSum, lastExpensesSum };
+    }
+    private async Task<(List<decimal> expenses, List<decimal> revenues)> GetCurrentYearJournalAsync(DateTime current)
+    {
         // Bar Chart 
         List<decimal> currentYearExpenses = new List<decimal>();
         List<decimal> currentYearRevenue = new List<decimal>();
@@ -91,12 +161,12 @@ public class HomeService : IHomeService
         var expensesMonthlyGrouped = currentYearJournal.Where(j => j.Type == (byte)JournalTypes.Subtract)
                                                        .GroupBy(j => j.CreatedAt.Month)
                                                        .Select(j => new { j.Key, Total = j.Sum(j => j.Amount * -1) })
-                                                       .ToDictionary(j => j.Key , j => j.Total);
+                                                       .ToDictionary(j => j.Key, j => j.Total);
 
 
         var revenuesMonthlyGrouped = currentYearJournal.Where(j => j.Type == (byte)JournalTypes.Add)
                                                        .GroupBy(j => j.CreatedAt.Month)
-                                                       .Select(j => new { j.Key, Total = j.Sum(j => j.Amount )})
+                                                       .Select(j => new { j.Key, Total = j.Sum(j => j.Amount) })
                                                        .ToDictionary(j => j.Key, j => j.Total);
 
         for (int i = 1; i <= 12; i++)
@@ -106,42 +176,9 @@ public class HomeService : IHomeService
             currentYearRevenue.Add(revenuesMonthlyGrouped.TryGetValue(i, out decimal revenueValue) ? revenueValue : 0);
         }
 
-
-        // Get Month Budget Details 
-        var currentMonthJournals = (await _unitOfWork.JournalDetail
-            .GetAll(j => (j.Journal.CreatedAt.Month == current.Month && j.Journal.CreatedAt.Year == current.Year) && ( j.Journal.Type != (byte)JournalTypes.Due && j.Journal.Type != (byte)JournalTypes.Forward), "Journal", "Account"))
-            .GroupBy(j => j.Account.Number)
-            .Select(j => new { AccountNumber = j.Key, Total = j.Sum(j => j.Debit - j.Credit) });
-
-        var currentCashAmount = currentMonthJournals.Where(d => d.AccountNumber.StartsWith(accounts[accountIds[4]].Number)).Sum(x => x.Total);
-        var gamieaPaidAmount = currentMonthJournals.Where(d => d.AccountNumber.StartsWith(accounts[accountIds[5]].Number)).Sum(x => x.Total);
-        var currentPeriodExpenses = currentMonthJournals.Where(d => d.AccountNumber.StartsWith(accounts[accountIds[6]].Number)).Sum(x => x.Total);
-        var otherExpenses = currentMonthJournals.Where(d => d.AccountNumber.StartsWith(accounts[accountIds[7]].Number) && d.AccountNumber != accounts[accountIds[6]].Number).Sum(x => x.Total);
-
-
-
-        return new GetHomeDTO
-        {
-            AccountsSummary = balances,
-            LastPeriods = lastPeriods,
-            CurrentYearExpenses = currentYearExpenses,
-            CurrentYearRevenues = currentYearRevenue,
-            CurrentAndLastMonthExpenses = currentAndLastMonthExpenses,
-            PeriodExpensesAmount = currentPeriodExpenses,
-            PeriodExpensesTarget = dashboard.PeriodExpensesTarget,
-            OtherExpensesAmount = otherExpenses,
-            OtherExpensesTarget = dashboard.OtherExpensesTarget,
-            GamieaLiabilitiesAmount = gamieaPaidAmount,
-            GamieaLiabilitiesTarget = dashboard.GamieaLiabilitiesTarget,
-            MonthlySavingsAmount = currentCashAmount,
-            MonthlySavingsTarget = dashboard.MonthlySavingsTarget,
-            AvailableFunds = dashboard.OtherExpensesTarget - otherExpenses,
-            DayRate = dashboard.DayRate,
-            PeriodDays = settings.DefaultPeriodDays.GetValueOrDefault(),
-        };
+        return (currentYearExpenses, currentYearRevenue);
     }
-
-    public GetHomeDTO GetEmptyHome()
+    private GetHomeDTO GetEmptyHome()
     {
         return new GetHomeDTO
         {
@@ -155,25 +192,22 @@ public class HomeService : IHomeService
             CurrentAndLastMonthExpenses = new List<decimal> { 0, 0},
             CurrentYearExpenses = new List<decimal> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
             CurrentYearRevenues = new List<decimal> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+            AvailableFunds = 0,
+            DayRate = 0,
+            PeriodDays = 0,
+            BudgetProgress = new List<BudgetAccountDTO> { 
+                new BudgetAccountDTO { 
+                    Budget = 0,
+                    Color = "",
+                    DisplayName = "No Account",
+                    Percentage = 0,
+                    Spent = 0
+                
+                } }
            
         };
     }
 
-    public async Task<decimal> GetBalance(Account account)
-    {
-        if (account is null)
-            return 0;
-
-        return (await _unitOfWork.JournalDetail.SelectAll(d => d.Account.Number.StartsWith(account.Number), d => d.Debit - d.Credit, "Account")).Sum();
-        
-    }
-}
-
-
-class de
-{
-
-
-
 
 }
+

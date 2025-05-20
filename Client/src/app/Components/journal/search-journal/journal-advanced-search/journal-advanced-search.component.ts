@@ -12,6 +12,7 @@ import { JournalSearchModalComponent } from './journal-search-modal/journal-sear
 export class JournalAdvancedSearchComponent {
   @Output() Search = new EventEmitter<string>();
   @Input() Amount;
+  @Input() Count;
   readonly dialog = inject(MatDialog);
 
   openDialog() {
