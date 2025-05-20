@@ -1,4 +1,5 @@
 ﻿using Domain.DTO.Response;
+using Domain.Enums;
 
 namespace Domain.IServices;
 public interface IReportService 
@@ -8,6 +9,7 @@ public interface IReportService
     Task<IEnumerable<AccountSummaryDTO>> GetIncomeStatement(DateTime from, DateTime to);
     Task<IEnumerable<AccountSummaryDTO>> GetAccountsSummary(DateTime from, DateTime to);
     Task<IEnumerable<AccountSummaryDTO>> GetAccountsOverview(DateTime from, DateTime to);
+    Task<AccountComparerDTO> GetAccountComparer(DateTime? from, DateTime? to, int accountId, int? costCenterId, AccountComparerGroups groupType);
 }
 
 

@@ -1,0 +1,20 @@
+@if(accountComparer){
+<div
+  class="rounded-lg mb-2 px-6 py-2 flex justify-between items-center text-sm text font-medium bg-white text-slate-900"
+>
+  <h4>{{ accountComparer.label }} | Grouped {{ accountComparer.groupType }}</h4>
+  <h4>{{ accountComparer.from }} - {{ accountComparer.to }}</h4>
+</div>
+
+@if (chart()) {
+
+<div class="bg-white rounded-xl relative mb-2 p-5">
+  <button
+    class="absolute top-2 right-2 transition-all hover:text-lg"
+    (click)="SwitchChartType()"
+  >
+    <i [ngClass]="[chartTypeIcon(), 'fa-solid', 'text-gray-700']"></i>
+  </button>
+  <canvas baseChart [data]="chart()" [type]="chartType()" @slideUp> </canvas>
+</div>
+} }

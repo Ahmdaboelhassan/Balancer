@@ -19,6 +19,8 @@ import { AccountingTreeComponent } from './Components/accounting-tree/accounting
 import { AccountsSummaryComponent } from './Components/accounts-summary/accounts-summary.component';
 import { AccountsOverviewComponent } from './Components/accounts-overview/accounts-overview.component';
 import { authGuard } from './Guards/auth.guard';
+import { AccountComparerComponent } from './Components/account-comparer/account-comparer.component';
+import { AccountComparerDetailsComponent } from './Components/account-comparer/account-comparer-details/account-comparer-details.component';
 
 export const routes: Routes = [
   {
@@ -105,6 +107,14 @@ export const routes: Routes = [
     path: 'AccountsOverview',
     canActivate: [authGuard],
     loadComponent: () => AccountsOverviewComponent,
+  },
+  {
+    path: 'AccountComparer',
+    canActivate: [authGuard],
+    children: [
+      { path: '', loadComponent: () => AccountComparerComponent },
+      { path: 'Get', loadComponent: () => AccountComparerDetailsComponent },
+    ],
   },
   { path: '**', loadComponent: () => HomeComponent, pathMatch: 'full' },
 ];

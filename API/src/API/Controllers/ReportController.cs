@@ -1,4 +1,5 @@
-﻿using Domain.IServices;
+﻿using Domain.Enums;
+using Domain.IServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -36,5 +37,12 @@ public class ReportController : ControllerBase
     public async Task<IActionResult> AccountsOverview(DateTime from, DateTime to)
     {
         return Ok(await _serviceContext.ReportService.GetAccountsOverview(from, to));
+    }
+
+    [AllowAnonymous]
+    [HttpGet("AccountComparer")]
+    public async Task<IActionResult> AccountComparer(DateTime? from, DateTime? to, int account, int? costCenter, int groupType)
+    {
+        return Ok(await _serviceContext.ReportService.GetAccountComparer(from, to ,account , costCenter , (AccountComparerGroups)groupType));
     }
 }

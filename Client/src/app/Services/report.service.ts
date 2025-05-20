@@ -2,8 +2,9 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { AccountStatement } from '../Interfaces/Response/AccountStatement';
-import { AccountsBalance } from '../Interfaces/Response/AccountsBalance';
+
 import { AccountSummary } from '../Interfaces/Response/AccountSummary';
+import { AccountComparer } from '../Interfaces/Response/AccountComparer';
 
 @Injectable({
   providedIn: 'root',
@@ -23,6 +24,16 @@ export class ReportService {
       url += `&openingbalance=${openingbalance}`;
     }
     return this.http.get<AccountStatement>(url);
+  }
+  GetAccountComparer(from, to, account, costcenter, groupType) {
+    let url =
+      this.url +
+      `/AccountComparer?from=${from}&to=${to}&account=${account}&groupType=${groupType}`;
+
+    if (costcenter) {
+      url += `&costcenter=${costcenter}`;
+    }
+    return this.http.get<AccountComparer>(url);
   }
 
   GetIncomeStatement(from, to) {

@@ -1,11 +1,8 @@
 ﻿using Domain.DTO.Response;
 using Domain.IRepository;
 using Domain.IServices;
-using Domain.Entities;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using System.Diagnostics;
-using System.Runtime.InteropServices.Marshalling;
-using System.Text;
+using Domain.Enums;
+using System.Globalization;
 
 namespace Application.Services;
 public class ReportService : IReportService
@@ -240,6 +237,76 @@ public class ReportService : IReportService
         return  accountsSummaries.OrderBy(s => s.AccountNumber);
     }
 
+    public async Task<AccountComparerDTO> GetAccountComparer(DateTime? from, DateTime? to, int accountId, int? costCenterId, AccountComparerGroups groupType)
+    {
+        // Get Accounts 
+        var account = await _uow.Accounts.Get(accountId);
+        if (account is null)
+            return new AccountComparerDTO();
+
+        
+
+        var journals = (await _uow.JournalDetail
+        .GetAll(d =>
+             d.Account.Number.StartsWith(account.Number)
+            && (!from.HasValue || d.Journal.CreatedAt.Date >= from.Value.Date)
+            && (!to.HasValue || d.Journal.CreatedAt.Date <= to.Value.Date)
+            && (!costCenterId.HasValue || d.CostCenterId == costCenterId)
+            , "CostCenter", "Account", "Journal")).OrderBy(j => j.Journal.CreatedAt);
+
+
+
+        IEnumerable<AccountComparerItemDTO> journalGroupKey = Enumerable.Empty<AccountComparerItemDTO>();
+
+        switch (groupType)
+        {
+            case AccountComparerGroups.ByDay:
+                journalGroupKey = journals.GroupBy(j => j.Journal.CreatedAt.Date)
+                    .Select(k => new AccountComparerItemDTO
+                    {
+                        Amount = k.Sum(a => a.Debit - a.Credit),
+                        Time = k.Key.ToShortDateString()
+                    });
+                break;
+
+            case AccountComparerGroups.ByMonth:
+                journalGroupKey = journals.GroupBy(j => j.Journal.CreatedAt.Month)
+                    .Select(k => new AccountComparerItemDTO
+                    {
+                        Amount = k.Sum(a => a.Debit - a.Credit),
+                        Time = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(k.Key),
+                    });
+                break;
+
+            case AccountComparerGroups.ByYear:
+                journalGroupKey = journals.GroupBy(j => j.Journal.CreatedAt.Year)
+                    .Select(k => new AccountComparerItemDTO
+                    {
+                        Amount = k.Sum(a => a.Debit - a.Credit),
+                        Time = k.Key.ToString(),
+                    });
+                break;
+
+            default:
+                journalGroupKey = journals.GroupBy(j => j.Journal.CreatedAt.Month)
+                    .Select(k => new AccountComparerItemDTO
+                    {
+                        Amount = k.Sum(a => a.Debit - a.Credit),
+                        Time = k.Key.ToString(),
+                    });
+                break;
+        }
+
+        return new AccountComparerDTO()
+        {
+            GroupType = groupType.ToString(), 
+            From = from.GetValueOrDefault().ToShortDateString(),
+            To = to.GetValueOrDefault().ToShortDateString(),
+            Label = account.Name,
+            Amounts = journalGroupKey.Select(j => j.Amount),
+            Time = journalGroupKey.Select(j => j.Time),
+        };        
+    }
     private AccountStatement GetEmptyAccountStatement()
     {
         return new AccountStatement()
