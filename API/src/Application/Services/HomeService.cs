@@ -74,7 +74,8 @@ public class HomeService : IHomeService
 
         // Progress Bar 
         var expensesNumber = accounts[accountIds[4]].Number;
-        (IEnumerable<BudgetAccountDTO> budgetProgress, decimal availableFunds) = await GetBudgetProgressAsync(dashboard.OtherExpensesTarget, expensesNumber, current);
+        (IEnumerable<BudgetAccountDTO> budgetProgress, decimal availableFunds) =
+            await GetBudgetProgressAsync(dashboard.OtherExpensesTarget, expensesNumber, current , dashboard.ApplyOverBudgetToFunds);
 
         return new GetHomeDTO
         {
@@ -90,7 +91,7 @@ public class HomeService : IHomeService
         };
     }
 
-    private async Task<(IEnumerable<BudgetAccountDTO> budgetProgress, decimal availableFunds)> GetBudgetProgressAsync(decimal otherExpensesTarget, string expensesNumber, DateTime current)
+    private async Task<(IEnumerable<BudgetAccountDTO> budgetProgress, decimal availableFunds)> GetBudgetProgressAsync(decimal otherExpensesTarget, string expensesNumber, DateTime current , bool applyOverBudgetToFunds)
     {
         var currentMonthJournals = (await _unitOfWork.JournalDetail
                    .GetAll(j => (j.Journal.CreatedAt.Month == current.Month && j.Journal.CreatedAt.Year == current.Year) && (j.Journal.Type == (byte)JournalTypes.Add || j.Journal.Type == (byte)JournalTypes.Subtract), "Journal", "Account"))
@@ -98,6 +99,8 @@ public class HomeService : IHomeService
                    .Select(j => new { AccountNumber = j.Key, Total = j.Sum(j => j.Debit - j.Credit) });
 
         var budgetAccounts = await _unitOfWork.BudgetAccounts.GetAll("Account");
+
+        decimal overExpenses = 0;
 
         var budgetProgress = budgetAccounts
              .GroupJoin(currentMonthJournals,
@@ -112,6 +115,9 @@ public class HomeService : IHomeService
                          .Where(d => d.AccountNumber.StartsWith(x.ba.Account.Number))
                          .Sum(d => d.Total);
 
+                     if (x.ba.Account.Number.StartsWith(expensesNumber))
+                        overExpenses += Math.Max(0, totalSpent - x.ba.Budget);
+
                      return new BudgetAccountDTO
                      {
                          DisplayName = x.ba.DisplayName,
@@ -120,13 +126,16 @@ public class HomeService : IHomeService
                          Percentage = (x.ba.Budget != 0) ? Math.Round((totalSpent / x.ba.Budget) * 100) : 0,
                          Color = x.ba.Color
                      };
-                 });
+                 }).ToList();
 
         var expensesAccounts = budgetAccounts.Where(a => a.Account.Number.StartsWith(expensesNumber)).Select(x => x.Account.Number);
 
         var otherExpenses = currentMonthJournals.Where(x => x.AccountNumber.StartsWith(expensesNumber) && !expensesAccounts.Any(a => x.AccountNumber.StartsWith(a))).Sum(x => x.Total);
 
-        var availableFunds = otherExpensesTarget - otherExpenses;
+        var availableFunds = otherExpensesTarget - otherExpenses ;
+
+        if (applyOverBudgetToFunds)
+            availableFunds -= overExpenses;
 
         return (budgetProgress, availableFunds);
     }

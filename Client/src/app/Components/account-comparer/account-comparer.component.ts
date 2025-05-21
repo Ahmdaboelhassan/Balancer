@@ -57,6 +57,9 @@ export class AccountComparerComponent {
       to: formValue.to,
     };
 
+    if (formValue.costCenter) {
+      params['costCenter'] = formValue.costCenter;
+    }
     const queryParams = new URLSearchParams(params).toString();
     const hashRoute = `#/AccountComparer/Get?${queryParams}`;
 

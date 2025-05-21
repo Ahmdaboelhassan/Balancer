@@ -7,5 +7,5 @@ public class DashboardSettings
     public int Account3 { get; set; }
     public int Account4 { get; set; }
     public decimal OtherExpensesTarget { get; set; }
-
+    public bool ApplyOverBudgetToFunds { get; set; }
 }

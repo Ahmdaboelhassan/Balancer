@@ -17,8 +17,8 @@ import { NgClass } from '@angular/common';
 export class AccountComparerDetailsComponent {
   accountComparer: AccountComparer;
   chart = signal({});
-  chartType = signal('bar');
-  chartTypeIcon = signal<string>('fa-chart-line');
+  chartType = signal('line');
+  chartTypeIcon = signal<string>('fa-chart-column');
   constructor(
     private reportService: ReportService,
     private route: ActivatedRoute,
