@@ -87,16 +87,14 @@ internal class JournalService : IJournalService
     {
         var query = _uow.Journal.AsQueryable();
 
-        if (DTO.filterByKey && !string.IsNullOrWhiteSpace(DTO.key))
+        if (DTO.filterByKey && string.IsNullOrWhiteSpace(DTO.key))
             return Enumerable.Empty<JournalListItemDTO>();
 
         if (DTO.filterByKey)
             query = query.Where(j => j.Detail.Contains(DTO.key) || j.Code.ToString().Contains(DTO.key) || (j.Description != null && j.Description.Contains(DTO.key)));
 
-        else if (DTO.filterByDate && DTO.from.HasValue && DTO.to.HasValue)
+        if (DTO.filterByDate && DTO.from.HasValue && DTO.to.HasValue)
             query = query.Where(j => j.CreatedAt.Date >= DTO.from.Value.Date && j.CreatedAt.Date <= DTO.to.Value.Date);
-        else
-            return Enumerable.Empty<JournalListItemDTO>();
 
         if (DTO.type != 0)
             query = query.Where(j => j.Type == DTO.type);
