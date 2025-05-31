@@ -70,7 +70,7 @@ internal class JournalService : IJournalService
     }
     public async Task<IEnumerable<JournalListItemDTO>> Search(string criteria)
     {
-        return (await _uow.Journal.GetAll(a => a.Detail.Contains(criteria) || a.Code.ToString().Contains(criteria)))
+        return (await _uow.Journal.GetAll(a => a.Detail.Contains(criteria) || a.Code.ToString().Contains(criteria) || (a.Description != null && a.Description.Contains(criteria))))
             .OrderByDescending(j => j.CreatedAt).Select(a =>  new JournalListItemDTO
         {
             Id = a.Id,
@@ -87,14 +87,19 @@ internal class JournalService : IJournalService
     {
         var query = _uow.Journal.AsQueryable();
 
+        if (DTO.filterByKey && !string.IsNullOrWhiteSpace(DTO.key))
+            return Enumerable.Empty<JournalListItemDTO>();
+
         if (DTO.filterByKey)
-            query = query.Where(j => j.Detail.Contains(DTO.key) || j.Code.ToString().Contains(DTO.key));
+            query = query.Where(j => j.Detail.Contains(DTO.key) || j.Code.ToString().Contains(DTO.key) || (j.Description != null && j.Description.Contains(DTO.key)));
+
+        else if (DTO.filterByDate && DTO.from.HasValue && DTO.to.HasValue)
+            query = query.Where(j => j.CreatedAt.Date >= DTO.from.Value.Date && j.CreatedAt.Date <= DTO.to.Value.Date);
+        else
+            return Enumerable.Empty<JournalListItemDTO>();
 
         if (DTO.type != 0)
             query = query.Where(j => j.Type == DTO.type);
-
-        if (DTO.filterByDate && DTO.from.HasValue && DTO.to.HasValue)
-            query = query.Where(j => j.CreatedAt.Date >= DTO.from.Value.Date && j.CreatedAt.Date <= DTO.to.Value.Date);
 
         switch (DTO.orderBy)
         {   

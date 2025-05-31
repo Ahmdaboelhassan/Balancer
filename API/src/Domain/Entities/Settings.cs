@@ -12,6 +12,7 @@ public class Settings
     public int? RevenueAccount { get; set; }
     public int? AssetsAccount { get; set; }
     public int? CurrentAssetsAccount { get; set; }
+    public int? FixedAssetsAccount { get; set; }
     public int? CurrentCashAccount { get; set; }
     public int? LiabilitiesAccount { get; set; }
     public int? BanksAccount { get; set; }

@@ -35,6 +35,7 @@ public class HomeService : IHomeService
             dashboard.Account3,
             dashboard.Account4,
             settings.ExpensesAccount.GetValueOrDefault(),
+            settings.FixedAssetsAccount.GetValueOrDefault(),
         };
 
         var accounts = (await _unitOfWork.Accounts.GetAll(x => accountIds.Contains(x.Id))).ToDictionary(a => a.Id, a => a);
@@ -73,9 +74,14 @@ public class HomeService : IHomeService
         var currentYearJournal = await GetCurrentYearJournalAsync(current);
 
         // Progress Bar 
-        var expensesNumber = accounts[accountIds[4]].Number;
-        (IEnumerable<BudgetAccountDTO> budgetProgress, decimal availableFunds) =
-            await GetBudgetProgressAsync(dashboard.OtherExpensesTarget, expensesNumber, current , dashboard.ApplyOverBudgetToFunds);
+        var accountsSet = new HashSet<string>(new string[] 
+        { 
+          accounts[accountIds[4]].Number, 
+          accounts[accountIds[5]].Number 
+        });
+
+        (IEnumerable <BudgetAccountDTO> budgetProgress, decimal availableFunds) =
+            await GetBudgetProgressAsync(dashboard.OtherExpensesTarget, accountsSet , current, dashboard.ApplyOverBudgetToFunds);
 
         return new GetHomeDTO
         {
@@ -91,16 +97,20 @@ public class HomeService : IHomeService
         };
     }
 
-    private async Task<(IEnumerable<BudgetAccountDTO> budgetProgress, decimal availableFunds)> GetBudgetProgressAsync(decimal otherExpensesTarget, string expensesNumber, DateTime current , bool applyOverBudgetToFunds)
+    private async Task<(IEnumerable<BudgetAccountDTO> budgetProgress, decimal availableFunds)> GetBudgetProgressAsync(decimal otherExpensesTarget, 
+        HashSet<string> accountSet, DateTime current , bool applyOverBudgetToFunds)
     {
         var currentMonthJournals = (await _unitOfWork.JournalDetail
-                   .GetAll(j => (j.Journal.CreatedAt.Month == current.Month && j.Journal.CreatedAt.Year == current.Year) && (j.Journal.Type == (byte)JournalTypes.Add || j.Journal.Type == (byte)JournalTypes.Subtract), "Journal", "Account"))
+                   .GetAll(j => (j.Journal.CreatedAt.Month == current.Month && j.Journal.CreatedAt.Year == current.Year) 
+                            && (j.Journal.Type == (byte)JournalTypes.Add || j.Journal.Type == (byte)JournalTypes.Subtract), "Journal", "Account"))
                    .GroupBy(j => j.Account.Number)
                    .Select(j => new { AccountNumber = j.Key, Total = j.Sum(j => j.Debit - j.Credit) });
 
         var budgetAccounts = await _unitOfWork.BudgetAccounts.GetAll("Account");
 
         decimal overExpenses = 0;
+
+        var IsAccountNumberInAccountSet = (string n) => accountSet.Any(a => n.StartsWith(a));
 
         var budgetProgress = budgetAccounts
              .GroupJoin(currentMonthJournals,
@@ -115,7 +125,7 @@ public class HomeService : IHomeService
                          .Where(d => d.AccountNumber.StartsWith(x.ba.Account.Number))
                          .Sum(d => d.Total);
 
-                     if (x.ba.Account.Number.StartsWith(expensesNumber))
+                     if (IsAccountNumberInAccountSet(x.ba.Account.Number))
                         overExpenses += Math.Max(0, totalSpent - x.ba.Budget);
 
                      return new BudgetAccountDTO
@@ -128,9 +138,11 @@ public class HomeService : IHomeService
                      };
                  }).ToList();
 
-        var expensesAccounts = budgetAccounts.Where(a => a.Account.Number.StartsWith(expensesNumber)).Select(x => x.Account.Number);
+        var excludedAccounts = budgetAccounts.Where(a => IsAccountNumberInAccountSet(a.Account.Number)).Select(x => x.Account.Number);
 
-        var otherExpenses = currentMonthJournals.Where(x => x.AccountNumber.StartsWith(expensesNumber) && !expensesAccounts.Any(a => x.AccountNumber.StartsWith(a))).Sum(x => x.Total);
+        var otherExpenses = currentMonthJournals
+            .Where(x => IsAccountNumberInAccountSet(x.AccountNumber) && !excludedAccounts.Any(a => x.AccountNumber.StartsWith(a)))
+            .Sum(x => x.Total);
 
         var availableFunds = otherExpensesTarget - otherExpenses ;
 
