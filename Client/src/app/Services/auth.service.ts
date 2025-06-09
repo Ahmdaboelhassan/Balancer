@@ -11,9 +11,9 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class AuthService {
   user: WritableSignal<User> = signal(null);
-  url = environment.baseUrl + 'Auth';
-  refreshTokenHandler;
-  refreshTokenTimeInHours = 3;
+  private url = environment.baseUrl + 'Auth';
+  private refreshTokenHandler;
+  private refreshTokenTimeInHours = 3;
 
   constructor(private http: HttpClient, private toest: ToastrService) {}
 

@@ -14,11 +14,11 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("Client", policy =>
     {
-        policy.WithOrigins(MagicStrings.DevelopmentsCORS)
+        policy.WithOrigins(MagicStrings.ProductionOrigins)
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials();
-    });
+    }); 
 });
 
 builder.Services
@@ -27,7 +27,7 @@ builder.Services
 
 
 var app = builder.Build();
-
+        
 if (builder.Environment.IsDevelopment())
 {
     app.UseSwagger();
