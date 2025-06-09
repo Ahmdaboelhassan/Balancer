@@ -67,11 +67,13 @@ export class CreateAccountComponent implements OnInit {
     });
   }
   intializeEditForm() {
+    debugger;
     this.accountForm = new FormGroup({
       id: new FormControl(this.account.id),
       name: new FormControl(this.account.name, Validators.required),
       description: new FormControl(this.account.description),
       parent: new FormControl(this.account.parentId),
+      isArchive: new FormControl(this.account.isArchive),
       number: new FormControl({
         value: this.account.accountNumber,
         disabled: true,
@@ -84,6 +86,7 @@ export class CreateAccountComponent implements OnInit {
       name: new FormControl('', Validators.required),
       description: new FormControl(''),
       parent: new FormControl(0),
+      isArchive: new FormControl(false),
       number: new FormControl({
         value: '',
         disabled: true,
@@ -101,6 +104,7 @@ export class CreateAccountComponent implements OnInit {
       id: formValue.id,
       name: formValue.name,
       parentId: formValue.parent,
+      isArchive: formValue.isArchive,
     };
 
     if (this.isEdit) {

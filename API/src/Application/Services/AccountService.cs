@@ -3,6 +3,7 @@ using Domain.DTO.Response;
 using Domain.Entities;
 using Domain.IRepository;
 using Domain.IServices;
+using System.IO.Compression;
 using System.Linq.Expressions;
 using System.Text;
 
@@ -30,6 +31,8 @@ public class AccountService : IAccountService
                 ParentNumber = a.Parent?.Number,
                 ParentName = a.Parent?.Name,
                 IsParent = a.IsParent,
+                IsArchive = a.IsArchive,
+               
             });
     }
     public async Task<IEnumerable<AccountingTreeItem>> GetPrimaryAccounts() {
@@ -53,7 +56,8 @@ public class AccountService : IAccountService
                 AccountNumber = a.Number,
                 ParentNumber = a.Parent?.Number,
                 ParentName = a.Parent?.Name,
-                IsParent = a.IsParent
+                IsParent = a.IsParent,
+                IsArchive = a.IsArchive
             });
     }
     public async Task<IEnumerable<SelectItemDTO>> GetSelectList(Expression<Func<Account, bool>>? criteria = null)
@@ -77,6 +81,7 @@ public class AccountService : IAccountService
             ParentNumber = account.Parent?.Number,
             ParentName = account.Parent?.Name, 
             IsParent = account.IsParent,
+            IsArchive = account.IsArchive,
             Accounts = await GetSelectList(a => a.Id != id)
         };
     }
@@ -96,6 +101,7 @@ public class AccountService : IAccountService
             ParentId = DTO.ParentId > 0 ? DTO.ParentId : null,
             Level = response.AccountLevel,
             Number = response.AccountNumber,
+            IsArchive = DTO.IsArchive,
         };
 
         await _uow.Accounts.AddAsync(newAccount);
@@ -122,6 +128,7 @@ public class AccountService : IAccountService
         {
             account.Name = DTO.Name;
             account.Description = DTO.Description;
+            account.IsArchive = DTO.IsArchive;
 
             _uow.Accounts.Update(account);
             await _uow.SaveChangesAync();
@@ -140,6 +147,7 @@ public class AccountService : IAccountService
         account.Description = DTO.Description;
         account.Level = response.AccountLevel;
         account.Number = response.AccountNumber;
+        
 
         _uow.Accounts.Update(account);
         await _uow.SaveChangesAync();

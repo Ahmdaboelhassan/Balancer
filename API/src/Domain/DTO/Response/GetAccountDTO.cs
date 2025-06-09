@@ -8,5 +8,6 @@ public class GetAccountDTO : CreateAccountDTO
     public string? ParentNumber { get; set; }
     public string? ParentName { get; set; }
     public bool IsParent { get; set; }
+    public bool IsArchive { get; set; }
     public IEnumerable<SelectItemDTO> Accounts { get; set; }
 }

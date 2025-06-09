@@ -28,7 +28,7 @@ internal class JournalService : IJournalService
 
         return new GetJournalDTO()
         {
-            Accounts = await _accountService.GetSelectList(a => !a.IsParent),
+            Accounts = await _accountService.GetSelectList(a => !a.IsParent && !a.IsArchive),
             CostCenters = await _costCenterService.GetAllSelectList(),
             Code = await GetNextCode(),
             DebitAccountId = settings.DefaultDebitAccount.GetValueOrDefault(),
@@ -64,7 +64,7 @@ internal class JournalService : IJournalService
             Detail = journal.Detail,
             Description = journal.Description,
             CostCenters = await _costCenterService.GetAllSelectList(),
-            Accounts = await _accountService.GetSelectList(a => !a.IsParent),
+            Accounts = await _accountService.GetSelectList(a => !a.IsParent && !a.IsArchive),
         };
 
     }

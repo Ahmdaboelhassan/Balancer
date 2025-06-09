@@ -19,6 +19,7 @@ public class Account
     public string? Description { get; set; }
     public int? ParentId { get; set; }
     public bool IsParent { get; set; }
+    public bool IsArchive { get; set; }
     public bool IsDeleted { get; set; }
     [ForeignKey(nameof(ParentId))]
     public Account? Parent { get; set; }

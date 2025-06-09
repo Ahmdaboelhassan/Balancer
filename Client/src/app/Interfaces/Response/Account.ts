@@ -6,5 +6,6 @@ export interface Account extends CreateAccount {
   parentNumber: any;
   parentName: any;
   isParent: boolean;
+  isArchive: boolean;
   accounts: AccountSelectList[];
 }

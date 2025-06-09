@@ -3,4 +3,5 @@ export interface CreateAccount {
   name: string;
   description: string;
   parentId: number;
+  isArchive: boolean;
 }

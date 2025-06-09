@@ -8,4 +8,5 @@ public class CreateAccountDTO
     public string Name { get; set; }
     public string? Description { get; set; }
     public int? ParentId { get; set; }
+    public bool IsArchive { get; set; }
 }
