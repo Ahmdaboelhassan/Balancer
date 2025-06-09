@@ -74,7 +74,9 @@ export class AuthService {
   AutoRefreshToken() {
     var refreshToken = this.user()?.getRefreshToken;
     if (refreshToken) {
-      const timeInMillSecounds = this.refreshTokenTimeInHours * 60 * 1000;
+      const timeInMillSecounds = this.refreshTokenTimeInHours * 60 * 60 * 1000;
+
+      clearInterval(this.refreshTokenHandler);
 
       this.refreshTokenHandler = setInterval(() => {
         this.RefreshToken(refreshToken, false);
