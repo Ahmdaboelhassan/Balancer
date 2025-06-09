@@ -13,7 +13,7 @@ export class AuthService {
   user: WritableSignal<User> = signal(null);
   private url = environment.baseUrl + 'Auth';
   private refreshTokenHandler;
-  private refreshTokenTimeInHours = 3;
+  private refreshTokenTimeInHours = 1;
 
   constructor(private http: HttpClient, private toest: ToastrService) {}
 
@@ -25,12 +25,12 @@ export class AuthService {
     });
   }
 
-  RefreshToken(refreshToken: string) {
+  RefreshToken(refreshToken: string, showHelloMessage) {
     const url = this.url + `/RefreshToken`;
     return this.http
       .post<AuthResponse>(url, { refreshToken: refreshToken })
       .subscribe({
-        next: (response) => this.ManageLogin(response, false),
+        next: (response) => this.ManageLogin(response, showHelloMessage),
         error: (error) => this.manageError(error),
       });
   }
@@ -58,10 +58,13 @@ export class AuthService {
         localStorageUser._refreshTokenExpireOn
       );
 
-      if (singInUser?.getToken) {
+      if (
+        singInUser?.getToken &&
+        singInUser.expireOnHours > this.refreshTokenTimeInHours
+      ) {
         this.user.set(singInUser);
       } else if (singInUser?.getRefreshToken) {
-        this.RefreshToken(singInUser?.getRefreshToken);
+        this.RefreshToken(singInUser?.getRefreshToken, true);
       }
     } else {
       this.Logout();
@@ -71,10 +74,10 @@ export class AuthService {
   AutoRefreshToken() {
     var refreshToken = this.user()?.getRefreshToken;
     if (refreshToken) {
-      const timeInMillSecounds = this.refreshTokenTimeInHours * 60 * 60 * 1000;
+      const timeInMillSecounds = this.refreshTokenTimeInHours * 60 * 1000;
 
       this.refreshTokenHandler = setInterval(() => {
-        this.RefreshToken(refreshToken);
+        this.RefreshToken(refreshToken, false);
       }, timeInMillSecounds);
     }
   }

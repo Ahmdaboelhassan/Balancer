@@ -13,6 +13,11 @@ export class User {
     return this._token;
   }
 
+  get expireOnHours() {
+    let dateBetween = new Date(this._expireOn).getTime() - new Date().getTime();
+    return dateBetween / (60 * 60 * 1000);
+  }
+
   get getRefreshToken() {
     let dateBetween =
       new Date(this._refreshTokenExpireOn).getTime() - new Date().getTime();
