@@ -11,8 +11,10 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class AuthService {
   user: WritableSignal<User> = signal(null);
-
   url = environment.baseUrl + 'Auth';
+  refreshTokenHandler;
+  refreshTokenTimeInHours = 3;
+
   constructor(private http: HttpClient, private toest: ToastrService) {}
 
   Login(model: Login) {
@@ -25,11 +27,18 @@ export class AuthService {
 
   RefreshToken(refreshToken: string) {
     const url = this.url + `/RefreshToken`;
-    return this.http.post<AuthResponse>(url, { refreshToken: refreshToken });
+    return this.http
+      .post<AuthResponse>(url, { refreshToken: refreshToken })
+      .subscribe({
+        next: (response) => this.ManageLogin(response, false),
+        error: (error) => this.manageError(error),
+      });
   }
 
   Logout() {
     this.user.set(null);
+
+    clearInterval(this.refreshTokenHandler);
 
     if (localStorage.getItem('user')) {
       localStorage.removeItem('user');
@@ -52,17 +61,30 @@ export class AuthService {
       if (singInUser?.getToken) {
         this.user.set(singInUser);
       } else if (singInUser?.getRefreshToken) {
-        this.RefreshToken(singInUser?.getRefreshToken).subscribe({
-          next: (response) => this.ManageLogin(response),
-          error: (error) => this.manageError(error),
-        });
+        this.RefreshToken(singInUser?.getRefreshToken);
       }
     } else {
       this.Logout();
     }
   }
 
-  ManageLogin(response: AuthResponse) {
+  AutoRefreshToken() {
+    var refreshToken = this.user()?.getRefreshToken;
+    if (refreshToken) {
+      const timeInMillSecounds = this.refreshTokenTimeInHours * 60 * 60 * 1000;
+
+      this.refreshTokenHandler = setInterval(() => {
+        this.RefreshToken(refreshToken);
+      }, timeInMillSecounds);
+    }
+  }
+
+  isPublicEndpoint(route: string): boolean {
+    const publicEndpoints = ['/Login', '/RefreshToken', '/Refresh', '/public'];
+    return publicEndpoints.some((endpoint) => route.includes(endpoint));
+  }
+
+  private ManageLogin(response: AuthResponse, ShowHelloMessage = true) {
     const user: User = new User(
       response.userName,
       response.token,
@@ -73,10 +95,12 @@ export class AuthService {
 
     this.user.set(user);
     localStorage.setItem('user', JSON.stringify(user));
-    this.toest.success(`Hi ${user.Username}`);
+    if (ShowHelloMessage) {
+      this.toest.success(`Hi ${user.Username}`);
+    }
   }
 
-  manageError(resError) {
+  private manageError(resError) {
     const errorObject = resError.error;
     let errorList: string[] = [];
     if (resError.status == 500) {

@@ -11,4 +11,5 @@ export interface Home {
   dayRate: number;
   periodDays: number;
   availableFunds: number;
+  otherExpensesTarget: number;
 }

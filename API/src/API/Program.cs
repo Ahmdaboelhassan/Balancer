@@ -1,5 +1,6 @@
 using Infrastructure;
 using Application;
+using Domain.Static;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,7 +10,16 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddCors();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("Client", policy =>
+    {
+        policy.WithOrigins(MagicStrings.DevelopmentsCORS)
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials();
+    });
+});
 
 builder.Services
     .AddInfrastructureLayer(builder.Configuration)
@@ -26,14 +36,12 @@ if (builder.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCors("Client");
+
 app.UseAuthentication();
 
 app.UseAuthorization();
 
-app.UseCors( opt =>
-    opt.AllowAnyOrigin()
-       .AllowAnyHeader()
-       .AllowAnyMethod());
 
 app.MapControllers();
 
