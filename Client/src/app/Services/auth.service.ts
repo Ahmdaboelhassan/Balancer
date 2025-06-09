@@ -23,6 +23,11 @@ export class AuthService {
     });
   }
 
+  RefreshToken(refreshToken: string) {
+    const url = this.url + `/RefreshToken`;
+    return this.http.post<AuthResponse>(url, { refreshToken: refreshToken });
+  }
+
   Logout() {
     this.user.set(null);
 
@@ -39,31 +44,39 @@ export class AuthService {
       let singInUser = new User(
         localStorageUser.Username,
         localStorageUser._token,
-        localStorageUser._expireOn
+        localStorageUser._expireOn,
+        localStorageUser._refreshToken,
+        localStorageUser._refreshTokenExpireOn
       );
 
       if (singInUser?.getToken) {
         this.user.set(singInUser);
+      } else if (singInUser?.getRefreshToken) {
+        this.RefreshToken(singInUser?.getRefreshToken).subscribe({
+          next: (response) => this.ManageLogin(response),
+          error: (error) => this.manageError(error),
+        });
       }
     } else {
-      this.user.set(null);
+      this.Logout();
     }
   }
 
-  private ManageLogin(response: AuthResponse) {
+  ManageLogin(response: AuthResponse) {
     const user: User = new User(
       response.userName,
       response.token,
-      response.expireOn
+      response.expireOn,
+      response.refreshToken,
+      response.refreshTokenExpireOn
     );
 
     this.user.set(user);
     localStorage.setItem('user', JSON.stringify(user));
-    localStorage.setItem('token', response.token);
     this.toest.success(`Hi ${user.Username}`);
   }
 
-  private manageError(resError) {
+  manageError(resError) {
     const errorObject = resError.error;
     let errorList: string[] = [];
     if (resError.status == 500) {

@@ -15,6 +15,7 @@ namespace Infrastructure.Data
         public DbSet<User> Users { get; set; }
         public DbSet<DashboardSettings> DashboardSettings { get; set; }
         public DbSet<BudgetAccount> BudgetAccounts { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

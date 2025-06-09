@@ -25,8 +25,8 @@ import { AccountComparerDetailsComponent } from './Components/account-comparer/a
 export const routes: Routes = [
   {
     path: 'Home',
-    loadComponent: () => HomeComponent,
     canActivate: [authGuard],
+    loadComponent: () => HomeComponent,
   },
   {
     path: 'Auth',

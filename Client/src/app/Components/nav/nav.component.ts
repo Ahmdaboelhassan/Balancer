@@ -16,6 +16,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+import { AuthService } from '../../Services/auth.service';
 
 @Component({
   selector: 'app-nav',
@@ -39,7 +40,10 @@ export class NavComponent {
   @ViewChild('toggleButton', { static: true }) toggleButton: ElementRef;
   @Output() navbarEvent = new EventEmitter<boolean>();
 
-  constructor(private elementRef: ElementRef) {}
+  constructor(
+    private elementRef: ElementRef,
+    private authService: AuthService
+  ) {}
 
   @HostListener('document:click', ['$event'])
   handleOutsideClick(event: MouseEvent): void {
@@ -70,5 +74,9 @@ export class NavComponent {
     this.navbar.nativeElement.classList.remove('lg:translate-x-0');
     this.toggleButton.nativeElement.classList.remove('lg:hidden');
     this.navbarEvent.emit(false);
+  }
+
+  LogOut() {
+    this.authService.Logout();
   }
 }

@@ -32,15 +32,27 @@ public class AuthService : IAuthService
             return new AuthResponse() { IsAuth = false, Message = "Invalid Username or Password" };
 
         var token = _tokenService.CreateToken(user);
-        return new AuthResponse
+
+        if (token is null)
+            return new AuthResponse() { IsAuth = false, Message = "Something went wrong while creating token" };
+
+        var authResponse = new AuthResponse
         {
-            ExpireOn = token.ValidTo,
             IsAuth = true,
             Message = "Login Successfully",
-            Token = new JwtSecurityTokenHandler().WriteToken(token),
             UserName = model.Username,
+            Token = new JwtSecurityTokenHandler().WriteToken(token),
+            ExpireOn = token.ValidTo
         };
 
+        if (model.StayLogin)
+        {
+            var refreshToken = await _tokenService.CreateRefreshToken(user);
+            authResponse.RefreshToken = refreshToken.RefreshToken;
+            authResponse.RefreshTokenExpireOn = refreshToken.RefreshTokenExpireOn;
+        }
+
+        return authResponse;
     }
 
     public async Task<AuthResponse> Register(LoginDTO model)
@@ -64,13 +76,71 @@ public class AuthService : IAuthService
         if (token is null)
             return new AuthResponse() { Message = "Something wrong" };
 
-        return new AuthResponse
+        var authResponse = new AuthResponse
         {
-            ExpireOn = token.ValidTo,
+            IsAuth = true,
+            Message = "User Created Successfully",
+            UserName = model.Username,
+            Token = new JwtSecurityTokenHandler().WriteToken(token),
+            ExpireOn = token.ValidTo
+        };
+
+
+        if (model.StayLogin)
+        {
+            var refreshToken = await _tokenService.CreateRefreshToken(user);
+            authResponse.RefreshToken = refreshToken.RefreshToken;
+            authResponse.RefreshTokenExpireOn = refreshToken.RefreshTokenExpireOn;
+        }
+
+        return authResponse;
+    }
+
+    public async Task<AuthResponse> RefreshToken(string? token)
+    {
+        if (string.IsNullOrEmpty(token))
+            return new AuthResponse() {Message = "Invalid Token" };
+
+        var refreshToken = await _unitOfWork.RefreshTokens.Get(rt => rt.Token == token && !rt.IsRevoked, "User");
+        if (refreshToken is null)
+            return new AuthResponse() {Message = "Invalid Refresh Token" };
+
+        if (refreshToken.ExpireOn < DateTime.UtcNow)
+            return new AuthResponse() {Message = "Refresh Token Expired" };
+
+        var user = refreshToken.User;
+
+        var newToken = _tokenService.CreateToken(user);
+
+        if (newToken is null)
+            return new AuthResponse() { IsAuth = false, Message = "Something went wrong while creating token" };
+
+        var authResponse = new AuthResponse
+        {
             IsAuth = true,
             Message = "Login Successfully",
-            Token = new JwtSecurityTokenHandler().WriteToken(token),
-            UserName = model.Username,
+            UserName = user.Username,
+            ExpireOn = newToken.ValidTo,
+            Token = new JwtSecurityTokenHandler().WriteToken(newToken),
         };
+
+        if (refreshToken.ExpireOn < DateTime.UtcNow.AddDays(10))
+        {
+            // delete old refresh token
+            _unitOfWork.RefreshTokens.Delete(refreshToken);
+            await _unitOfWork.SaveChangesAync();
+
+            // create new refresh token
+            var newRefreshToken = await _tokenService.CreateRefreshToken(user);
+            authResponse.RefreshToken = newRefreshToken.RefreshToken;
+            authResponse.RefreshTokenExpireOn = newRefreshToken.RefreshTokenExpireOn;
+        }
+        else
+        {
+            authResponse.RefreshToken = refreshToken.Token;
+            authResponse.RefreshTokenExpireOn = refreshToken.ExpireOn;
+        }
+
+        return authResponse;
     }
 }

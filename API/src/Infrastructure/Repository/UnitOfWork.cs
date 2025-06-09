@@ -9,15 +9,16 @@ namespace Infrastructure.Repository;
 public class UnitOfWork : IUnitOfWork
 {
     private readonly AppDbContext _context;
-    public IPeriodRepo Periods { get; private set; }
-    public IAccountRepo Accounts { get; private set; }
-    public IJournalRepo Journal { get; private set; }
-    public IJournalDetailRepo JournalDetail { get; private set; }
-    public ICostCenterRepo CostCenter { get; private set; }
-    public ISettingsRepo Settings { get; private set; }
-    public IUserRepo Users { get; private set; }
-    public IBudgetAccountRepo BudgetAccounts { get; private set; }
-    public IDashboardAccountsRepo DashboardAccounts { get; private set; }
+    public IPeriodRepo Periods { get;}
+    public IAccountRepo Accounts { get;}
+    public IJournalRepo Journal { get;}
+    public IJournalDetailRepo JournalDetail { get;}
+    public ICostCenterRepo CostCenter { get;}
+    public ISettingsRepo Settings { get;}
+    public IUserRepo Users { get;}
+    public IBudgetAccountRepo BudgetAccounts { get;}
+    public IDashboardAccountsRepo DashboardAccounts { get;}
+    public IRefreshTokenRepo RefreshTokens { get;}
 
     public UnitOfWork(AppDbContext context)
     {
@@ -31,6 +32,7 @@ public class UnitOfWork : IUnitOfWork
         Users = new UserRepo(context);
         BudgetAccounts = new BudgetAccountRepo(context);
         DashboardAccounts = new DashboardAccountsRepo(context);
+        RefreshTokens = new RefreshTokenRepo(context);
     }
    
 

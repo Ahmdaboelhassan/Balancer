@@ -23,7 +23,7 @@ export const appConfig: ApplicationConfig = {
       maxOpened: 3,
       autoDismiss: true,
       closeButton: true,
-      timeOut: 1000,
+      timeOut: 3000,
       positionClass: 'toast-top-right',
     }),
     provideHttpClient(withInterceptors([loadingInterceptor, authInterceptor])),

@@ -8,26 +8,32 @@ namespace API.Controllers;
 [ApiController]
 public class AuthController : ControllerBase
 {
-    private readonly IServiceContext _serviceContext;
+    private readonly IAuthService _authService;
 
-    public AuthController(IServiceContext serviceContext)
+    public AuthController(IAuthService authService)
     {
-        _serviceContext = serviceContext;
+        _authService = authService;
     }
 
     [HttpPost("Login")]
     public async Task<IActionResult> Login(LoginDTO model)
     {
-        var result = await _serviceContext.AuthService.Login(model);
+        var result = await _authService.Login(model);
         return result.IsAuth ? Ok(result) : BadRequest(result);
 
     }
 
-    [Authorize]
     [HttpPost("Register")]
     public async Task<IActionResult> Register (LoginDTO model)
     {
-        var result = await _serviceContext.AuthService.Register(model);
+        var result = await _authService.Register(model);
+        return result.IsAuth ? Ok(result) : BadRequest(result);
+    }
+
+    [HttpPost("RefreshToken")]
+    public async Task<IActionResult> RefreshToken(RefreshTokenRequest refreshToken)
+    {
+        var result = await _authService.RefreshToken(refreshToken.RefreshToken);
         return result.IsAuth ? Ok(result) : BadRequest(result);
     }
 

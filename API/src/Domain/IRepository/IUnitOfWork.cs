@@ -13,6 +13,7 @@ public interface IUnitOfWork
      IUserRepo Users{ get; }
      IDashboardAccountsRepo DashboardAccounts { get; }
     IBudgetAccountRepo BudgetAccounts { get; }
+    IRefreshTokenRepo RefreshTokens { get; }
     Task SaveChangesAync();
     IDbTransaction StartTransaction();
 }

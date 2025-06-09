@@ -11,13 +11,13 @@
       ></span>
     </div>
     <div class="text-center p-5 flex justify-center">
-      <a routerLink="home">
+      <a routerLink="Home">
         <img src="favicon.ico" alt="Logo" class="w-28 h-28 md:w-40 md:h-40"
       /></a>
     </div>
     <div class="p-5">
       <a
-        routerLink="home"
+        routerLink="Home"
         class="bg-slate-800 font-bold text-white block py-3 px-5 mb-2 hover:bg-gray-800 rounded-xl"
         style="box-shadow: inset 0px -1px 2px #0000006e"
         ><i class="fa-solid fa-house me-2"></i>Home</a
@@ -252,6 +252,26 @@
                   Balance Sheet</a
                 >
               </li> -->
+            </ul>
+          </mat-expansion-panel>
+        </div>
+        <div class="mb-2">
+          <mat-expansion-panel>
+            <mat-expansion-panel-header>
+              <mat-panel-title class="font-bold text-slate-800">
+                <i class="fa-solid fa-gear me-2"></i>
+                Settings
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+            <ul>
+              <li>
+                <span
+                  (click)="LogOut()"
+                  class="p-2 inline-block hover:text-slate-950"
+                >
+                  Logout</span
+                >
+              </li>
             </ul>
           </mat-expansion-panel>
         </div>

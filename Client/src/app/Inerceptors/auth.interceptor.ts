@@ -11,8 +11,6 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     authReq = req.clone({
       headers: req.headers.set('Authorization', `Bearer ${user.getToken}`),
     });
-  } else {
-    authService.Logout();
   }
 
   return next(authReq);
