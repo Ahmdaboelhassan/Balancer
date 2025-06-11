@@ -22,7 +22,7 @@ public class HomeService : IHomeService
     public async Task<GetHomeDTO> GetHome()
     {
         // Statistics
-        var dashboard = await _unitOfWork.DashboardAccounts.GetFirst();
+        var dashboard = await _unitOfWork.DashboardSettings.GetFirst();
         var settings = await _unitOfWork.Settings.GetFirst();
         if (dashboard == null || settings == null)
             return GetEmptyHome();

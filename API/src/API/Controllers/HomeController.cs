@@ -9,17 +9,17 @@ namespace API.Controllers;
 [Authorize]
 public class HomeController : ControllerBase
 {
-    private readonly IServiceContext _serviceContext;
+    private readonly IHomeService _homeService;
 
-    public HomeController(IServiceContext serviceContext)
+    public HomeController(IHomeService homeService)
     {
-        _serviceContext = serviceContext;
+        _homeService = homeService;
     }
 
     [HttpGet("Index")]
     public async Task<IActionResult> Index()
     {
-        return Ok(await _serviceContext.HomeService.GetHome());
+        return Ok(await _homeService.GetHome());
     }
 
 

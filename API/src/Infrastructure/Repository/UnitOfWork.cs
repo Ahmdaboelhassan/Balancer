@@ -17,7 +17,7 @@ public class UnitOfWork : IUnitOfWork
     public ISettingsRepo Settings { get;}
     public IUserRepo Users { get;}
     public IBudgetAccountRepo BudgetAccounts { get;}
-    public IDashboardAccountsRepo DashboardAccounts { get;}
+    public IDashboardSettingsRepo DashboardSettings { get;}
     public IRefreshTokenRepo RefreshTokens { get;}
 
     public UnitOfWork(AppDbContext context)
@@ -31,7 +31,7 @@ public class UnitOfWork : IUnitOfWork
         Settings = new SettingsRepo(context);
         Users = new UserRepo(context);
         BudgetAccounts = new BudgetAccountRepo(context);
-        DashboardAccounts = new DashboardAccountsRepo(context);
+        DashboardSettings = new DashboardSettingsRepo(context);
         RefreshTokens = new RefreshTokenRepo(context);
     }
    

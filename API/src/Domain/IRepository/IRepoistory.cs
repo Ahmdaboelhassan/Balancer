@@ -24,6 +24,7 @@ public interface IRepository<T>
 
     // Command
     Task AddAsync(T element);
+    Task AddRange(IEnumerable<T> element);
     void Delete(T element);
     void Update(T element);
     void DeleteRange(IEnumerable<T> items);

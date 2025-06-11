@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using System.Data;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace Infrastructure.Repository;
 public class Repository<T> : IRepository<T> where T : class
@@ -136,6 +137,11 @@ public class Repository<T> : IRepository<T> where T : class
     {
         await _set.AddAsync(element);
     }
+    public async Task AddRange(IEnumerable<T> element)
+    {
+        await _set.AddRangeAsync(element);
+    }
+
     public void Update(T element)
     {
         _set.Update(element);
@@ -157,4 +163,5 @@ public class Repository<T> : IRepository<T> where T : class
        await _set.Where(criteria).ExecuteUpdateAsync(update);
     }
 
+    
 }
