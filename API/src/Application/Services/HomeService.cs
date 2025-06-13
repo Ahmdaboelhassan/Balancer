@@ -81,7 +81,7 @@ public class HomeService : IHomeService
         });
 
         (IEnumerable <BudgetAccountDTO> budgetProgress, decimal availableFunds) =
-            await GetBudgetProgressAsync(dashboard.OtherExpensesTarget, accountsSet , current, dashboard.ApplyOverBudgetToFunds);
+            await GetBudgetProgressAsync(dashboard ,accountsSet , current);
 
         return new GetHomeDTO
         {
@@ -98,8 +98,8 @@ public class HomeService : IHomeService
         };
     }
 
-    private async Task<(IEnumerable<BudgetAccountDTO> budgetProgress, decimal availableFunds)> GetBudgetProgressAsync(decimal otherExpensesTarget, 
-        HashSet<string> accountSet, DateTime current , bool applyOverBudgetToFunds)
+    private async Task<(IEnumerable<BudgetAccountDTO> budgetProgress, decimal availableFunds)> GetBudgetProgressAsync(DashboardSettings dashboard, 
+        HashSet<string> accountSet, DateTime current)
     {
         var currentMonthJournals = (await _unitOfWork.JournalDetail
                    .GetAll(j => (j.Journal.CreatedAt.Month == current.Month && j.Journal.CreatedAt.Year == current.Year) 
@@ -145,9 +145,9 @@ public class HomeService : IHomeService
             .Where(x => IsAccountNumberInAccountSet(x.AccountNumber) && !excludedAccounts.Any(a => x.AccountNumber.StartsWith(a)))
             .Sum(x => x.Total);
 
-        var availableFunds = otherExpensesTarget - otherExpenses ;
+        var availableFunds = dashboard.OtherExpensesTarget - otherExpenses + dashboard.AddOnExpensesTarget ;
 
-        if (applyOverBudgetToFunds)
+        if (dashboard.ApplyOverBudgetToFunds)
             availableFunds -= overExpenses;
 
         return (budgetProgress, availableFunds);

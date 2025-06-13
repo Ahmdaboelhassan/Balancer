@@ -14,7 +14,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("Client", policy =>
     {
-        policy.WithOrigins(MagicStrings.DevelopmentsOrigins)
+        policy.WithOrigins(MagicStrings.ProductionOrigins)
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials();

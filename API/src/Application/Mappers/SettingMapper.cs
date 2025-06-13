@@ -1,4 +1,4 @@
-﻿using Domain.DTO.Request;
+﻿using Domain.DTO.Both;
 using Domain.Entities;
 
 namespace Application.Mappers
@@ -65,5 +65,7 @@ namespace Application.Mappers
                 MaxAccountLevel = settingDTO.MaxAccountLevel
             };
         }
+
+
     }
 }

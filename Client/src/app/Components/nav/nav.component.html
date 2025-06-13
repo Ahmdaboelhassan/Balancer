@@ -265,9 +265,28 @@
             </mat-expansion-panel-header>
             <ul>
               <li>
+                <a
+                  routerLink="/Settings"
+                  routerLinkActive="route-active"
+                  class="p-2 inline-block hover:text-slate-950"
+                >
+                  General Settings</a
+                >
+              </li>
+              <li>
+                <a
+                  routerLink="/DashboardSettings"
+                  routerLinkActive="route-active"
+                  class="p-2 inline-block hover:text-slate-950"
+                >
+                  Dashboard Settings</a
+                >
+              </li>
+
+              <li>
                 <span
                   (click)="LogOut()"
-                  class="p-2 inline-block hover:text-slate-950"
+                  class="p-2 inline-block font-bold hover:text-slate-950"
                 >
                   Logout</span
                 >

@@ -119,7 +119,7 @@ export class HomeComponent implements OnInit {
           label: 'Profit',
           data: difference,
           tension: 0.2,
-          hidden: true,
+          //hidden: true,
         },
       ],
     });
@@ -183,11 +183,6 @@ export class HomeComponent implements OnInit {
     if (cover) {
       cover.classList.toggle('opacity-0');
     }
-  }
-
-  ScrollHorizontally(event, scrollContainer: HTMLElement) {
-    event.preventDefault();
-    scrollContainer.scrollLeft += event.deltaY;
   }
 
   SwitchRevenueAndExpensesChartType() {

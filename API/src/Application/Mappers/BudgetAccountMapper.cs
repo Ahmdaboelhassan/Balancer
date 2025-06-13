@@ -1,4 +1,5 @@
-﻿using Domain.Entities;
+﻿using Domain.DTO.Both;
+using Domain.Entities;
 
 namespace Application.Mappers
 {
@@ -63,5 +64,4 @@ namespace Application.Mappers
             return dtos?.Select(dto => dto.ToEntity()) ?? new List<BudgetAccount>();
         }
     }
-}
 }

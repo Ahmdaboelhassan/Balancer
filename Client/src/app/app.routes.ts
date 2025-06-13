@@ -21,6 +21,9 @@ import { AccountsOverviewComponent } from './Components/accounts-overview/accoun
 import { authGuard } from './Guards/auth.guard';
 import { AccountComparerComponent } from './Components/account-comparer/account-comparer.component';
 import { AccountComparerDetailsComponent } from './Components/account-comparer/account-comparer-details/account-comparer-details.component';
+import { SettingsComponent } from './Components/settings/settings.component';
+import { DashboardSettingsComponent } from './Components/dashboard-settings/dashboard-settings.component';
+import { AccountBudgetSettingsComponent } from './Components/dashboard-settings/account-budget-settings/account-budget-settings.component';
 
 export const routes: Routes = [
   {
@@ -116,5 +119,21 @@ export const routes: Routes = [
       { path: 'Get', loadComponent: () => AccountComparerDetailsComponent },
     ],
   },
+  {
+    path: 'Settings',
+    canActivate: [authGuard],
+    loadComponent: () => SettingsComponent,
+  },
+  {
+    path: 'DashboardSettings',
+    canActivate: [authGuard],
+    loadComponent: () => DashboardSettingsComponent,
+  },
+  {
+    path: 'BudgetAccountSettings',
+    canActivate: [authGuard],
+    loadComponent: () => AccountBudgetSettingsComponent,
+  },
+
   { path: '**', loadComponent: () => HomeComponent, pathMatch: 'full' },
 ];

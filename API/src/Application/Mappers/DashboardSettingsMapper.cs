@@ -1,4 +1,4 @@
-﻿using Domain.DTO.Request;
+﻿using Domain.DTO.Both;
 using Domain.Entities;
 
 namespace Application.Mappers
@@ -18,6 +18,7 @@ namespace Application.Mappers
                 Account3 = dashboardSettings.Account3,
                 Account4 = dashboardSettings.Account4,
                 OtherExpensesTarget = dashboardSettings.OtherExpensesTarget,
+                AddOnExpensesTarget = dashboardSettings.AddOnExpensesTarget,
                 ApplyOverBudgetToFunds = dashboardSettings.ApplyOverBudgetToFunds
             };
         }
@@ -40,6 +41,7 @@ namespace Application.Mappers
                 Account3 = dashboardSettingsDTO.Account3,
                 Account4 = dashboardSettingsDTO.Account4,
                 OtherExpensesTarget = dashboardSettingsDTO.OtherExpensesTarget,
+                AddOnExpensesTarget = dashboardSettingsDTO.AddOnExpensesTarget,
                 ApplyOverBudgetToFunds = dashboardSettingsDTO.ApplyOverBudgetToFunds
             };
         }

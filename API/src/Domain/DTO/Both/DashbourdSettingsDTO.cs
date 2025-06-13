@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain.DTO.Request
+namespace Domain.DTO.Both
 {
     public class DashboardSettingsDTO
     {
@@ -18,7 +18,8 @@ namespace Domain.DTO.Request
         public int Account3 { get; set; }
         [Required]
         public int Account4 { get; set; }
-        public decimal OtherExpensesTarget { get; set; } 
+        public decimal OtherExpensesTarget { get; set; }
+        public decimal AddOnExpensesTarget { get; set; }
         public bool ApplyOverBudgetToFunds { get; set; }
     }
 }

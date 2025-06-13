@@ -1,0 +1,124 @@
+<div class="bg-white rounded-lg lg:p-10 p-6 mb-3">
+  <h1 class="text-slate-800 font-bold text-3xl mb-4 lg:w-4/5">
+    Dashboard Settings
+  </h1>
+  <hr />
+  <div>
+    @if (settingsForm) {
+    <form [formGroup]="settingsForm" (ngSubmit)="onSubmit()" class="py-5">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <input type="hidden" id="id" formControlName="id" />
+        <div class="form-group">
+          <label for="account1">First Account</label>
+          <select
+            id="account1"
+            formControlName="account1"
+            class="form-control w-full"
+          >
+            <option value="">Select Account</option>
+            @for (account of accounts; track account.id) {
+            <option [value]="account.id">{{ account.name }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="account2">Second Account</label>
+          <select
+            id="account2"
+            formControlName="account2"
+            class="form-control w-full"
+          >
+            <option value="">Select Account</option>
+            @for (account of accounts; track account.id) {
+            <option [value]="account.id">{{ account.name }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="account3">Third Account</label>
+          <select
+            id="account3"
+            formControlName="account3"
+            class="form-control w-full"
+          >
+            <option value="">Select Account</option>
+            @for (account of accounts; track account.id) {
+            <option [value]="account.id">{{ account.name }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="account4">Forth Account</label>
+          <select
+            id="account4"
+            formControlName="account4"
+            class="form-control w-full"
+          >
+            <option value="">Select Account</option>
+            @for (account of accounts; track account.id) {
+            <option [value]="account.id">{{ account.name }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="otherExpensesTarget">Other Expenses Target</label>
+          <input
+            type="number"
+            id="otherExpensesTarget"
+            formControlName="otherExpensesTarget"
+            class="form-control w-full"
+          />
+        </div>
+        <div class="form-group">
+          <label for="otherExpensesTarget">Add On Expenses Target</label>
+          <input
+            type="number"
+            id="addOnExpensesTarget"
+            formControlName="addOnExpensesTarget"
+            class="form-control w-full"
+          />
+        </div>
+
+        <div class="form-group flex items-center">
+          <label class="inline-flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              id="applyOverBudgetToFunds"
+              formControlName="applyOverBudgetToFunds"
+              name="ignoreTo"
+              class="sr-only peer"
+            />
+            <div
+              class="relative w-11 h-6 bg-gray-200 rounded-full peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"
+            ></div>
+            <span class="ms-3 text-sm font-medium text-gray-900"
+              >Apply Over Budget to Funds</span
+            >
+          </label>
+        </div>
+      </div>
+
+      <div class="mt-5 flex flex-col md:flex-row gap-2">
+        <button
+          type="submit"
+          class="btn-save w-full md:w-1/4"
+          [disabled]="!settingsForm.valid"
+        >
+          Save
+        </button>
+        <a
+          routerLink="/BudgetAccountSettings"
+          class="md:ms-2 btn-add text-center"
+          [disabled]="!settingsForm.valid"
+        >
+          Budget Accounts Settings
+        </a>
+      </div>
+    </form>
+    }
+  </div>
+</div>

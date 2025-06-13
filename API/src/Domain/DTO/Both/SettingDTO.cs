@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Domain.DTO.Request
+namespace Domain.DTO.Both
 {
     public class SettingDTO
     {

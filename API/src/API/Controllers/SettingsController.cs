@@ -1,5 +1,4 @@
-﻿using Domain.DTO.Request;
-using Domain.Entities;
+﻿using Domain.DTO.Both;
 using Domain.IServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

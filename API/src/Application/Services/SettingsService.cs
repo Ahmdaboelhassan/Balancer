@@ -1,7 +1,6 @@
 ﻿using Application.Mappers;
-using Domain.DTO.Request;
+using Domain.DTO.Both;
 using Domain.DTO.Response;
-using Domain.Entities;
 using Domain.IRepository;
 using Domain.IServices;
 
@@ -88,12 +87,14 @@ namespace Application.Services
                 return new ConfirmationResponse() { IsSucceed = true, Message = "Dashboard Settings created successfully." };
             }
 
-            existedSettings.ApplyOverBudgetToFunds = settings.ApplyOverBudgetToFunds;
-            existedSettings.OtherExpensesTarget = settings.OtherExpensesTarget;
             existedSettings.Account1 = settings.Account1;
             existedSettings.Account2 = settings.Account2;
             existedSettings.Account3 = settings.Account3;
             existedSettings.Account4 = settings.Account4;
+
+            existedSettings.AddOnExpensesTarget = settings.AddOnExpensesTarget;
+            existedSettings.ApplyOverBudgetToFunds = settings.ApplyOverBudgetToFunds;
+            existedSettings.OtherExpensesTarget = settings.OtherExpensesTarget;
             _unitOfWork.DashboardSettings.Update(existedSettings);
             await _unitOfWork.SaveChangesAync();
 

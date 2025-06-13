@@ -18,6 +18,7 @@ public static class DI
         services.AddScoped<IPasswordHasher, PasswordHasher>();
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<ISettingsService, SettingsService>();
         services.AddScoped<IServiceContext, ServiceContext>();
         return services;
     }

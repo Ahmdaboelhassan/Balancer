@@ -1,4 +1,4 @@
-﻿namespace Domain.Entities
+﻿namespace Domain.DTO.Both
 {
     public class BudgetAccountSettingsDTO
     {
