@@ -13,9 +13,10 @@ import { Journal } from '../../../Interfaces/Response/Journal';
 import { NgClass, NgFor } from '@angular/common';
 import { AccountService } from '../../../Services/account.service';
 import { CreateJournal } from '../../../Interfaces/Request/CreateJournal';
+import { NgSelectComponent } from '@ng-select/ng-select';
 
 @Component({
-  imports: [RouterLink, ReactiveFormsModule, NgFor, NgClass],
+  imports: [RouterLink, ReactiveFormsModule, NgFor, NgClass, NgSelectComponent],
   templateUrl: './create-journal.component.html',
   styleUrl: './create-journal.component.css',
 })
@@ -63,8 +64,8 @@ export class CreateJournalComponent {
       id: new FormControl(journal.id),
       details: new FormControl(journal.detail, Validators.required),
       amount: new FormControl(journal.amount, Validators.min(1)),
-      debit: new FormControl(journal.debitAccountId),
-      credit: new FormControl(journal.creditAccountId),
+      debit: new FormControl(journal.debitAccountId, Validators.required),
+      credit: new FormControl(journal.creditAccountId, Validators.required),
       costCenter: new FormControl(journal.costCenterId ?? ''),
       code: new FormControl({ disabled: true, value: journal.code }),
       created: new FormControl(

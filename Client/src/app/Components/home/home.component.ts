@@ -119,7 +119,7 @@ export class HomeComponent implements OnInit {
           label: 'Profit',
           data: difference,
           tension: 0.2,
-          //hidden: true,
+          hidden: true,
         },
       ],
     });

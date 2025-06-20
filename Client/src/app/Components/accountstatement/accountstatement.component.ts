@@ -7,10 +7,10 @@ import { AccountSelectList } from '../../Interfaces/Response/AccountSelectList';
 import { CostCenterSelectList } from '../../Interfaces/Response/CostCenterSelectList';
 import { NgFor } from '@angular/common';
 import { Title } from '@angular/platform-browser';
+import { NgSelectComponent } from '@ng-select/ng-select';
 
 @Component({
-  selector: 'app-accountstatement',
-  imports: [FormsModule, NgFor],
+  imports: [FormsModule, NgFor, NgSelectComponent],
   templateUrl: './accountstatement.component.html',
   styleUrl: './accountstatement.component.css',
 })
@@ -30,9 +30,9 @@ export class AccountstatementComponent {
     private titleServive: Title
   ) {
     this.GetDefaultDate();
-    this.accountService
-      .GetAllAccountSelectList()
-      .subscribe({ next: (accounts) => (this.accounts = accounts) });
+    this.accountService.GetAllAccountSelectList().subscribe({
+      next: (accounts) => (this.accounts = accounts),
+    });
     this.costCenterService
       .GetAllCostCenterSelectList()
       .subscribe({ next: (costCenters) => (this.costCenters = costCenters) });

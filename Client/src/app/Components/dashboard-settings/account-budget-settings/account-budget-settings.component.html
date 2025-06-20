@@ -11,16 +11,15 @@
         <div class="grid grid-cols-4 gap-3">
           <div class="form-group md:col-span-1 col-span-4">
             <label [for]="'account-' + $index">Account</label>
-            <select
+
+            <ng-select
+              [items]="accounts"
+              bindLabel="name"
+              bindValue="id"
               [id]="'account-' + $index"
               formControlName="accountId"
-              class="form-control w-full"
             >
-              <option value="">Select Account</option>
-              @for (account of accounts; track account.id) {
-              <option [value]="account.id">{{ account.name }}</option>
-              }
-            </select>
+            </ng-select>
           </div>
 
           <div class="form-group md:col-span-1 col-span-4">

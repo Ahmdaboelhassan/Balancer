@@ -10,10 +10,11 @@ import { AccountSelectList } from '../../../Interfaces/Response/AccountSelectLis
 import { AccountService } from '../../../Services/account.service';
 import { SettingsService } from '../../../Services/settings.service';
 import { ToastrService } from 'ngx-toastr';
+import { NgSelectComponent } from '@ng-select/ng-select';
 
 @Component({
   selector: 'app-account-budget-settings',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, NgSelectComponent],
   templateUrl: './account-budget-settings.component.html',
   styleUrl: './account-budget-settings.component.css',
 })

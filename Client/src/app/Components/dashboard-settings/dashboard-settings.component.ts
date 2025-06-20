@@ -11,10 +11,11 @@ import { AccountSelectList } from '../../Interfaces/Response/AccountSelectList';
 import { DashboardSettingsDTO } from '../../Interfaces/Both/DashboardSettingsDTO';
 import { ToastrService } from 'ngx-toastr';
 import { RouterLink } from '@angular/router';
+import { NgSelectComponent } from '@ng-select/ng-select';
 
 @Component({
   selector: 'app-dashboard-settings',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, NgSelectComponent],
   templateUrl: './dashboard-settings.component.html',
   styleUrl: './dashboard-settings.component.css',
 })

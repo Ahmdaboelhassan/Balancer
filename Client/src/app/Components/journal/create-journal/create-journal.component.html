@@ -23,7 +23,6 @@
         <div class="col-span-4 lg:col-span-2">
           <label for="amount"> Amount </label>
           <input
-            (input)="ChangeBalances()"
             type="number"
             id="amount"
             formControlName="amount"
@@ -32,19 +31,13 @@
         </div>
         <div class="col-span-4 lg:col-span-2">
           <label for="credit"> From Account </label>
-
-          <select
-            class="form-control w-full"
-            id="credit"
+          <ng-select
+            [items]="Journal().accounts"
+            bindLabel="name"
+            bindValue="id"
             formControlName="credit"
           >
-            <option
-              *ngFor="let account of Journal().accounts"
-              [value]="account.id"
-            >
-              {{ account.name }}
-            </option>
-          </select>
+          </ng-select>
         </div>
         <!-- Credit Balance -->
         <!-- <div class="col-span-4 lg:col-span-1">
@@ -57,18 +50,13 @@
         </div> -->
         <div class="col-span-4 lg:col-span-2">
           <label for="debit"> To Account</label>
-          <select
-            class="form-control w-full"
-            id="debit"
+          <ng-select
+            [items]="Journal().accounts"
+            bindLabel="name"
+            bindValue="id"
             formControlName="debit"
           >
-            <option
-              *ngFor="let account of Journal().accounts"
-              [value]="account.id"
-            >
-              {{ account.name }}
-            </option>
-          </select>
+          </ng-select>
         </div>
         <!-- Debit Balance -->
         <!-- <div class="col-span-4 lg:col-span-1">

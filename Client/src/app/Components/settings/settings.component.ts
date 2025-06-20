@@ -9,10 +9,11 @@ import { AccountService } from '../../Services/account.service';
 import { SettingsService } from '../../Services/settings.service';
 import { AccountSelectList } from '../../Interfaces/Response/AccountSelectList';
 import { ToastrService } from 'ngx-toastr';
+import { NgSelectComponent } from '@ng-select/ng-select';
 
 @Component({
   selector: 'app-settings',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, NgSelectComponent],
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.css',
 })

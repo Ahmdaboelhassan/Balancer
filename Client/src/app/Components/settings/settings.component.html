@@ -10,30 +10,86 @@
         <!-- Account Selection Fields -->
         <div class="form-group">
           <label for="defaultCreditAccount">Default Credit Account</label>
-          <select
+          <ng-select
+            [items]="accounts"
+            bindLabel="name"
+            bindValue="id"
             id="defaultCreditAccount"
             formControlName="defaultCreditAccount"
-            class="form-control w-full"
           >
-            <option value="">Select Account</option>
-            @for (account of accounts; track account.id) {
-            <option [value]="account.id">{{ account.name }}</option>
-            }
-          </select>
+          </ng-select>
         </div>
 
         <div class="form-group">
           <label for="defaultDebitAccount">Default Debit Account</label>
-          <select
+          <ng-select
+            [items]="accounts"
+            bindLabel="name"
+            bindValue="id"
             id="defaultDebitAccount"
             formControlName="defaultDebitAccount"
-            class="form-control w-full"
           >
-            <option value="">Select Account</option>
-            @for (account of accounts; track account.id) {
-            <option [value]="account.id">{{ account.name }}</option>
-            }
-          </select>
+          </ng-select>
+        </div>
+
+        <!-- Account Type Selection Fields -->
+        <!-- Asset Accounts -->
+        <div class="form-group">
+          <label for="assetsAccount">Assets Account</label>
+          <ng-select
+            [items]="accounts"
+            bindLabel="name"
+            bindValue="id"
+            id="assetsAccount"
+            formControlName="assetsAccount"
+          >
+          </ng-select>
+        </div>
+        <div class="form-group">
+          <label for="liabilitiesAccount">Liabilities Account</label>
+          <ng-select
+            [items]="accounts"
+            bindLabel="name"
+            bindValue="id"
+            id="liabilitiesAccount"
+            formControlName="liabilitiesAccount"
+          >
+          </ng-select>
+        </div>
+        <div class="form-group">
+          <label for="expensesAccount">Expenses Account</label>
+          <ng-select
+            [items]="accounts"
+            bindLabel="name"
+            bindValue="id"
+            id="expensesAccount"
+            formControlName="expensesAccount"
+          >
+          </ng-select>
+        </div>
+
+        <div class="form-group">
+          <label for="revenueAccount">Revenue Account</label>
+          <ng-select
+            [items]="accounts"
+            bindLabel="name"
+            bindValue="id"
+            id="revenueAccount"
+            formControlName="revenueAccount"
+          >
+          </ng-select>
+        </div>
+
+        <div class="form-group">
+          <label for="currentAssetsAccount">Current Assets Account</label>
+          <ng-select
+            [items]="accounts"
+            bindLabel="name"
+            bindValue="id"
+            id="currentAssetsAccount"
+            formControlName="currentAssetsAccount"
+          >
+          </ng-select>
         </div>
 
         <!-- Period and Rate Settings -->
@@ -55,64 +111,6 @@
             formControlName="defaultDayRate"
             class="form-control w-full"
           />
-        </div>
-
-        <!-- Account Type Selection Fields -->
-        <div class="form-group">
-          <label for="expensesAccount">Expenses Account</label>
-          <select
-            id="expensesAccount"
-            formControlName="expensesAccount"
-            class="form-control w-full"
-          >
-            <option value="">Select Account</option>
-            @for (account of accounts; track account.id) {
-            <option [value]="account.id">{{ account.name }}</option>
-            }
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="revenueAccount">Revenue Account</label>
-          <select
-            id="revenueAccount"
-            formControlName="revenueAccount"
-            class="form-control w-full"
-          >
-            <option value="">Select Account</option>
-            @for (account of accounts; track account.id) {
-            <option [value]="account.id">{{ account.name }}</option>
-            }
-          </select>
-        </div>
-
-        <!-- Asset Accounts -->
-        <div class="form-group">
-          <label for="assetsAccount">Assets Account</label>
-          <select
-            id="assetsAccount"
-            formControlName="assetsAccount"
-            class="form-control w-full"
-          >
-            <option value="">Select Account</option>
-            @for (account of accounts; track account.id) {
-            <option [value]="account.id">{{ account.name }}</option>
-            }
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="currentAssetsAccount">Current Assets Account</label>
-          <select
-            id="currentAssetsAccount"
-            formControlName="currentAssetsAccount"
-            class="form-control w-full"
-          >
-            <option value="">Select Account</option>
-            @for (account of accounts; track account.id) {
-            <option [value]="account.id">{{ account.name }}</option>
-            }
-          </select>
         </div>
 
         <!-- Level Settings -->
