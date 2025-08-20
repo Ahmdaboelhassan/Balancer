@@ -7,6 +7,7 @@ import { Journal } from '../Interfaces/Response/Journal';
 import { CreateJournal } from '../Interfaces/Request/CreateJournal';
 import { ConfirmationRespose } from '../Interfaces/Response/ConfirmationRespose';
 import { Subject } from 'rxjs';
+import { Result } from '../Interfaces/Response/Result';
 
 @Injectable({
   providedIn: 'root',
@@ -52,12 +53,12 @@ export class JournalService {
       url = url + `?periodId=${periodId}`;
     }
 
-    return this.http.get<Journal>(url);
+    return this.http.get<Result<Journal>>(url);
   }
 
   GetEditJournal(journalId: number) {
     let url = this.url + `/Get/${journalId}`;
-    return this.http.get<Journal>(url);
+    return this.http.get<Result<Journal>>(url);
   }
 
   SaveJournal(journal: CreateJournal) {

@@ -91,7 +91,7 @@ public class HomeService : IHomeService
             CurrentYearRevenues = currentYearJournal.revenues,
             CurrentAndLastMonthExpenses = currentAndLastMonthExpenses,
             AvailableFunds = availableFunds,
-            OtherExpensesTarget = dashboard.OtherExpensesTarget,
+            OtherExpensesTarget = dashboard.OtherExpensesTarget + dashboard.AddOnExpensesTarget,
             BudgetProgress = budgetProgress,
             DayRate = settings.DefaultDayRate,
             PeriodDays = settings.DefaultPeriodDays.GetValueOrDefault(),

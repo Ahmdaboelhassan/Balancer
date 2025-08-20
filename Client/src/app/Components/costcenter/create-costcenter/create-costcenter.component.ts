@@ -109,12 +109,15 @@ export class CreateCostcenterComponent {
     }
   }
   DeleteCostCenter() {
-    this.CostCenterService.DeleteCostCenter(this.CostCenter.id).subscribe({
-      next: (result) => {
-        this.toastr.success(result.message);
-        this.router.navigate(['/CostCenter', 'List']);
-      },
-      error: (error) => this.toastr.error(error.error.message),
-    });
+    var result = confirm('Are You Sure For Deleting This Cost Center?');
+    if (result) {
+      this.CostCenterService.DeleteCostCenter(this.CostCenter.id).subscribe({
+        next: (result) => {
+          this.toastr.success(result.message);
+          this.router.navigate(['/CostCenter', 'List']);
+        },
+        error: (error) => this.toastr.error(error.error.message),
+      });
+    }
   }
 }

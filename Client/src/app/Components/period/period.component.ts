@@ -18,7 +18,7 @@ export class PeriodComponent {
     private periodService: PeriodService,
     private titleService: Title
   ) {
-    titleService.setTitle('Periods');
+    this.titleService.setTitle('Periods');
   }
 
   GetPeriodsByDate(date: object | any) {

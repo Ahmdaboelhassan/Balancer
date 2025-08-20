@@ -14,9 +14,17 @@ import { NgClass, NgFor } from '@angular/common';
 import { AccountService } from '../../../Services/account.service';
 import { CreateJournal } from '../../../Interfaces/Request/CreateJournal';
 import { NgSelectComponent } from '@ng-select/ng-select';
+import { BidiModule } from '@angular/cdk/bidi';
 
 @Component({
-  imports: [RouterLink, ReactiveFormsModule, NgFor, NgClass, NgSelectComponent],
+  imports: [
+    RouterLink,
+    ReactiveFormsModule,
+    NgFor,
+    NgClass,
+    NgSelectComponent,
+    BidiModule,
+  ],
   templateUrl: './create-journal.component.html',
   styleUrl: './create-journal.component.css',
 })
@@ -43,17 +51,25 @@ export class CreateJournalComponent {
       this.isEdit = true;
       this.titleService.setTitle('Edit Journal');
       this.journalService.GetEditJournal(JournalId).subscribe({
-        next: (journal) => {
-          this.Journal.set(journal);
-          this.intializeForm(journal);
+        next: (result) => {
+          if (result.isSucceed) {
+            this.Journal.set(result.data);
+            this.intializeForm(result.data);
+          } else {
+            this.toastr.info(result.message, 'Get Journal');
+          }
         },
       });
     } else {
       const periodId = this.route.snapshot.queryParams['periodId'] || 0;
       this.journalService.GetNewJournal(periodId).subscribe({
-        next: (journal) => {
-          this.Journal.set(journal);
-          this.intializeForm(journal);
+        next: (result) => {
+          if (result.isSucceed) {
+            this.Journal.set(result.data);
+            this.intializeForm(result.data);
+          } else {
+            this.toastr.info(result.message, 'Get Journal');
+          }
         },
       });
     }
@@ -138,11 +154,10 @@ export class CreateJournalComponent {
       this.journalService.EditJournal(journal).subscribe({
         next: (result) => {
           this.toastr.success(result.message, 'Edit Journal');
-          this.router.navigate(['/Journal', 'List']);
+          //this.router.navigate(['/Journal', 'List']);
         },
         error: (error) => {
-          console.log(error),
-            this.toastr.error(error.error.message, 'Edit Journal');
+          this.toastr.error(error.error.message, 'Edit Journal');
         },
       });
     } else {
@@ -173,11 +188,14 @@ export class CreateJournalComponent {
     }
   }
   DeleteJournal(id) {
-    this.journalService.DeleteJournal(id).subscribe({
-      next: (result) => this.toastr.success(result.message, 'Delete Journal'),
-      error: (err) => this.toastr.error(err.error.message, 'Delete Journal'),
-      complete: () => this.router.navigate(['/Journal', 'List']),
-    });
+    var result = confirm('Are You Sure For Deleting This Journal?');
+    if (result) {
+      this.journalService.DeleteJournal(id).subscribe({
+        next: (result) => this.toastr.success(result.message, 'Delete Journal'),
+        error: (err) => this.toastr.error(err.error.message, 'Delete Journal'),
+        complete: () => this.router.navigate(['/Journal', 'List']),
+      });
+    }
   }
   GetLocaleDateTime(date: Date) {
     const year = date.getFullYear();

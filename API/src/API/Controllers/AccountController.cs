@@ -53,7 +53,7 @@ public class AccountController : ControllerBase
     [HttpGet("GetSelectList")]
     public async Task<IActionResult> GetSelectList()
     {
-        return Ok(await _accountService.GetSelectList(a => !a.IsArchive));
+        return Ok(await _accountService.GetSelectList());
     }
 
     [HttpPost("Create")]

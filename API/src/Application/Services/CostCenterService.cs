@@ -19,7 +19,7 @@ public class CostCenterService : ICostCenterService
         return await _uow.CostCenter.SelectAll(a => true, a => new GetCostCenter
         {
             Id = a.Id,
-            CreatedAt = a.CreatedAt,
+            CreatedAt = a.CreatedAt.ToShortDateString(),
             Description = a.Description,
             Name = a.Name,
         });
@@ -44,7 +44,7 @@ public class CostCenterService : ICostCenterService
         return new GetCostCenter
         {
             Id = costCenter.Id,
-            CreatedAt = costCenter.CreatedAt,
+            CreatedAt = costCenter.CreatedAt.ToShortDateString(),
             Description = costCenter.Description,
             Name = costCenter.Name,
         };

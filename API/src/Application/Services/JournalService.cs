@@ -20,26 +20,32 @@ internal class JournalService : IJournalService
         _accountService = accountService;
         _costCenterService = costCenterService;
     }
-    public async Task<GetJournalDTO?> New(int? periodId)
+    public async Task<Result<GetJournalDTO>> New(int? periodId)
     {
         var settings = await _uow.Settings.GetFirst();
         if (settings is null)
-            return null;
+            return new Result<GetJournalDTO> { Message = "Application Settings Not Found", IsSucceed = false };
+        
 
-        return new GetJournalDTO()
+        return new Result<GetJournalDTO>
         {
-            Accounts = await _accountService.GetSelectList(a => !a.IsParent && !a.IsArchive),
-            CostCenters = await _costCenterService.GetAllSelectList(),
-            Code = await GetNextCode(),
-            DebitAccountId = settings.DefaultDebitAccount.GetValueOrDefault(),
-            CreditAccountId = settings.DefaultCreditAccount.GetValueOrDefault(),
-            PeriodId = periodId.GetValueOrDefault(),
-            CreatedAt = DateTime.Now,
+            IsSucceed = true,
+            Data = new GetJournalDTO()
+            {
+                Accounts = await _accountService.GetSelectList(a => !a.IsParent && !a.IsArchive),
+                CostCenters = await _costCenterService.GetAllSelectList(),
+                Code = await GetNextCode(),
+                DebitAccountId = settings.DefaultDebitAccount.GetValueOrDefault(),
+                CreditAccountId = settings.DefaultCreditAccount.GetValueOrDefault(),
+                PeriodId = periodId.GetValueOrDefault(),
+                CreatedAt = DateTime.Now,
+            }
         };
+       
     }
-    public async Task<GetJournalDTO> Get(int id)
+    public async Task<Result<GetJournalDTO>> Get(int id)
     {
-        var journal = await _uow.Journal.Get(j => j.Id == id , "JournalDetails");
+        var journal = await _uow.Journal.Get(j => j.Id == id , "JournalDetails", "JournalDetails.Account");
         if (journal is null)
         {
             var lastPeriod = await _uow.Periods.GetLastOrderBy(p => p.To);
@@ -48,23 +54,33 @@ internal class JournalService : IJournalService
             return await New(periodId);
         }
 
-        return new GetJournalDTO()
+        var archiveAccount = journal.JournalDetails.FirstOrDefault(x => x.Account.IsArchive);
+
+        if (archiveAccount != null)
+            return new Result<GetJournalDTO> { Message = "Can't Load This Journal Because It Contains Archived Account", IsSucceed = false };
+
+
+        return new Result<GetJournalDTO>
         {
-            Id = journal.Id,
-            CostCenterId = journal.JournalDetails.FirstOrDefault()?.CostCenterId,
-            DebitAccountId = journal.JournalDetails.First(d => d.Debit > 0).AccountId,
-            CreditAccountId = journal.JournalDetails.First(d => d.Credit > 0).AccountId,
-            CreatedAt = journal.CreatedAt,
-            Amount = Math.Abs(journal.Amount),
-            Type = journal.Type,
-            Code = journal.Code,
-            Notes = journal.Notes,
-            LastUpdatedAt = journal.LastUpdatedAt?.ToString("g"),
-            PeriodId = journal.PeriodId,
-            Detail = journal.Detail,
-            Description = journal.Description,
-            CostCenters = await _costCenterService.GetAllSelectList(),
-            Accounts = await _accountService.GetSelectList(a => !a.IsParent && !a.IsArchive),
+            IsSucceed = true,
+            Data = new GetJournalDTO()
+            {
+                Id = journal.Id,
+                CostCenterId = journal.JournalDetails.FirstOrDefault()?.CostCenterId,
+                DebitAccountId = journal.JournalDetails.First(d => d.Debit > 0).AccountId,
+                CreditAccountId = journal.JournalDetails.First(d => d.Credit > 0).AccountId,
+                CreatedAt = journal.CreatedAt,
+                Amount = Math.Abs(journal.Amount),
+                Type = journal.Type,
+                Code = journal.Code,
+                Notes = journal.Notes,
+                LastUpdatedAt = journal.LastUpdatedAt?.ToString("g"),
+                PeriodId = journal.PeriodId,
+                Detail = journal.Detail,
+                Description = journal.Description,
+                CostCenters = await _costCenterService.GetAllSelectList(),
+                Accounts = await _accountService.GetSelectList(a => !a.IsParent && !a.IsArchive),
+            }
         };
 
     }
@@ -473,6 +489,10 @@ internal class JournalService : IJournalService
         if (IsDrawerOrBank(creditNumber))
         {
             journalType = IsDrawerOrBank(debitNumber) ? JournalTypes.Forward : JournalTypes.Subtract;
+        }
+        else if (IsDrawerOrBank(debitNumber))
+        {
+            journalType = JournalTypes.Add;
         }
         else if (creditNumber.StartsWith(liabilitiesAccount.Number))
         {

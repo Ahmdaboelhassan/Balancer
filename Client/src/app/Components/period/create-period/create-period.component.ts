@@ -116,12 +116,15 @@ export class CreatePeriodComponent implements OnInit {
     }
   }
   DeletePeriod() {
-    this.periodService.DeletePeriod(this.period.id).subscribe({
-      next: (response) => {
-        this.toastr.success(response.message);
-        this.router.navigate(['/Period', 'List']);
-      },
-      error: (error) => this.toastr.error(error.error.message),
-    });
+    var result = confirm('Are You Sure For Deleting This Period?');
+    if (result) {
+      this.periodService.DeletePeriod(this.period.id).subscribe({
+        next: (response) => {
+          this.toastr.success(response.message);
+          this.router.navigate(['/Period', 'List']);
+        },
+        error: (error) => this.toastr.error(error.error.message),
+      });
+    }
   }
 }

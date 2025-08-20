@@ -128,12 +128,15 @@ export class CreateAccountComponent implements OnInit {
     }
   }
   DeleteAccount() {
-    this.accountService.DeleteAccount(this.account.id).subscribe({
-      next: (result) => {
-        this.toastr.success(result.message);
-        this.router.navigate(['/Account', 'List']);
-      },
-      error: (error) => this.toastr.error(error.error.message),
-    });
+    var result = confirm('Are You Sure For Deleting This Account?');
+    if (result) {
+      this.accountService.DeleteAccount(this.account.id).subscribe({
+        next: (result) => {
+          this.toastr.success(result.message);
+          this.router.navigate(['/Account', 'List']);
+        },
+        error: (error) => this.toastr.error(error.error.message),
+      });
+    }
   }
 }
