@@ -30,9 +30,7 @@
               "@ng-select/ng-select/themes/default.theme.css",
               "src/styles.css"
             ],
-            "scripts": [
-              "node_modules/tabulator-tables/dist/js/tabulator.min.JS"
-            ]
+            "scripts": []
           },
           "configurations": {
             "production": {
