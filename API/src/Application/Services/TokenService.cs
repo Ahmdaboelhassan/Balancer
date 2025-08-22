@@ -27,9 +27,9 @@ public class TokenService : ITokenService
     {
         var claims = new[]
         {
-          new Claim(JwtRegisteredClaimNames.Sub, user.Username),
-          new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-          new Claim(JwtRegisteredClaimNames.NameId , user.Id.ToString())
+          new Claim(ClaimTypes.Surname, user.Username),
+          new Claim(ClaimTypes.Hash, Guid.NewGuid().ToString()),
+          new Claim(ClaimTypes.NameIdentifier , user.Id.ToString())
         };
 
         var jwtKey = _jwt.Key;

@@ -26,10 +26,13 @@
             ],
             "styles": [
               "node_modules/@fortawesome/fontawesome-free/css/all.min.css",
+              "node_modules/tabulator-tables/dist/css/tabulator_bootstrap5.min.css",
               "@ng-select/ng-select/themes/default.theme.css",
               "src/styles.css"
             ],
-            "scripts": []
+            "scripts": [
+              "node_modules/tabulator-tables/dist/js/tabulator.min.JS"
+            ]
           },
           "configurations": {
             "production": {

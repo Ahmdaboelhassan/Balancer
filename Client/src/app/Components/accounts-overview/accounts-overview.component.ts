@@ -7,7 +7,7 @@ import { AccountSummary } from '../../Interfaces/Response/AccountSummary';
 
 @Component({
   selector: 'app-accounts-overview',
-  imports: [DateRangeComponent, CurrencyPipe],
+  imports: [CurrencyPipe, DateRangeComponent],
   templateUrl: './accounts-overview.component.html',
   styleUrl: './accounts-overview.component.css',
 })
@@ -21,8 +21,10 @@ export class AccountsOverviewComponent {
   }
 
   GetAccountsOverview(dates: any) {
-    this.reportService.GetAccountsOverview(dates.from, dates.to).subscribe({
-      next: (accounts) => (this.accounts = accounts),
-    });
+    this.reportService
+      .GetAccountsOverview(dates.from, dates.to, dates.maxLevel)
+      .subscribe({
+        next: (accounts) => (this.accounts = accounts),
+      });
   }
 }

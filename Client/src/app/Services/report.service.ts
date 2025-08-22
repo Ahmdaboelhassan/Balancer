@@ -46,9 +46,12 @@ export class ReportService {
 
     return this.http.get<AccountSummary[]>(url);
   }
-  GetAccountsOverview(from, to) {
+  GetAccountsOverview(from, to, maxLevel) {
     let url = this.url + `/AccountsOverview?from=${from}&to=${to}`;
 
+    if (maxLevel) {
+      url += `&maxLevel=${maxLevel}`;
+    }
     return this.http.get<AccountSummary[]>(url);
   }
 }

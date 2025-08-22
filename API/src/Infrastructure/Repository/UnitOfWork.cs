@@ -19,6 +19,8 @@ public class UnitOfWork : IUnitOfWork
     public IBudgetAccountRepo BudgetAccounts { get;}
     public IDashboardSettingsRepo DashboardSettings { get;}
     public IRefreshTokenRepo RefreshTokens { get;}
+    public IEvaluationRepo Evaluations { get;}
+    public IEvaluationDetailRepo EvaluationDetails { get;}
 
     public UnitOfWork(AppDbContext context)
     {
@@ -33,6 +35,8 @@ public class UnitOfWork : IUnitOfWork
         BudgetAccounts = new BudgetAccountRepo(context);
         DashboardSettings = new DashboardSettingsRepo(context);
         RefreshTokens = new RefreshTokenRepo(context);
+        Evaluations = new EvaluationRepo(context);
+        EvaluationDetails = new EvaluationDetailRepo(context);
     }
    
 

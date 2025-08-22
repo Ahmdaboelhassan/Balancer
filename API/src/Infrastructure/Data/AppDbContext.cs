@@ -16,6 +16,8 @@ namespace Infrastructure.Data
         public DbSet<DashboardSettings> DashboardSettings { get; set; }
         public DbSet<BudgetAccount> BudgetAccounts { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<Evaluation> Evaluations { get; set; }
+        public DbSet<EvaluationDetail> EvaluationDetails { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -24,6 +26,8 @@ namespace Infrastructure.Data
             modelBuilder.Entity<Journal>().HasQueryFilter(p => !p.IsDeleted);
             modelBuilder.Entity<JournalDetail>().HasQueryFilter(p => !p.IsDeleted);
             modelBuilder.Entity<CostCenter>().HasQueryFilter(p => !p.IsDeleted);
+            modelBuilder.Entity<Evaluation>().HasQueryFilter(p => !p.IsDeleted);
+            modelBuilder.Entity<EvaluationDetail>().HasQueryFilter(p => !p.IsDeleted);
 
             modelBuilder.Entity<JournalDetail>()
             .HasOne(d => d.Journal)

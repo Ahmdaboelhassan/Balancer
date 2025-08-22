@@ -1,1 +1,7 @@
-<p>evaluation works!</p>
+<app-date-range
+  [isYearRange]="true"
+  (dates)="GetEvaluationsByDate($event)"
+></app-date-range>
+<main class="daterange-result bg-white mt-4 rounded-xl">
+  <app-evaluation-list [evaluations]="items"></app-evaluation-list>
+</main>

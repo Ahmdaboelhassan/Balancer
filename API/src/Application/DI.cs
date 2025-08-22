@@ -19,6 +19,7 @@ public static class DI
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<ISettingsService, SettingsService>();
+        services.AddScoped<IEvaluationService, EvaluationService>();
         services.AddScoped<IServiceContext, ServiceContext>();
         return services;
     }

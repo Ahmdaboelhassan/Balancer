@@ -173,10 +173,13 @@ internal class PeriodService : IPeriodService
             return new ConfirmationResponse { IsSucceed = false, Message = "Period Is Not Exist!" };
 
         var JournalIds = period.Journals.Select(j => j.Id);
+
         await _uow.JournalDetail.ExecuteUpdateAsync(d => JournalIds.Contains(d.JournalId), e => e.SetProperty(d => d.IsDeleted, true));
         await _uow.Journal.ExecuteUpdateAsync(j => j.PeriodId == id, e => e.SetProperty(j => j.IsDeleted ,true));
 
         period.IsDeleted = true;
+        period.Journals.Clear();
+
         _uow.Periods.Update(period);
         await _uow.SaveChangesAync();
         return  new ConfirmationResponse { IsSucceed = true, Message = "Period Has Been Deleted Successfully" }; ;

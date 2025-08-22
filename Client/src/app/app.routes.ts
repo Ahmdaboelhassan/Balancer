@@ -24,6 +24,8 @@ import { AccountComparerDetailsComponent } from './Components/account-comparer/a
 import { SettingsComponent } from './Components/settings/settings.component';
 import { DashboardSettingsComponent } from './Components/dashboard-settings/dashboard-settings.component';
 import { AccountBudgetSettingsComponent } from './Components/dashboard-settings/account-budget-settings/account-budget-settings.component';
+import { EvaluationComponent } from './Components/evaluation/evaluation.component';
+import { CreateEvaluationComponent } from './Components/evaluation/create-evaluation/create-evaluation.component';
 
 export const routes: Routes = [
   {
@@ -56,6 +58,20 @@ export const routes: Routes = [
       { path: 'Edit/:id', loadComponent: () => CreatePeriodComponent },
       { path: 'Search', loadComponent: () => SearchPeriodComponent },
       { path: 'List', loadComponent: () => PeriodComponent },
+      {
+        path: 'PeriodJournals/:id',
+        loadComponent: () => PeriodJournalsComponent,
+      },
+    ],
+  },
+  {
+    path: 'Evaluation',
+    canActivate: [authGuard],
+    children: [
+      { path: '', redirectTo: 'List', pathMatch: 'full' },
+      { path: 'Create', loadComponent: () => CreateEvaluationComponent },
+      { path: 'Edit/:id', loadComponent: () => CreateEvaluationComponent },
+      { path: 'List', loadComponent: () => EvaluationComponent },
       {
         path: 'PeriodJournals/:id',
         loadComponent: () => PeriodJournalsComponent,

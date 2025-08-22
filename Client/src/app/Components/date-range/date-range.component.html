@@ -5,8 +5,7 @@
     type="date"
     class="lg:w-1/4 w-full print:text-xs date-form-control"
     required
-    #fromDate
-    [value]="from"
+    [(ngModel)]="from"
   />
   <label
     class="text-slate-900 font-bold text-lg print:text-lg hidden lg:inline-block"
@@ -15,12 +14,27 @@
   <input
     type="date"
     class="lg:w-1/4 w-full date-form-control print:text-xs"
-    #toDate
-    [value]="to"
+    required
+    [(ngModel)]="to"
   />
+
+  @if(showMaxLevelFilter){
+  <select
+    [(ngModel)]="maxLevel"
+    class="date-form-control print:text-xs lg:m-0 my-1 w-full lg:w-auto print:hidden"
+  >
+    <option value="">All Levels</option>
+    <option value="1">1st Level</option>
+    <option value="2">2nd Level</option>
+    <option value="3">3rd Level</option>
+    <option value="4">4th Level</option>
+    <option value="5">5th Level</option>
+  </select>
+  }
   <div
     class="lg:flex justify-between w-full items-center lg:w-1/4 print:hidden"
   >
+    @if(!isYearRange){
     <div class="flex w-full justify-center lg:w-4/12 lg:m-0 mb-1" role="group">
       <button
         type="button"
@@ -37,11 +51,11 @@
         <i class="fa-solid fa-rotate-right"></i>
       </button>
     </div>
-
+    }
     <button
       type="button"
-      class="btn-primary w-full lg:w-8/12"
-      (click)="EmitDatesValue(fromDate, toDate)"
+      class="btn-primary w-full lg:w-8/12 flex-1"
+      (click)="EmitDatesValue()"
     >
       <div class="flex justify-between items-center">
         <span>Search</span>

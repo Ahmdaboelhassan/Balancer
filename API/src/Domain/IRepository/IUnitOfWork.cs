@@ -16,4 +16,6 @@ public interface IUnitOfWork
     IRefreshTokenRepo RefreshTokens { get; }
     Task SaveChangesAync();
     IDbTransaction StartTransaction();
+    IEvaluationRepo Evaluations { get; }
+    IEvaluationDetailRepo EvaluationDetails { get; }
 }

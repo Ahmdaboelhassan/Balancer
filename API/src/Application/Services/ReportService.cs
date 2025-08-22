@@ -197,7 +197,7 @@ public class ReportService : IReportService
         return incomeStatement;
     }
 
-    public async Task<IEnumerable<AccountSummaryDTO>> GetAccountsOverview(DateTime from, DateTime to)
+    public async Task<IEnumerable<AccountSummaryDTO>> GetAccountsOverview(DateTime from, DateTime to, int? maxLevel)
     {
         var currentJournalAccounts = (await _uow.JournalDetail
             .SelectAll(d => d.Journal.CreatedAt.Date >= from && d.Journal.CreatedAt.Date <= to
@@ -209,7 +209,7 @@ public class ReportService : IReportService
         if (!currentJournalAccounts.Any())
             return Enumerable.Empty<AccountSummaryDTO>();
 
-        var accounts = await _uow.Accounts.GetAll();
+        var accounts = await _uow.Accounts.GetAll(d => !maxLevel.HasValue || d.Level <= maxLevel.Value);
 
         var accountsSummaries = new LinkedList<AccountSummaryDTO>();
 
@@ -221,7 +221,7 @@ public class ReportService : IReportService
             var balance = debit - credit;
 
             if (balance != 0)
-            { //string.Concat(Enumerable.Repeat("ahmed" , account.Level * 2))
+            { 
                 accountsSummaries.AddLast(
                     new AccountSummaryDTO()
                     {

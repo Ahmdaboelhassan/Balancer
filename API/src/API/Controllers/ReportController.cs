@@ -34,9 +34,9 @@ public class ReportController : ControllerBase
         return Ok(await _serviceContext.ReportService.GetAccountsSummary(from, to));
     }
     [HttpGet("AccountsOverview")]
-    public async Task<IActionResult> AccountsOverview(DateTime from, DateTime to)
+    public async Task<IActionResult> AccountsOverview(DateTime from, DateTime to, int? maxLevel)
     {
-        return Ok(await _serviceContext.ReportService.GetAccountsOverview(from, to));
+        return Ok(await _serviceContext.ReportService.GetAccountsOverview(from, to, maxLevel));
     }
 
     [AllowAnonymous]
