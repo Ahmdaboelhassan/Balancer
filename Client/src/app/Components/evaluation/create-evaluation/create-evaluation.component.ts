@@ -133,7 +133,7 @@ export class CreateEvaluationComponent implements OnInit {
             cellEdited: (cell) => {
               const table = cell.getTable();
               const data = table.getData();
-              let income = this.evaluationForm.get('income').value;
+              let income = Number(this.evaluationForm.get('income').value);
               income = income == 0 ? 1 : income;
 
               let totalAmount = 0;
@@ -151,8 +151,10 @@ export class CreateEvaluationComponent implements OnInit {
               table.setData(newData);
               table.setSort('amount', 'desc');
 
+              const profit = income - totalAmount;
               this.evaluationForm.patchValue({
-                profit: income - totalAmount,
+                profit: profit,
+                profitPercentage: Math.round((profit / income) * 100),
               });
             },
           },
@@ -289,15 +291,15 @@ export class CreateEvaluationComponent implements OnInit {
   }
 
   calculateProfitPercentage() {
-    const profit = this.evaluationForm.get('profit').value;
-    const income = this.evaluationForm.get('income').value;
+    const profit = Number(this.evaluationForm.get('profit').value);
+    const income = Number(this.evaluationForm.get('income').value);
 
     const profitPercentage = Math.round((profit / income) * 100);
 
     this.evaluationForm.patchValue({ profitPercentage: profitPercentage });
   }
   calculateProfit() {
-    const income = this.evaluationForm.get('income').value;
+    const income = Number(this.evaluationForm.get('income').value);
     const totalAmount = this.evaluationDetailsTabulator
       .getData()
       .reduce((acc, e) => acc + e.amount, 0);
