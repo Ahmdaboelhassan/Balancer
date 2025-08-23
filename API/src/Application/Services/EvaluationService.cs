@@ -44,10 +44,10 @@ namespace Application.Services
                     Percentage = 0,
                 }).ToList();
 
-                fromDate = lastEvaluation.To;
+                fromDate = lastEvaluation.To.AddDays(1);
             }
 
-            var toDate = fromDate.AddMonths(3);
+            var toDate = fromDate.AddMonths(3).AddDays(-1);
 
             var count = await _uow.Evaluations.Count(p => p.From.Year == DateTime.Now.Year);
 
@@ -75,7 +75,7 @@ namespace Application.Services
                 Income = eva.Income,
                 Name = eva.Name,
                 LastUpdatedAt = eva.LastUpdatedAt.ToString("g"),
-                CreatedAt = eva.LastUpdatedAt.ToString("g"),
+                CreatedAt = eva.CreatedAt.ToString("g"),
                 Note = eva.Note,
                 Profit = eva.Profit,
                 ProfitPercentage = Math.Round((eva.Profit / eva.Income) * 100, 2),

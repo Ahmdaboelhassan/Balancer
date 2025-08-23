@@ -151,7 +151,7 @@ export class CreateEvaluationComponent implements OnInit {
               table.setData(newData);
               table.setSort('amount', 'desc');
 
-              const profit = income - totalAmount;
+              const profit = Math.round(income - totalAmount);
               this.evaluationForm.patchValue({
                 profit: profit,
                 profitPercentage: Math.round((profit / income) * 100),
