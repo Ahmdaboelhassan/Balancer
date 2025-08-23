@@ -125,10 +125,36 @@ export class CreateEvaluationComponent implements OnInit {
           {
             title: 'Amount',
             field: 'amount',
+            editor: 'number',
             bottomCalc: 'sum',
             bottomCalcFormatter: 'money',
             bottomCalcFormatterParams: { precision: 2 },
             mutator: (value) => value ?? 0,
+            cellEdited: (cell) => {
+              const table = cell.getTable();
+              const data = table.getData();
+              let income = this.evaluationForm.get('income').value;
+              income = income == 0 ? 1 : income;
+
+              let totalAmount = 0;
+              let newData = [];
+
+              data.forEach((e) => {
+                newData.push({
+                  accountId: e.accountId,
+                  amount: e.amount,
+                  percentage: Math.round((e.amount / income) * 100),
+                });
+                totalAmount += e.amount;
+              });
+
+              table.setData(newData);
+              table.setSort('amount', 'desc');
+
+              this.evaluationForm.patchValue({
+                profit: income - totalAmount,
+              });
+            },
           },
           {
             title: 'Percentage',
@@ -260,5 +286,26 @@ export class CreateEvaluationComponent implements OnInit {
 
   getFormattedDate(date: string) {
     return new Date(date).toLocaleDateString('en-CA');
+  }
+
+  calculateProfitPercentage() {
+    const profit = this.evaluationForm.get('profit').value;
+    const income = this.evaluationForm.get('income').value;
+
+    const profitPercentage = Math.round((profit / income) * 100);
+
+    this.evaluationForm.patchValue({ profitPercentage: profitPercentage });
+  }
+  calculateProfit() {
+    const income = this.evaluationForm.get('income').value;
+    const totalAmount = this.evaluationDetailsTabulator
+      .getData()
+      .reduce((acc, e) => acc + e.amount, 0);
+    const profit = income - totalAmount;
+    const profitPercentage = Math.round((profit / income) * 100);
+    this.evaluationForm.patchValue({
+      profitPercentage: profitPercentage,
+      profit: profit,
+    });
   }
 }

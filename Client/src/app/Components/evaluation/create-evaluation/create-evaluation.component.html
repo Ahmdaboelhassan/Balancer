@@ -40,6 +40,7 @@
           <label>Income</label>
           <input
             formControlName="income"
+            (input)="calculateProfit()"
             type="number"
             class="form-control w-full"
           />
@@ -48,8 +49,8 @@
           <label>Profit</label>
           <input
             formControlName="profit"
+            (input)="calculateProfitPercentage()"
             type="number"
-            readonly
             class="form-control w-full"
           />
         </div>
