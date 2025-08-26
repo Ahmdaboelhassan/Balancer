@@ -26,6 +26,7 @@ namespace Application.Services
                 To = sp.To.ToShortDateString(),
                 Profit = sp.Profit,
                 IncreasedProfit = sp.Profit >= 0,
+                ProfitPercentage = Math.Round((sp.Profit / sp.Income) * 100)
             });
         }
 

@@ -16,14 +16,17 @@
   <div class="p-1 flex justify-end">
     <span>
       @if (item?.increasedProfit){
-      <span class="text-green-500 text-3xl font-bold me-2"
-        >{{ item?.profit }}
+      <span
+        class="text-green-500 text-3xl font-bold me-2"
+        [title]="item?.profit"
+      >
+        %{{ item.profitPercentage }}
       </span>
       <i class="fa-solid fa-square-plus text-green-500 text-3xl"></i>
       } @else{
-      <span class="text-red-500 text-3xl font-bold me-2">{{
-        item?.profit
-      }}</span>
+      <span class="text-red-500 text-3xl font-bold me-2" [title]="item?.profit">
+        %{{ item.profitPercentage }}</span
+      >
       <i class="fa-solid fa-square-minus text-red-500 text-3xl"></i>
       }
     </span>

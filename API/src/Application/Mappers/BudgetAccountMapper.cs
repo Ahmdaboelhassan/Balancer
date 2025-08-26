@@ -36,7 +36,6 @@ namespace Application.Mappers
 
             return new BudgetAccount
             {
-                Id = dto.Id,
                 AccountId = dto.AccountId,
                 Budget = dto.Budget,
                 Color = dto.Color,

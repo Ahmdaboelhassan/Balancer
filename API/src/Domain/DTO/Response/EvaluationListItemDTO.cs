@@ -8,6 +8,7 @@
         public string To { get; set; }
         public bool IncreasedProfit { get; set; }
         public decimal Profit { get; set; }
+        public decimal ProfitPercentage { get; set; }
         
     }
 }

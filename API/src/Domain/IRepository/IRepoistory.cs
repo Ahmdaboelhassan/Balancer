@@ -23,6 +23,7 @@ public interface IRepository<T>
     Task<decimal> Sum(Expression<Func<T, decimal>> criteria);
 
     // Command
+    void Add(T element);
     Task AddAsync(T element);
     Task AddRange(IEnumerable<T> element);
     void Delete(T element);

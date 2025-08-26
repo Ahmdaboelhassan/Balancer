@@ -18,7 +18,7 @@ export class EvaluationComponent {
     private evaluationService: EvaluationService,
     private titleService: Title
   ) {
-    this.titleService.setTitle('Periods');
+    this.titleService.setTitle('Evaluations');
   }
 
   GetEvaluationsByDate(date: object | any) {

@@ -5,4 +5,5 @@ export interface EvaluationListItem {
   to: string;
   increasedProfit: boolean;
   profit: number;
+  profitPercentage: number;
 }

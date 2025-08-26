@@ -232,10 +232,10 @@ button.toast-close-button {
   @apply my-1 inline-block text-white  bg-green-700 hover:bg-green-800 disabled:bg-green-300 font-medium rounded-lg text-sm px-7 py-3;
 }
 .btn-danger {
-  @apply my-1 inline-block text-white bg-red-700 hover:bg-red-800  font-medium rounded-lg text-sm px-7 py-3;
+  @apply my-1 inline-block text-white bg-red-700  hover:bg-red-800  font-medium rounded-lg text-sm px-7 py-3;
 }
 .btn-add {
-  @apply my-1 inline-block text-white bg-slate-700 hover:bg-slate-800 font-medium rounded-lg text-sm px-7 py-3;
+  @apply my-1 inline-block text-white bg-slate-700 disabled:bg-slate-300 hover:bg-slate-800 font-medium rounded-lg text-sm px-7 py-3;
 }
 .form-control,
 .ng-select .ng-select-container {

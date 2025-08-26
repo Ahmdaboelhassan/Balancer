@@ -5,7 +5,12 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TabulatorFull as Tabulator } from 'tabulator-tables';
 import { Evaluation } from '../../../Interfaces/Response/Evaluation';
@@ -48,11 +53,11 @@ export class CreateEvaluationComponent implements OnInit {
         this.route.params.subscribe((params) => {
           if (params['id']) {
             this.isEdit = true;
-            this.titleService.setTitle('Edit Period');
+            this.titleService.setTitle('Edit Evaluation');
             this.getEvaluation(+params['id']);
           } else {
             this.isEdit = false;
-            this.titleService.setTitle('Create Period');
+            this.titleService.setTitle('Create Evaluation');
             this.getEvaluation();
           }
         });
@@ -76,12 +81,12 @@ export class CreateEvaluationComponent implements OnInit {
   initEvaluationForm(evaluation: Evaluation) {
     this.evaluationForm = this.fb.group({
       id: [evaluation.id],
-      from: [this.getFormattedDate(evaluation.from)],
-      to: [this.getFormattedDate(evaluation.to)],
-      name: [evaluation.name],
-      profit: [evaluation.profit],
+      from: [this.getFormattedDate(evaluation.from), Validators.required],
+      to: [this.getFormattedDate(evaluation.to), Validators.required],
+      name: [evaluation.name, Validators.required],
+      profit: [evaluation.profit, Validators.required],
       profitPercentage: [evaluation.profitPercentage],
-      income: [evaluation.income],
+      income: [evaluation.income, [Validators.required, Validators.min(1)]],
       note: [evaluation.note],
       lastUpdatedAt: [{ value: evaluation.lastUpdatedAt, disabled: true }],
       createdAt: [{ value: evaluation.createdAt, disabled: true }],
@@ -98,7 +103,7 @@ export class CreateEvaluationComponent implements OnInit {
     this.evaluationDetailsTabulator = new Tabulator(
       this.tableRef.nativeElement,
       {
-        height: '400px',
+        height: '450px',
         layout: 'fitColumns',
         columns: [
           {
@@ -126,6 +131,10 @@ export class CreateEvaluationComponent implements OnInit {
             title: 'Amount',
             field: 'amount',
             editor: 'number',
+            formatter: 'money',
+            formatterParams: {
+              precision: 2,
+            },
             bottomCalc: 'sum',
             bottomCalcFormatter: 'money',
             bottomCalcFormatterParams: { precision: 2 },

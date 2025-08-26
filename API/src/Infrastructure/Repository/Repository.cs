@@ -137,6 +137,11 @@ public class Repository<T> : IRepository<T> where T : class
     {
         await _set.AddAsync(element);
     }
+
+    public void Add(T element)
+    {
+        _set.Add(element);
+    }
     public async Task AddRange(IEnumerable<T> element)
     {
         await _set.AddRangeAsync(element);

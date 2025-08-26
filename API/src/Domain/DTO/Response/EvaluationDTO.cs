@@ -10,7 +10,7 @@ namespace Domain.DTO.Response
         public string To { get; set; }
         public string? Name { get; set; }
         public decimal Profit { get; set; }
-        public decimal ProfitPercentage { get; set; }
+        public decimal? ProfitPercentage { get; set; }
         public decimal Income { get; set; }
         public string? Note { get; set; }
         public string?  LastUpdatedAt { get; set; }
