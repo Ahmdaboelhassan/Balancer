@@ -94,6 +94,9 @@ export class AccountBudgetSettingsComponent implements OnInit {
           formatterParams: {
             precision: 2,
           },
+          bottomCalc: 'sum',
+          bottomCalcFormatter: 'money',
+          bottomCalcFormatterParams: { precision: 2 },
           mutator: (value) => value || 0,
         },
       ],
