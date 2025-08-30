@@ -211,7 +211,7 @@ internal class JournalService : IJournalService
             To = period.To.ToShortDateString(),
             Id = period.Id,
             Name = period.Name,
-            Journals = period.Journals.OrderByDescending(j => j.CreatedAt)
+            Journals = period.Journals.OrderBy(j => j.CreatedAt)
             .Select(j => new JournalListItemDTO
             {
                 Id = j.Id,
