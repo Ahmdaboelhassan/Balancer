@@ -18,8 +18,11 @@ namespace Application.Services
         public async Task<IEnumerable<EvaluationListItemDTO>> GetAll(DateTime From, DateTime To)
         {
             var evaluations = await _uow.Evaluations.GetAll(p => p.From >= From.Date && p.From <= To.Date);
-            return evaluations.OrderByDescending(p => p.To).Select(sp => new EvaluationListItemDTO
-            {
+            return evaluations
+                .OrderByDescending(p => p.To)
+                .ThenByDescending(p => p.Id)
+                .Select(sp => new EvaluationListItemDTO
+             {
                 Id = sp.Id,
                 Name = sp.Name,
                 From = sp.From.ToShortDateString(),
