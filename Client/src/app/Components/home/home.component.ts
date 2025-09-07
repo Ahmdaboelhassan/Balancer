@@ -81,13 +81,10 @@ export class HomeComponent implements OnInit {
   IntializeRevenuesAndExpensesChart(revenues: number[], expenses: number[]) {
     revenues = revenues ? revenues.map((x) => (x === 0 ? null : x)) : [];
     expenses = expenses ? expenses.map((x) => (x === 0 ? null : x)) : [];
-    const difference = revenues.map((el, i) => {
-      if (el && expenses[i]) {
-        const dif = el - expenses[i];
-        return dif > 0 ? dif : 0;
-      }
-      return null;
-    });
+
+    const difference = revenues.map((el, i) =>
+      el && expenses[i] ? el - expenses[i] : null
+    );
 
     this.RevenuesAndExpensesChart.set({
       labels: [
