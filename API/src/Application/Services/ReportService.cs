@@ -227,6 +227,7 @@ public class ReportService : IReportService
                     {
                         AccountName = string.Concat(new string(' ',(account.Level - 1) * 5) , account.Name),
                         AccountNumber = account.Number,
+                        AccountId = account.Id,
                         Debit = debit,
                         Credit = credit,
                         Balance = balance

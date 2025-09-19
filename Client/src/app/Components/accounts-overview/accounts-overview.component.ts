@@ -4,15 +4,19 @@ import { CurrencyPipe } from '@angular/common';
 import { ReportService } from '../../Services/report.service';
 import { Title } from '@angular/platform-browser';
 import { AccountSummary } from '../../Interfaces/Response/AccountSummary';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-accounts-overview',
-  imports: [CurrencyPipe, DateRangeComponent],
+  imports: [CurrencyPipe, DateRangeComponent, RouterLink],
   templateUrl: './accounts-overview.component.html',
   styleUrl: './accounts-overview.component.css',
 })
 export class AccountsOverviewComponent {
   accounts: AccountSummary[] = [];
+  to;
+  from;
+
   constructor(
     private reportService: ReportService,
     private titleServive: Title
@@ -20,9 +24,12 @@ export class AccountsOverviewComponent {
     this.titleServive.setTitle('Accounts Overview');
   }
 
-  GetAccountsOverview(dates: any) {
+  GetAccountsOverview(filter: any) {
+    this.to = filter.to;
+    this.from = filter.from;
+
     this.reportService
-      .GetAccountsOverview(dates.from, dates.to, dates.maxLevel)
+      .GetAccountsOverview(filter.from, filter.to, filter.maxLevel)
       .subscribe({
         next: (accounts) => (this.accounts = accounts),
       });
