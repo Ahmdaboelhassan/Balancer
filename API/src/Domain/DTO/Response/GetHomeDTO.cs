@@ -14,4 +14,5 @@ public class GetHomeDTO
     public decimal OtherExpensesTarget { get; set; }
     public decimal DayRate { get; set; }
     public decimal PeriodDays { get; set; }
+    public decimal OtherExpenses { get; set; }
 }

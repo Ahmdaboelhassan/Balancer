@@ -215,4 +215,14 @@ export class HomeComponent implements OnInit {
       percentage: fillAmount ? el.percentage : 0,
     }));
   }
+
+  scrollHorizontally(container: HTMLElement, event: WheelEvent) {
+    if (event.deltaY !== 0) {
+      event.preventDefault();
+      container.scrollBy({
+        left: event.deltaY,
+        behavior: 'smooth',
+      });
+    }
+  }
 }

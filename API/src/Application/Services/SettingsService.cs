@@ -58,7 +58,8 @@ namespace Application.Services
             existingSettings.LevelFourDigits = settings.LevelFourDigits;
             existingSettings.LevelFiveDigits = settings.LevelFiveDigits;
             existingSettings.MaxAccountLevel = settings.MaxAccountLevel;
-
+            existingSettings.NotBudgetCostCenter = settings.NotBudgetCostCenter;
+            
             _unitOfWork.Settings.Update(existingSettings);
             await _unitOfWork.SaveChangesAync();
 

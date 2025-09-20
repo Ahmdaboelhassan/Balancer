@@ -31,7 +31,8 @@ namespace Application.Mappers
                 LevelThreeDigits = setting.LevelThreeDigits,
                 LevelFourDigits = setting.LevelFourDigits,
                 LevelFiveDigits = setting.LevelFiveDigits,
-                MaxAccountLevel = setting.MaxAccountLevel
+                MaxAccountLevel = setting.MaxAccountLevel,
+                NotBudgetCostCenter = setting.NotBudgetCostCenter
             };
         }
 
@@ -60,6 +61,7 @@ namespace Application.Mappers
                 LevelOneDigits = settingDTO.LevelOneDigits,
                 LevelTwoDigits = settingDTO.LevelTwoDigits,
                 LevelThreeDigits = settingDTO.LevelThreeDigits,
+                NotBudgetCostCenter = settingDTO.NotBudgetCostCenter,
                 LevelFourDigits = settingDTO.LevelFourDigits,
                 LevelFiveDigits = settingDTO.LevelFiveDigits,
                 MaxAccountLevel = settingDTO.MaxAccountLevel

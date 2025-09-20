@@ -97,6 +97,89 @@ public class ReportService : IReportService
         };
     }
 
+    public async Task<AccountStatement> GetCostCenterStatement(DateTime? from, DateTime? to, int? costCenterId, bool openingBalance)
+    {
+        var costCenter = await _uow.CostCenter.Get(costCenterId.GetValueOrDefault());
+        if (costCenter == null)
+            return GetEmptyAccountStatement();
+
+        var journals = (await _uow.JournalDetail
+                   .GetAll(d =>
+                     (d.CostCenterId == costCenterId)
+                     && (!from.HasValue || d.Journal.CreatedAt.Date >= from.Value.Date)
+                     && (!to.HasValue || d.Journal.CreatedAt.Date <= to.Value.Date)
+                   , "CostCenter", "Journal"))
+                   .DistinctBy(d => d.JournalId)
+                   .OrderBy(d => d.Journal.CreatedAt);
+
+        var journalsLinkedList = new LinkedList<AccountStatementDetail>();
+
+        decimal balance = 0;
+        if (openingBalance && from.HasValue)
+        {
+            var openingJournals = await _uow.JournalDetail
+                    .GetAll(d => d.CostCenterId == costCenterId && d.Journal.CreatedAt < from.Value.Date, "Journal");
+
+            if (openingJournals.Count > 0)
+            {
+                balance = Math.Abs(openingJournals.Sum(j => j.Debit));
+
+                journalsLinkedList.AddFirst(new AccountStatementDetail
+                {
+                    Balance = balance,
+                    Credit = openingJournals.Sum(j => j.Credit),
+                    Debit = openingJournals.Sum(j => j.Debit),
+                    Detail = "Opening Balance",
+                    notes = "Opening Balance",
+                    Date = openingJournals.First().Journal.CreatedAt.ToShortDateString(),
+                });
+            }
+        }
+
+        foreach (var journal in journals)
+        {
+            balance += journal.Debit;
+
+            journalsLinkedList.AddLast(new AccountStatementDetail
+            {
+                Balance = balance,
+                Credit = journal.Credit,
+                Debit = journal.Debit,
+                CostCenter = journal.CostCenter?.Name ?? "",
+                Detail = journal.Journal.Detail,
+                JournalId = journal.JournalId,
+                notes = journal.Journal.Notes,
+                PeriodId = journal.Journal.PeriodId,
+                Date = journal.Journal.CreatedAt.ToShortDateString(),
+            });
+        }
+
+        if (journalsLinkedList.Count > 0)
+        {
+            journalsLinkedList.AddLast(new AccountStatementDetail
+            {
+                Balance = balance,
+                Credit = journalsLinkedList.Sum(j => j.Credit),
+                Debit = journalsLinkedList.Sum(j => j.Debit),
+                CostCenter = "",
+                Detail = "Total",
+                JournalId = 0,
+                notes = "Total",
+                PeriodId = 0,
+                Date = "",
+            });
+        }
+        return new AccountStatement()
+        {
+            AccountType = "",
+            Details = journalsLinkedList,
+            AccountName = costCenter.Name + " [ Cost Center ]",
+            From = from?.ToString("d") ?? "",
+            To = to?.ToString("d") ?? "",
+            Amount = Math.Abs(balance).ToString("c")
+        };
+    }
+
     public async Task<IEnumerable<AccountSummaryDTO>> GetIncomeStatement(DateTime from, DateTime to)
     {
         var settings = await _uow.Settings.GetFirst();
@@ -313,6 +396,7 @@ public class ReportService : IReportService
         return new AccountStatement()
         {
             AccountType = "",
+            AccountName = "Not Matched Any Results",
             Amount = 0.ToString("c"),
             Details = Enumerable.Empty<AccountStatementDetail>()
         };

@@ -25,6 +25,18 @@ export class ReportService {
     }
     return this.http.get<AccountStatement>(url);
   }
+
+  GetCostCenterStatemnt(from, to, costcenter, openingbalance) {
+    let url =
+      this.url +
+      `/CostCenterStatement?from=${from}&to=${to}&costcenter=${costcenter}`;
+
+    if (openingbalance) {
+      url += `&openingbalance=${openingbalance}`;
+    }
+    return this.http.get<AccountStatement>(url);
+  }
+
   GetAccountComparer(from, to, account, costcenter, groupType) {
     let url =
       this.url +

@@ -6,15 +6,20 @@ using Domain.Static;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-    
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+
 builder.Services.AddCors(options =>
 {
+    var origins = builder.Configuration
+                .GetSection("Origins")
+                .Get<string[]>();
+
     options.AddPolicy("Client", policy =>
     {
-        policy.WithOrigins(MagicStrings.ProductionOrigins)
+        policy.WithOrigins(origins)
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials();

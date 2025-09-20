@@ -1,7 +1,6 @@
 ﻿using Domain.Enums;
 using Domain.IServices;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -21,6 +20,12 @@ public class ReportController : ControllerBase
     public async Task<IActionResult> AccountStatement(DateTime? from , DateTime? to, int account , int? costCenter , bool openingBalance)
     {
         return Ok(await _serviceContext.ReportService.GetAccountStatement(from , to , account , costCenter , openingBalance));
+    }   
+    
+    [HttpGet("CostCenterStatement")]
+    public async Task<IActionResult> CostCenterStatement(DateTime? from , DateTime? to, int? costCenter, bool openingBalance)
+    {
+        return Ok(await _serviceContext.ReportService.GetCostCenterStatement(from , to, costCenter , openingBalance));
     }
 
     [HttpGet("IncomeStatement")]
@@ -33,13 +38,13 @@ public class ReportController : ControllerBase
     {
         return Ok(await _serviceContext.ReportService.GetAccountsSummary(from, to));
     }
+
     [HttpGet("AccountsOverview")]
     public async Task<IActionResult> AccountsOverview(DateTime from, DateTime to, int? maxLevel)
     {
         return Ok(await _serviceContext.ReportService.GetAccountsOverview(from, to, maxLevel));
     }
 
-    [AllowAnonymous]
     [HttpGet("AccountComparer")]
     public async Task<IActionResult> AccountComparer(DateTime? from, DateTime? to, int account, int? costCenter, int groupType)
     {

@@ -91,7 +91,18 @@
           >
           </ng-select>
         </div>
-
+        <div class="form-group">
+          <label for="notBudgetCostCenter">Not-Budget Cost Center</label>
+          <select
+            class="form-control w-full"
+            formControlName="notBudgetCostCenter"
+          >
+            <option value="">---- Not Selected ----</option>
+            <option *ngFor="let cost of costCenters" [value]="cost.id">
+              {{ cost.name }}
+            </option>
+          </select>
+        </div>
         <!-- Period and Rate Settings -->
         <div class="form-group">
           <label for="defaultPeriodDays">Default Period Days</label>

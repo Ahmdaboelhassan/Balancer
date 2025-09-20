@@ -17,6 +17,7 @@ public class Settings
     public int? LiabilitiesAccount { get; set; }
     public int? BanksAccount { get; set; }
     public int? DrawersAccount { get; set; }
+    public int? NotBudgetCostCenter { get; set; }
     public int LevelOneDigits { get; set; }
     public int LevelTwoDigits { get; set; }
     public int LevelThreeDigits { get; set; }

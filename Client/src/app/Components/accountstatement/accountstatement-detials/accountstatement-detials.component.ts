@@ -21,20 +21,31 @@ export class AccountstatementDetialsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    debugger;
     const from = this.route.snapshot.queryParams['from'] || '';
     const to = this.route.snapshot.queryParams['to'] || '';
     const account = this.route.snapshot.queryParams['account'];
     const costcenter = this.route.snapshot.queryParams['costCenter'] || '';
     const openingbalance = this.route.snapshot.queryParams['openingBalance'];
 
-    if (!account) {
-      this.toestr.error('Please Select Account');
+    if (!account && !costcenter) {
+      this.toestr.error('Please Select Account Or Cost Center');
     }
 
-    this.reportService
-      .GetAccountStatemnt(from, to, account, costcenter, openingbalance)
-      .subscribe({
-        next: (accountStatement) => (this.accountStatement = accountStatement),
-      });
+    if (account) {
+      this.reportService
+        .GetAccountStatemnt(from, to, account, costcenter, openingbalance)
+        .subscribe({
+          next: (accountStatement) =>
+            (this.accountStatement = accountStatement),
+        });
+    } else if (costcenter) {
+      this.reportService
+        .GetCostCenterStatemnt(from, to, costcenter, openingbalance)
+        .subscribe({
+          next: (accountStatement) =>
+            (this.accountStatement = accountStatement),
+        });
+    }
   }
 }

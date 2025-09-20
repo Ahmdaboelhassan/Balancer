@@ -8,6 +8,7 @@ import { CostCenterSelectList } from '../../Interfaces/Response/CostCenterSelect
 import { NgFor } from '@angular/common';
 import { Title } from '@angular/platform-browser';
 import { NgSelectComponent } from '@ng-select/ng-select';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   imports: [FormsModule, NgFor, NgSelectComponent],
@@ -24,9 +25,9 @@ export class AccountstatementComponent {
   ignoreFrom: boolean = false;
 
   constructor(
-    private router: Router,
     private accountService: AccountService,
     private costCenterService: CostcenterService,
+    private toester: ToastrService,
     private titleServive: Title
   ) {
     this.GetDefaultDate();
@@ -59,7 +60,9 @@ export class AccountstatementComponent {
   GetAccountStatement(form: NgForm) {
     const baseUrl = window.location.origin;
     const formValue = form.value;
-
+    if (!formValue.account && formValue.costCenter) {
+      this.toester.error('Please Select Account Or Cost Center');
+    }
     const params = {
       account: formValue.account,
       openingBalance: formValue.openingBalance,

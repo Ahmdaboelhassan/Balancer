@@ -11,6 +11,7 @@ namespace Domain.DTO.Both
         public int? DefaultDebitAccount { get; set; }
         public int? DefaultPeriodDays { get; set; } = 7;
         public decimal DefaultDayRate { get; set; }
+        public int? NotBudgetCostCenter { get; set; }
 
         [Required]
         public int? ExpensesAccount { get; set; }

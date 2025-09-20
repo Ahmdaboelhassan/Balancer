@@ -18,5 +18,6 @@ export interface SettingDTO {
     levelThreeDigits: number;
     levelFourDigits: number;
     levelFiveDigits: number;
+    notBudgetCostCenter: number;
     maxAccountLevel: number;
 }

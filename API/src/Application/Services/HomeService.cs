@@ -80,8 +80,8 @@ public class HomeService : IHomeService
           accounts[accountIds[5]].Number 
         });
 
-        (IEnumerable <BudgetAccountDTO> budgetProgress, decimal availableFunds) =
-            await GetBudgetProgressAsync(dashboard ,accountsSet , current);
+        (IEnumerable <BudgetAccountDTO> budgetProgress,decimal otherExpenses, decimal availableFunds) =
+            await GetBudgetProgressAsync(dashboard,settings,accountsSet , current);
 
         return new GetHomeDTO
         {
@@ -91,6 +91,7 @@ public class HomeService : IHomeService
             CurrentYearRevenues = currentYearJournal.revenues,
             CurrentAndLastMonthExpenses = currentAndLastMonthExpenses,
             AvailableFunds = availableFunds,
+            OtherExpenses = otherExpenses,
             OtherExpensesTarget = dashboard.OtherExpensesTarget + dashboard.AddOnExpensesTarget,
             BudgetProgress = budgetProgress,
             DayRate = settings.DefaultDayRate,
@@ -98,23 +99,25 @@ public class HomeService : IHomeService
         };
     }
 
-    private async Task<(IEnumerable<BudgetAccountDTO> budgetProgress, decimal availableFunds)> GetBudgetProgressAsync(DashboardSettings dashboard, 
-        HashSet<string> accountSet, DateTime current)
+    private async Task<(IEnumerable<BudgetAccountDTO> budgetProgress, decimal otherExpenses, decimal availableFunds)> 
+        GetBudgetProgressAsync(DashboardSettings dashboard, Settings settings, HashSet<string> accountSet, DateTime current)
     {
         var currentMonthJournals = (await _unitOfWork.JournalDetail
-                   .GetAll(j => (j.Journal.CreatedAt.Month == current.Month && j.Journal.CreatedAt.Year == current.Year) 
-                            && (j.Journal.Type == (byte)JournalTypes.Add || j.Journal.Type == (byte)JournalTypes.Subtract), "Journal", "Account"))
+                   .GetAll(j => (j.Journal.CreatedAt.Month == current.Month && j.Journal.CreatedAt.Year == current.Year), "Journal", "Account"));
+
+
+        var groupedJournals = currentMonthJournals 
                    .GroupBy(j => j.Account.Number)
                    .Select(j => new { AccountNumber = j.Key, Total = j.Sum(j => j.Debit - j.Credit) });
 
         var budgetAccounts = await _unitOfWork.BudgetAccounts.GetAll("Account");
 
-        decimal overExpenses = 0;
+        decimal overBudget = 0;
 
         var IsAccountNumberInAccountSet = (string n) => accountSet.Any(a => n.StartsWith(a));
 
         var budgetProgress = budgetAccounts
-             .GroupJoin(currentMonthJournals,
+             .GroupJoin(groupedJournals,
                  ba => ba.Account.Number,
                  cmj => cmj.AccountNumber,
                  (ba, cmjGroup) => new { ba, cmjGroup })
@@ -122,12 +125,12 @@ public class HomeService : IHomeService
                  x => x.cmjGroup.DefaultIfEmpty(),
                  (x, cmj) =>
                  {
-                     var totalSpent = currentMonthJournals
+                     var totalSpent = groupedJournals
                          .Where(d => d.AccountNumber.StartsWith(x.ba.Account.Number))
                          .Sum(d => d.Total);
 
                      if (IsAccountNumberInAccountSet(x.ba.Account.Number))
-                        overExpenses += Math.Max(0, totalSpent - x.ba.Budget);
+                        overBudget += Math.Max(0, totalSpent - x.ba.Budget);
 
                      return new BudgetAccountDTO
                      {
@@ -142,15 +145,18 @@ public class HomeService : IHomeService
         var excludedAccounts = budgetAccounts.Where(a => IsAccountNumberInAccountSet(a.Account.Number)).Select(x => x.Account.Number);
 
         var otherExpenses = currentMonthJournals
-            .Where(x => IsAccountNumberInAccountSet(x.AccountNumber) && !excludedAccounts.Any(a => x.AccountNumber.StartsWith(a)))
-            .Sum(x => x.Total);
+            .Where(x => IsAccountNumberInAccountSet(x.Account.Number) 
+            && !excludedAccounts.Any(a => x.Account.Number.StartsWith(a)) 
+            && (!settings.NotBudgetCostCenter.HasValue || x.CostCenterId == settings.NotBudgetCostCenter))
+            .Sum(x => x.Debit - x.Credit);
 
-        var availableFunds = dashboard.OtherExpensesTarget - otherExpenses + dashboard.AddOnExpensesTarget ;
 
         if (dashboard.ApplyOverBudgetToFunds)
-            availableFunds -= overExpenses;
+            otherExpenses += overBudget;
 
-        return (budgetProgress, availableFunds);
+        var availableFunds = dashboard.OtherExpensesTarget - otherExpenses + dashboard.AddOnExpensesTarget ;
+        
+        return (budgetProgress, otherExpenses, availableFunds);
     }
     private async Task<IEnumerable<decimal>> GetLastPeriodsBalancesAsync(int count)
     {
