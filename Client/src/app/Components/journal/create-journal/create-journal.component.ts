@@ -226,7 +226,7 @@ export class CreateJournalComponent {
             text: error.error.message ?? 'An Error Happend',
             icon: 'error',
             showConfirmButton: false,
-            timer: 2000,
+            timer: 5000,
             timerProgressBar: true,
           });
         },
@@ -250,7 +250,7 @@ export class CreateJournalComponent {
               text: res.message,
               icon: 'success',
               showConfirmButton: false,
-              timer: 2000,
+              timer: 5000,
               timerProgressBar: true,
             });
           },
@@ -260,7 +260,7 @@ export class CreateJournalComponent {
               text: err.error.message,
               icon: 'error',
               showConfirmButton: false,
-              timer: 2000,
+              timer: 5000,
               timerProgressBar: true,
             });
           },
