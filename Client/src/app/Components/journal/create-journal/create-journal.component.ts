@@ -185,7 +185,7 @@ export class CreateJournalComponent {
         error: (error) => {
           Swal.fire({
             title: 'Edit Journal',
-            text: error ?? 'An Error Happend',
+            text: error.error.message ?? 'An Error Happend',
             icon: 'error',
             showConfirmButton: false,
             timer: 2000,
@@ -223,7 +223,7 @@ export class CreateJournalComponent {
         error: (error) => {
           Swal.fire({
             title: 'Create Journal',
-            text: error ?? 'An Error Happend',
+            text: error.error.message ?? 'An Error Happend',
             icon: 'error',
             showConfirmButton: false,
             timer: 2000,
