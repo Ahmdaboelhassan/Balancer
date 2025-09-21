@@ -8,7 +8,7 @@ import { CostCenterSelectList } from '../../Interfaces/Response/CostCenterSelect
 import { NgFor } from '@angular/common';
 import { Title } from '@angular/platform-browser';
 import { NgSelectComponent } from '@ng-select/ng-select';
-import { ToastrService } from 'ngx-toastr';
+import Swal from 'sweetalert2';
 
 @Component({
   imports: [FormsModule, NgFor, NgSelectComponent],
@@ -27,7 +27,6 @@ export class AccountstatementComponent {
   constructor(
     private accountService: AccountService,
     private costCenterService: CostcenterService,
-    private toester: ToastrService,
     private titleServive: Title
   ) {
     this.GetDefaultDate();
@@ -60,28 +59,33 @@ export class AccountstatementComponent {
   GetAccountStatement(form: NgForm) {
     const baseUrl = window.location.origin;
     const formValue = form.value;
-    if (!formValue.account && formValue.costCenter) {
-      this.toester.error('Please Select Account Or Cost Center');
-    }
-    const params = {
-      account: formValue.account,
-      openingBalance: formValue.openingBalance,
-    };
+    if (!formValue.account && !formValue.costCenter) {
+      Swal.fire('', 'Please Select Account Or Cost Center', 'info');
+    } else {
+      const params = {
+        openingBalance: formValue.openingBalance,
+      };
 
-    if (formValue.costCenter) {
-      params['costCenter'] = formValue.costCenter;
-    }
-    if (formValue.from && !formValue.ignoreDates) {
-      params['from'] = formValue.from;
-    }
-    if (formValue.to && !formValue.ignoreDates) {
-      params['to'] = formValue.to;
-    }
-    const queryParams = new URLSearchParams(params).toString();
-    const hashRoute = `#/AccountStatement/Get?${queryParams}`;
+      if (formValue.account) {
+        params['account'] = formValue.account;
+      }
 
-    const fullUrl = `${baseUrl}/${hashRoute}`;
-    window.open(fullUrl, '_blank');
+      if (formValue.costCenter) {
+        params['costCenter'] = formValue.costCenter;
+      }
+
+      if (formValue.from && !formValue.ignoreDates) {
+        params['from'] = formValue.from;
+      }
+      if (formValue.to && !formValue.ignoreDates) {
+        params['to'] = formValue.to;
+      }
+      const queryParams = new URLSearchParams(params).toString();
+      const hashRoute = `#/AccountStatement/Get?${queryParams}`;
+
+      const fullUrl = `${baseUrl}/${hashRoute}`;
+      window.open(fullUrl, '_blank');
+    }
   }
   DecrementMonth() {
     let f = new Date(this.from());

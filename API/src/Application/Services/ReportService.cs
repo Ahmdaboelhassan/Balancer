@@ -105,11 +105,10 @@ public class ReportService : IReportService
 
         var journals = (await _uow.JournalDetail
                    .GetAll(d =>
-                     (d.CostCenterId == costCenterId)
+                     (d.CostCenterId == costCenterId && d.Debit > 0)
                      && (!from.HasValue || d.Journal.CreatedAt.Date >= from.Value.Date)
                      && (!to.HasValue || d.Journal.CreatedAt.Date <= to.Value.Date)
                    , "CostCenter", "Journal"))
-                   .DistinctBy(d => d.JournalId)
                    .OrderBy(d => d.Journal.CreatedAt);
 
         var journalsLinkedList = new LinkedList<AccountStatementDetail>();
@@ -118,7 +117,7 @@ public class ReportService : IReportService
         if (openingBalance && from.HasValue)
         {
             var openingJournals = await _uow.JournalDetail
-                    .GetAll(d => d.CostCenterId == costCenterId && d.Journal.CreatedAt < from.Value.Date, "Journal");
+                    .GetAll(d => d.CostCenterId == costCenterId && d.Journal.CreatedAt < from.Value.Date && d.Debit > 0, "Journal");
 
             if (openingJournals.Count > 0)
             {
@@ -127,11 +126,12 @@ public class ReportService : IReportService
                 journalsLinkedList.AddFirst(new AccountStatementDetail
                 {
                     Balance = balance,
-                    Credit = openingJournals.Sum(j => j.Credit),
-                    Debit = openingJournals.Sum(j => j.Debit),
+                    Credit = 0,
+                    Debit = 0,
                     Detail = "Opening Balance",
                     notes = "Opening Balance",
                     Date = openingJournals.First().Journal.CreatedAt.ToShortDateString(),
+                    CostCenter = costCenter.Name
                 });
             }
         }
@@ -143,9 +143,9 @@ public class ReportService : IReportService
             journalsLinkedList.AddLast(new AccountStatementDetail
             {
                 Balance = balance,
-                Credit = journal.Credit,
-                Debit = journal.Debit,
-                CostCenter = journal.CostCenter?.Name ?? "",
+                Credit = 0,
+                Debit = 0,
+                CostCenter = costCenter.Name,
                 Detail = journal.Journal.Detail,
                 JournalId = journal.JournalId,
                 notes = journal.Journal.Notes,
@@ -173,7 +173,7 @@ public class ReportService : IReportService
         {
             AccountType = "",
             Details = journalsLinkedList,
-            AccountName = costCenter.Name + " [ Cost Center ]",
+            AccountName = costCenter.Name + " (Cost Center)",
             From = from?.ToString("d") ?? "",
             To = to?.ToString("d") ?? "",
             Amount = Math.Abs(balance).ToString("c")

@@ -16,9 +16,9 @@ import { TabulatorFull as Tabulator } from 'tabulator-tables';
 import { Evaluation } from '../../../Interfaces/Response/Evaluation';
 import { EvaluationService } from '../../../Services/evaluation.service';
 import { Title } from '@angular/platform-browser';
-import { ToastrService } from 'ngx-toastr';
 import { AccountService } from '../../../Services/account.service';
 import { AccountSelectList } from '../../../Interfaces/Response/AccountSelectList';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-create-evaluation',
@@ -39,7 +39,6 @@ export class CreateEvaluationComponent implements OnInit {
     private titleService: Title,
     private route: ActivatedRoute,
     private router: Router,
-    private toastr: ToastrService,
     private fb: FormBuilder
   ) {}
 
@@ -240,34 +239,94 @@ export class CreateEvaluationComponent implements OnInit {
     if (this.isEdit) {
       this.evaluationService.Edit(createModel).subscribe({
         next: (response) => {
-          this.toastr.success(response.message),
+          Swal.fire({
+            title: 'Edit Evaluation',
+            text: response.message,
+            icon: 'success',
+            showConfirmButton: false,
+            timer: 2000,
+            timerProgressBar: true,
+          }).then(() => {
             this.router.navigate(['/Evaluation', 'Edit', createModel.id]);
+          });
         },
-        error: (error) => this.toastr.error(error.error.message),
+        error: (error) => {
+          Swal.fire({
+            title: 'Edit Evaluation',
+            text: error.error.message,
+            icon: 'error',
+            showConfirmButton: false,
+            timer: 2000,
+            timerProgressBar: true,
+          });
+        },
       });
     } else {
       this.evaluationService.Create(createModel).subscribe({
         next: (response) => {
-          this.toastr.success(response.message);
-          this.router.navigate(['/Evaluation', 'List']);
+          Swal.fire({
+            title: 'Create Evaluation',
+            text: response.message,
+            icon: 'success',
+            showConfirmButton: false,
+            timer: 2000,
+            timerProgressBar: true,
+          }).then(() => {
+            this.router.navigate(['/Evaluation', 'List']);
+          });
         },
-        error: (error) => this.toastr.error(error.error.message),
+        error: (error) => {
+          Swal.fire({
+            title: 'Create Evaluation',
+            text: error.error.message,
+            icon: 'error',
+            showConfirmButton: false,
+            timer: 2000,
+            timerProgressBar: true,
+          });
+        },
       });
     }
   }
   Delete() {
-    var result = confirm('Are You Sure For Deleting This Evaluation ?');
-    if (result) {
-      const id = this.evaluationForm.get('id').value;
-      this.evaluationService.Delete(id).subscribe({
-        next: (response) => {
-          this.toastr.success(response.message);
-          this.router.navigate(['/Evaluation', 'List']);
-        },
-        error: (error) => this.toastr.error(error.error.message),
-      });
-    }
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Are you sure you want to delete this evaluation?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const id = this.evaluationForm.get('id')?.value;
+        this.evaluationService.Delete(id).subscribe({
+          next: (response) => {
+            Swal.fire({
+              title: 'Delete Evaluation',
+              text: response.message,
+              icon: 'success',
+              showConfirmButton: false,
+              timer: 2000,
+              timerProgressBar: true,
+            }).then(() => {
+              this.router.navigate(['/Evaluation', 'List']);
+            });
+          },
+          error: (error) => {
+            Swal.fire({
+              title: 'Delete Evaluation',
+              text: error.error.message,
+              icon: 'error',
+              showConfirmButton: false,
+              timer: 2000,
+              timerProgressBar: true,
+            });
+          },
+        });
+      }
+    });
   }
+
   CalualateDetails() {
     const formValue = this.evaluationForm.value;
 
@@ -289,9 +348,26 @@ export class CreateEvaluationComponent implements OnInit {
       next: (result) => {
         this.initEvaluationForm(result.data);
         this.evaluationDetailsTabulator.setData(result.data?.evaluationDetails);
-        this.toastr.success(result.message);
+
+        Swal.fire({
+          title: 'Calculation Completed',
+          text: result.message,
+          icon: 'success',
+          showConfirmButton: false,
+          timer: 2000,
+          timerProgressBar: true,
+        });
       },
-      error: (error) => this.toastr.error(error.error.message),
+      error: (error) => {
+        Swal.fire({
+          title: 'Calculation Failed',
+          text: error.error.message,
+          icon: 'error',
+          showConfirmButton: false,
+          timer: 2000,
+          timerProgressBar: true,
+        });
+      },
     });
   }
 

@@ -1,8 +1,10 @@
-import { Component, signal, WritableSignal } from '@angular/core';
+import { Component, HostListener, signal, WritableSignal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { JournalService } from '../../../Services/journal.service';
 import { Title } from '@angular/platform-browser';
 import { ToastrService } from 'ngx-toastr';
+import Swal from 'sweetalert2';
+
 import {
   FormControl,
   FormGroup,
@@ -41,8 +43,7 @@ export class CreateJournalComponent {
     private router: Router,
     private journalService: JournalService,
     private accountService: AccountService,
-    private titleService: Title,
-    private toastr: ToastrService
+    private titleService: Title
   ) {
     this.titleService.setTitle('Create Journal');
     var JournalId = this.route.snapshot.params['id'];
@@ -56,7 +57,7 @@ export class CreateJournalComponent {
             this.Journal.set(result.data);
             this.intializeForm(result.data);
           } else {
-            this.toastr.info(result.message, 'Get Journal');
+            Swal.fire('Invalid Journal', result.message, 'info');
           }
         },
       });
@@ -68,7 +69,7 @@ export class CreateJournalComponent {
             this.Journal.set(result.data);
             this.intializeForm(result.data);
           } else {
-            this.toastr.info(result.message, 'Get Journal');
+            Swal.fire('Invalid Journal', result.message, 'info');
           }
         },
       });
@@ -79,7 +80,7 @@ export class CreateJournalComponent {
     this.JournalForm = new FormGroup({
       id: new FormControl(journal.id),
       details: new FormControl(journal.detail, Validators.required),
-      amount: new FormControl(journal.amount, Validators.min(1)),
+      amount: new FormControl(journal.amount, Validators.min(0.1)),
       debit: new FormControl(journal.debitAccountId, Validators.required),
       credit: new FormControl(journal.creditAccountId, Validators.required),
       costCenter: new FormControl(journal.costCenterId ?? ''),
@@ -110,7 +111,16 @@ export class CreateJournalComponent {
           creditBalance: this.creditBalance - this.journalAmount,
         });
       },
-      error: (error) => this.toastr.error(error),
+      error: (error) => {
+        Swal.fire({
+          title: 'Get Credit Balance',
+          text: error ?? 'An Error Happend',
+          icon: 'error',
+          showConfirmButton: false,
+          timer: 2000,
+          timerProgressBar: true,
+        });
+      },
     });
   }
   GetDebitBalance() {
@@ -123,7 +133,16 @@ export class CreateJournalComponent {
           debitBalance: this.debitBalance + this.journalAmount,
         });
       },
-      error: (error) => this.toastr.error(error),
+      error: (error) => {
+        Swal.fire({
+          title: 'Get Debit Balance',
+          text: error ?? 'An Error Happend',
+          icon: 'error',
+          showConfirmButton: false,
+          timer: 2000,
+          timerProgressBar: true,
+        });
+      },
     });
   }
   ChangeBalances() {
@@ -153,17 +172,38 @@ export class CreateJournalComponent {
     if (this.isEdit) {
       this.journalService.EditJournal(journal).subscribe({
         next: (result) => {
-          this.toastr.success(result.message, 'Edit Journal');
+          Swal.fire({
+            title: 'Edit Journal',
+            text: result.message,
+            icon: 'success',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+          });
           //this.router.navigate(['/Journal', 'List']);
         },
         error: (error) => {
-          this.toastr.error(error.error.message, 'Edit Journal');
+          Swal.fire({
+            title: 'Edit Journal',
+            text: error ?? 'An Error Happend',
+            icon: 'error',
+            showConfirmButton: false,
+            timer: 2000,
+            timerProgressBar: true,
+          });
         },
       });
     } else {
       this.journalService.SaveJournal(journal).subscribe({
         next: (result) => {
-          this.toastr.success(result.message, 'Create Journal');
+          Swal.fire({
+            title: 'Create Journal',
+            text: result.message,
+            icon: 'success',
+            showConfirmButton: false,
+            timer: 2000,
+            timerProgressBar: true,
+          });
           this.router.navigate(['/Journal', 'Create']).then(() => {
             this.journalAmount = 0;
             this.JournalForm.patchValue({
@@ -181,22 +221,57 @@ export class CreateJournalComponent {
           });
         },
         error: (error) => {
-          console.log(error),
-            this.toastr.error(error.error.message, 'Create Journal');
+          Swal.fire({
+            title: 'Create Journal',
+            text: error ?? 'An Error Happend',
+            icon: 'error',
+            showConfirmButton: false,
+            timer: 2000,
+            timerProgressBar: true,
+          });
         },
       });
     }
   }
-  DeleteJournal(id) {
-    var result = confirm('Are You Sure For Deleting This Journal?');
-    if (result) {
-      this.journalService.DeleteJournal(id).subscribe({
-        next: (result) => this.toastr.success(result.message, 'Delete Journal'),
-        error: (err) => this.toastr.error(err.error.message, 'Delete Journal'),
-        complete: () => this.router.navigate(['/Journal', 'List']),
-      });
-    }
+  DeleteJournal(id: number) {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Are you sure you want to delete this journal?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.journalService.DeleteJournal(id).subscribe({
+          next: (res) => {
+            Swal.fire({
+              title: 'Delete Journal',
+              text: res.message,
+              icon: 'success',
+              showConfirmButton: false,
+              timer: 2000,
+              timerProgressBar: true,
+            });
+          },
+          error: (err) => {
+            Swal.fire({
+              title: 'Delete Journal',
+              text: err.error.message,
+              icon: 'error',
+              showConfirmButton: false,
+              timer: 2000,
+              timerProgressBar: true,
+            });
+          },
+          complete: () => {
+            this.router.navigate(['/Journal', 'List']);
+          },
+        });
+      }
+    });
   }
+
   GetLocaleDateTime(date: Date) {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -214,5 +289,17 @@ export class CreateJournalComponent {
     const hours = String(date.getHours()).padStart(2, '0');
     const minutes = String(date.getMinutes()).padStart(2, '0');
     return `${year}-${month}-${day}T${hours}:${minutes}`;
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent) {
+    if (event.ctrlKey && event.key === 'Enter') {
+      event.preventDefault();
+      if (this.JournalForm.valid) {
+        this.SaveJournal();
+      } else {
+        Swal.fire('Invalid Form', 'Please Fill All Required Fields', 'info');
+      }
+    }
   }
 }

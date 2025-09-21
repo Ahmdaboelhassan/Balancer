@@ -21,6 +21,7 @@
   @if(showMaxLevelFilter){
   <select
     [(ngModel)]="maxLevel"
+    (change)="EmitDatesValue()"
     class="date-form-control print:text-xs lg:m-0 my-1 w-full lg:w-auto print:hidden"
   >
     <option value="">All Levels</option>

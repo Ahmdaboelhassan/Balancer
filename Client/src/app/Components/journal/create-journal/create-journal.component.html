@@ -136,31 +136,38 @@
           class="btn-save me-2"
           [disabled]="!JournalForm.valid"
         >
-          Save
+          <i class="fa-solid fa-floppy-disk me-1"></i> Save
         </button>
-        <a routerLink="/Journal/List" class="btn-primary me-2">List</a>
-        @if(isEdit){
+
+        <a routerLink="/Journal/List" class="btn-primary me-2">
+          <i class="fa-solid fa-list me-1"></i> List
+        </a>
+
+        @if (isEdit) {
         <a
           (click)="DeleteJournal(Journal().id)"
           class="btn-danger me-2"
           role="button"
           type="button"
         >
-          Delete
+          <i class="fa-solid fa-trash me-1"></i> Delete
         </a>
         }
-        <a [routerLink]="['/Journal', 'Create']" class="btn-add me-2"
-          >New Journal</a
-        >
-        <a [routerLink]="['/Period', 'Create']" class="btn-add me-2"
-          >New Period</a
-        >
+
+        <a [routerLink]="['/Journal', 'Create']" class="btn-add me-2">
+          <i class="fa-solid fa-plus me-1"></i> New Journal
+        </a>
+
+        <a [routerLink]="['/Period', 'Create']" class="btn-add me-2">
+          <i class="fa-solid fa-calendar-plus me-1"></i> New Period
+        </a>
 
         <a
           [routerLink]="['/Period', 'PeriodJournals', Journal().periodId]"
           class="btn-add me-2"
-          >Period Journals</a
         >
+          <i class="fa-solid fa-book me-1"></i> Period Journals
+        </a>
       </div>
     </form>
   </div>

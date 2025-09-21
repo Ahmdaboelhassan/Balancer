@@ -1,4 +1,4 @@
-import { AfterContentInit, Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { PeriodService } from '../../../Services/period.service';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -7,6 +7,7 @@ import { Period } from '../../../Interfaces/Response/Period';
 import { finalize } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { CreatePeriod } from '../../../Interfaces/Request/CreatePeriod';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-create-period',
@@ -23,8 +24,7 @@ export class CreatePeriodComponent implements OnInit {
     private titleService: Title,
     private periodService: PeriodService,
     private route: ActivatedRoute,
-    private router: Router,
-    private toastr: ToastrService
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -36,6 +36,7 @@ export class CreatePeriodComponent implements OnInit {
         this.getPeriod();
       }
     });
+
     if (this.isEdit) {
       this.titleService.setTitle('Edit Period');
     } else {
@@ -100,31 +101,93 @@ export class CreatePeriodComponent implements OnInit {
       daysCount: formValue.daysCount,
       notes: formValue.notes,
     };
+
     if (this.isEdit) {
       this.periodService.EditPeriod(createModel).subscribe({
-        next: (response) => this.toastr.success(response.message),
-        error: (error) => this.toastr.error(error.error.message),
+        next: (response) => {
+          Swal.fire({
+            title: 'Edit Period',
+            text: response.message,
+            icon: 'success',
+            showConfirmButton: false,
+            timer: 2000,
+            timerProgressBar: true,
+          });
+        },
+        error: (error) => {
+          Swal.fire({
+            title: 'Edit Period',
+            text: error.error.message,
+            icon: 'error',
+            showConfirmButton: false,
+            timer: 2000,
+            timerProgressBar: true,
+          });
+        },
       });
     } else {
       this.periodService.CreatePeriod(createModel).subscribe({
         next: (response) => {
-          this.toastr.success(response.message);
-          this.router.navigate(['/Period', 'List']);
+          Swal.fire({
+            title: 'Create Period',
+            text: response.message,
+            icon: 'success',
+            showConfirmButton: false,
+            timer: 2000,
+            timerProgressBar: true,
+          }).then(() => {
+            this.router.navigate(['/Period', 'List']);
+          });
         },
-        error: (error) => this.toastr.error(error.error.message),
+        error: (error) => {
+          Swal.fire({
+            title: 'Create Period',
+            text: error.error.message,
+            icon: 'error',
+            showConfirmButton: false,
+            timer: 2000,
+            timerProgressBar: true,
+          });
+        },
       });
     }
   }
+
   DeletePeriod() {
-    var result = confirm('Are You Sure For Deleting This Period?');
-    if (result) {
-      this.periodService.DeletePeriod(this.period.id).subscribe({
-        next: (response) => {
-          this.toastr.success(response.message);
-          this.router.navigate(['/Period', 'List']);
-        },
-        error: (error) => this.toastr.error(error.error.message),
-      });
-    }
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Are you sure you want to delete this period?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.periodService.DeletePeriod(this.period.id).subscribe({
+          next: (response) => {
+            Swal.fire({
+              title: 'Delete Period',
+              text: response.message,
+              icon: 'success',
+              showConfirmButton: false,
+              timer: 2000,
+              timerProgressBar: true,
+            }).then(() => {
+              this.router.navigate(['/Period', 'List']);
+            });
+          },
+          error: (error) => {
+            Swal.fire({
+              title: 'Delete Period',
+              text: error.error.message,
+              icon: 'error',
+              showConfirmButton: false,
+              timer: 2000,
+              timerProgressBar: true,
+            });
+          },
+        });
+      }
+    });
   }
 }
