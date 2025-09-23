@@ -17,6 +17,7 @@ import { AccountService } from '../../../Services/account.service';
 import { CreateJournal } from '../../../Interfaces/Request/CreateJournal';
 import { NgSelectComponent } from '@ng-select/ng-select';
 import { BidiModule } from '@angular/cdk/bidi';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   imports: [
@@ -116,9 +117,8 @@ export class CreateJournalComponent {
           title: 'Get Credit Balance',
           text: error ?? 'An Error Happend',
           icon: 'error',
-          showConfirmButton: false,
-          timer: 2000,
-          timerProgressBar: true,
+          showConfirmButton: true,
+          timer: environment.sweetAlertTimeOut,
         });
       },
     });
@@ -138,9 +138,8 @@ export class CreateJournalComponent {
           title: 'Get Debit Balance',
           text: error ?? 'An Error Happend',
           icon: 'error',
-          showConfirmButton: false,
-          timer: 2000,
-          timerProgressBar: true,
+          showConfirmButton: true,
+          timer: environment.sweetAlertTimeOut,
         });
       },
     });
@@ -177,8 +176,7 @@ export class CreateJournalComponent {
             text: result.message,
             icon: 'success',
             showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true,
+            timer: environment.sweetAlertTimeOut,
           });
           //this.router.navigate(['/Journal', 'List']);
         },
@@ -187,9 +185,7 @@ export class CreateJournalComponent {
             title: 'Edit Journal',
             text: error.error.message ?? 'An Error Happend',
             icon: 'error',
-            showConfirmButton: false,
-            timer: 2000,
-            timerProgressBar: true,
+            showConfirmButton: true,
           });
         },
       });
@@ -201,8 +197,7 @@ export class CreateJournalComponent {
             text: result.message,
             icon: 'success',
             showConfirmButton: false,
-            timer: 2000,
-            timerProgressBar: true,
+            timer: environment.sweetAlertTimeOut,
           });
           this.router.navigate(['/Journal', 'Create']).then(() => {
             this.journalAmount = 0;
@@ -225,9 +220,7 @@ export class CreateJournalComponent {
             title: 'Create Journal',
             text: error.error.message ?? 'An Error Happend',
             icon: 'error',
-            showConfirmButton: false,
-            timer: 5000,
-            timerProgressBar: true,
+            showConfirmButton: true,
           });
         },
       });
@@ -250,8 +243,6 @@ export class CreateJournalComponent {
               text: res.message,
               icon: 'success',
               showConfirmButton: false,
-              timer: 5000,
-              timerProgressBar: true,
             });
           },
           error: (err) => {
@@ -259,9 +250,7 @@ export class CreateJournalComponent {
               title: 'Delete Journal',
               text: err.error.message,
               icon: 'error',
-              showConfirmButton: false,
-              timer: 5000,
-              timerProgressBar: true,
+              showConfirmButton: true,
             });
           },
           complete: () => {

@@ -8,6 +8,7 @@ import { finalize } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { CreatePeriod } from '../../../Interfaces/Request/CreatePeriod';
 import Swal from 'sweetalert2';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-create-period',
@@ -110,8 +111,7 @@ export class CreatePeriodComponent implements OnInit {
             text: response.message,
             icon: 'success',
             showConfirmButton: false,
-            timer: 2000,
-            timerProgressBar: true,
+            timer: environment.sweetAlertTimeOut,
           });
         },
         error: (error) => {
@@ -119,9 +119,7 @@ export class CreatePeriodComponent implements OnInit {
             title: 'Edit Period',
             text: error.error.message,
             icon: 'error',
-            showConfirmButton: false,
-            timer: 2000,
-            timerProgressBar: true,
+            showConfirmButton: true,
           });
         },
       });
@@ -133,8 +131,7 @@ export class CreatePeriodComponent implements OnInit {
             text: response.message,
             icon: 'success',
             showConfirmButton: false,
-            timer: 2000,
-            timerProgressBar: true,
+            timer: environment.sweetAlertTimeOut,
           }).then(() => {
             this.router.navigate(['/Period', 'List']);
           });
@@ -144,9 +141,7 @@ export class CreatePeriodComponent implements OnInit {
             title: 'Create Period',
             text: error.error.message,
             icon: 'error',
-            showConfirmButton: false,
-            timer: 2000,
-            timerProgressBar: true,
+            showConfirmButton: true,
           });
         },
       });
@@ -170,8 +165,7 @@ export class CreatePeriodComponent implements OnInit {
               text: response.message,
               icon: 'success',
               showConfirmButton: false,
-              timer: 2000,
-              timerProgressBar: true,
+              timer: environment.sweetAlertTimeOut,
             }).then(() => {
               this.router.navigate(['/Period', 'List']);
             });
@@ -181,9 +175,7 @@ export class CreatePeriodComponent implements OnInit {
               title: 'Delete Period',
               text: error.error.message,
               icon: 'error',
-              showConfirmButton: false,
-              timer: 2000,
-              timerProgressBar: true,
+              showConfirmButton: true,
             });
           },
         });

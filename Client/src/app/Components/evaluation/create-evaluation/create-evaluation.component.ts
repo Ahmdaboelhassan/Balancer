@@ -19,6 +19,7 @@ import { Title } from '@angular/platform-browser';
 import { AccountService } from '../../../Services/account.service';
 import { AccountSelectList } from '../../../Interfaces/Response/AccountSelectList';
 import Swal from 'sweetalert2';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-create-evaluation',
@@ -244,8 +245,7 @@ export class CreateEvaluationComponent implements OnInit {
             text: response.message,
             icon: 'success',
             showConfirmButton: false,
-            timer: 2000,
-            timerProgressBar: true,
+            timer: environment.sweetAlertTimeOut,
           }).then(() => {
             this.router.navigate(['/Evaluation', 'Edit', createModel.id]);
           });
@@ -255,9 +255,7 @@ export class CreateEvaluationComponent implements OnInit {
             title: 'Edit Evaluation',
             text: error.error.message,
             icon: 'error',
-            showConfirmButton: false,
-            timer: 2000,
-            timerProgressBar: true,
+            showConfirmButton: true,
           });
         },
       });
@@ -269,8 +267,7 @@ export class CreateEvaluationComponent implements OnInit {
             text: response.message,
             icon: 'success',
             showConfirmButton: false,
-            timer: 2000,
-            timerProgressBar: true,
+            timer: environment.sweetAlertTimeOut,
           }).then(() => {
             this.router.navigate(['/Evaluation', 'List']);
           });
@@ -280,9 +277,7 @@ export class CreateEvaluationComponent implements OnInit {
             title: 'Create Evaluation',
             text: error.error.message,
             icon: 'error',
-            showConfirmButton: false,
-            timer: 2000,
-            timerProgressBar: true,
+            showConfirmButton: true,
           });
         },
       });
@@ -306,8 +301,7 @@ export class CreateEvaluationComponent implements OnInit {
               text: response.message,
               icon: 'success',
               showConfirmButton: false,
-              timer: 2000,
-              timerProgressBar: true,
+              timer: environment.sweetAlertTimeOut,
             }).then(() => {
               this.router.navigate(['/Evaluation', 'List']);
             });
@@ -317,9 +311,7 @@ export class CreateEvaluationComponent implements OnInit {
               title: 'Delete Evaluation',
               text: error.error.message,
               icon: 'error',
-              showConfirmButton: false,
-              timer: 2000,
-              timerProgressBar: true,
+              showConfirmButton: true,
             });
           },
         });
@@ -354,8 +346,7 @@ export class CreateEvaluationComponent implements OnInit {
           text: result.message,
           icon: 'success',
           showConfirmButton: false,
-          timer: 2000,
-          timerProgressBar: true,
+          timer: environment.sweetAlertTimeOut,
         });
       },
       error: (error) => {
@@ -363,9 +354,7 @@ export class CreateEvaluationComponent implements OnInit {
           title: 'Calculation Failed',
           text: error.error.message,
           icon: 'error',
-          showConfirmButton: false,
-          timer: 2000,
-          timerProgressBar: true,
+          showConfirmButton: true,
         });
       },
     });
