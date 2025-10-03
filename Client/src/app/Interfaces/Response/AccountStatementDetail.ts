@@ -1,6 +1,7 @@
 export interface AccountStatementDetail {
   detail: string;
   notes: string;
+  description: string;
   debit: number;
   credit: number;
   balance: number;

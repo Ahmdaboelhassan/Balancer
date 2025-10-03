@@ -10,4 +10,5 @@ public class CostCenter
     public string? Description { get; set; }
     public DateTime CreatedAt { get; set; }
     public bool IsDeleted { get; set; }
+    public bool IsArchived { get; set; }
 }

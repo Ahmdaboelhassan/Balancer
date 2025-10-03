@@ -1,10 +1,11 @@
 import { Component, Input } from '@angular/core';
 import { Account } from '../../../../Interfaces/Response/Account';
 import { RouterLink } from '@angular/router';
+import { NgClass } from '@angular/common';
 
 @Component({
   selector: 'app-account-list-item',
-  imports: [RouterLink],
+  imports: [RouterLink, NgClass],
   templateUrl: './account-list-item.component.html',
   styleUrl: './account-list-item.component.css',
 })

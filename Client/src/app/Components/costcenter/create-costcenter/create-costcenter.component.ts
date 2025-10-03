@@ -59,6 +59,7 @@ export class CreateCostcenterComponent {
       id: new FormControl(this.CostCenter.id),
       name: new FormControl(this.CostCenter.name, Validators.required),
       description: new FormControl(this.CostCenter.description),
+      isArchived: new FormControl(this.CostCenter.isArchived),
       CreatedAt: new FormControl({
         value: this.CostCenter.createdAt,
         disabled: true,
@@ -70,6 +71,7 @@ export class CreateCostcenterComponent {
       id: new FormControl(0),
       name: new FormControl('', Validators.required),
       description: new FormControl(''),
+      isArchived: new FormControl(false),
       CreatedAt: new FormControl({
         value: '',
         disabled: true,
@@ -82,14 +84,14 @@ export class CreateCostcenterComponent {
       return;
     }
     const formValue = this.CostCenterForm.value;
-    const SaveJournal: CreateCostCenter = {
+    const SaveCostCenter: CreateCostCenter = {
       id: formValue.id,
       name: formValue.name,
       description: formValue.description,
+      isArchived: formValue.isArchived,
     };
-
     if (this.isEdit) {
-      this.CostCenterService.EditCostCenter(SaveJournal).subscribe({
+      this.CostCenterService.EditCostCenter(SaveCostCenter).subscribe({
         next: (result) => {
           this.toastr.success(result.message);
           this.router.navigate(['/CostCenter', 'List']);
@@ -99,7 +101,7 @@ export class CreateCostcenterComponent {
         },
       });
     } else {
-      this.CostCenterService.CreateCostCenter(SaveJournal).subscribe({
+      this.CostCenterService.CreateCostCenter(SaveCostCenter).subscribe({
         next: (result) => {
           this.toastr.success(result.message);
           this.router.navigate(['/CostCenter', 'List']);

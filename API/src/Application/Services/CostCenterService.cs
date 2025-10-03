@@ -22,12 +22,13 @@ public class CostCenterService : ICostCenterService
             CreatedAt = a.CreatedAt.ToShortDateString(),
             Description = a.Description,
             Name = a.Name,
+            IsArchived = a.IsArchived,
         });
     }
 
     public async Task<IEnumerable<SelectItemDTO>> GetAllSelectList()
     {
-        return (await _uow.CostCenter.SelectAll(a => true, a => new SelectItemDTO
+        return (await _uow.CostCenter.SelectAll(a => !a.IsArchived, a => new SelectItemDTO
         {
             Id = a.Id,
             Name = a.Name,
@@ -47,6 +48,7 @@ public class CostCenterService : ICostCenterService
             CreatedAt = costCenter.CreatedAt.ToShortDateString(),
             Description = costCenter.Description,
             Name = costCenter.Name,
+            IsArchived = costCenter.IsArchived,
         };
 
     }
@@ -60,6 +62,7 @@ public class CostCenterService : ICostCenterService
             Name = model.Name,
             CreatedAt = DateTime.Now,
             Description = model.Description,
+            IsArchived = model.IsArchived,
         };
 
         await _uow.CostCenter.AddAsync(newCostCenter);
@@ -85,6 +88,7 @@ public class CostCenterService : ICostCenterService
         costCenter.Name = model.Name;
         costCenter.CreatedAt = DateTime.Now;
         costCenter.Description = model.Description;
+        costCenter.IsArchived = model.IsArchived;
 
         _uow.CostCenter.Update(costCenter);
         await _uow.SaveChangesAync();

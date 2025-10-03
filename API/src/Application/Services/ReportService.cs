@@ -48,6 +48,7 @@ public class ReportService : IReportService
                     Debit = openingJournals.Sum(j => j.Debit),
                     Detail = "Opening Balance",
                     notes = "Opening Balance",
+                    Description = "Opening Balance",
                     Date = openingJournals.First().Journal.CreatedAt.ToShortDateString(),
                 });
             }
@@ -67,6 +68,7 @@ public class ReportService : IReportService
                 JournalId = journal.JournalId,
                 notes = journal.Journal.Notes,
                 PeriodId = journal.Journal.PeriodId,
+                Description = journal.Journal.Description,
                 Date = journal.Journal.CreatedAt.ToShortDateString(),
             });
         }
@@ -82,6 +84,7 @@ public class ReportService : IReportService
                 Detail = "Total",
                 JournalId = 0,
                 notes = "Total",
+                Description = "",
                 PeriodId = 0,
                 Date = "",
             });

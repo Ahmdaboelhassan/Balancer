@@ -10,4 +10,5 @@ public class AccountStatementDetail
    public int JournalId { get; set; }
    public int PeriodId { get; set; }
    public string? Date { get; set; }
+   public string? Description { get; set; }
 }

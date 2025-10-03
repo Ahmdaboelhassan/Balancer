@@ -13,9 +13,9 @@
     <tr class="text-xs text-white uppercase bg-slate-800 rounded-xl">
       <th scope="col" class="py-3 px-5" style="width: 20%">Detail</th>
       <th scope="col" class="p-3" style="width: 10%">Date</th>
-      <th scope="col" class="p-3" style="width: 10%">Balance</th>
       <th scope="col" class="p-3" style="width: 10%">Debit</th>
       <th scope="col" class="p-3" style="width: 10%">Credit</th>
+      <th scope="col" class="p-3" style="width: 10%">Balance</th>
       <th scope="col" class="p-3" style="width: 10%">Cost Center</th>
       <th scope="col" class="p-3 w-2" style="width: 5%">Notes</th>
       <th scope="col" class="p-3 print:hidden text-center" style="width: 10%">
@@ -32,11 +32,19 @@
           class="py-4 px-5 font-bold text-base text-gray-900 whitespace-nowrap"
         >
           {{ item.detail }}
+
+          @if(item.description){
+          <i
+            [title]="item.description"
+            (click)="ShowDescription(item.description)"
+            class="fa-solid fa-circle-info text-blue-700 hover:scale-125 cursor-pointer ms-2 transition-transform"
+          ></i>
+          }
         </th>
         <td class="py-4 px-3">{{ item.date }}</td>
-        <td class="py-4 px-3 font-bold">{{ item.balance | currency }}</td>
         <td class="py-4 px-3 font-bold">{{ item.debit | currency }}</td>
         <td class="py-4 px-3 font-bold">{{ item.credit | currency }}</td>
+        <td class="py-4 px-3 font-bold">{{ item.balance | currency }}</td>
         <td class="py-4 px-3">{{ item.costCenter }}</td>
         <td
           [title]="item.notes"
@@ -51,9 +59,10 @@
           @if(item.journalId > 0 && item.periodId > 0){
           <a
             [routerLink]="['/Journal/Edit/', item.journalId]"
-            class="font-medium text-blue-600 hover:underline me-2"
+            class="font-medium text-blue-600 hover:underline me-2 hover:me-3 transition-all"
           >
-            <i class="fa-solid fa-folder-open"></i> Open</a
+            <i class="fa-solid fa-folder-open cursor-pointer"></i>
+            Open</a
           >
           }
         </td>

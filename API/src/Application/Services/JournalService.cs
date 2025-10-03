@@ -45,7 +45,7 @@ internal class JournalService : IJournalService
     }
     public async Task<Result<GetJournalDTO>> Get(int id)
     {
-        var journal = await _uow.Journal.Get(j => j.Id == id , "JournalDetails", "JournalDetails.Account");
+        var journal = await _uow.Journal.Get(j => j.Id == id , "JournalDetails", "JournalDetails.Account", "JournalDetails.CostCenter");
         if (journal is null)
         {
             var lastPeriod = await _uow.Periods.GetLastOrderBy(p => p.To);
@@ -59,6 +59,10 @@ internal class JournalService : IJournalService
         if (archiveAccount != null)
             return new Result<GetJournalDTO> { Message = "Can't Load This Journal Because It Contains Archived Account", IsSucceed = false };
 
+        var archiveCostCenter = journal.JournalDetails.FirstOrDefault(x => x.CostCenter != null && x.CostCenter.IsArchived);
+
+        if (archiveCostCenter != null)
+            return new Result<GetJournalDTO> { Message = "Can't Load This Journal Because It Contains Archived Cost Center", IsSucceed = false };
 
         return new Result<GetJournalDTO>
         {

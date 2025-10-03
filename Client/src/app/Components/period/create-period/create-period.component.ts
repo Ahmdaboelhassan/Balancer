@@ -5,7 +5,6 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Period } from '../../../Interfaces/Response/Period';
 import { finalize } from 'rxjs';
-import { ToastrService } from 'ngx-toastr';
 import { CreatePeriod } from '../../../Interfaces/Request/CreatePeriod';
 import Swal from 'sweetalert2';
 import { environment } from '../../../../environments/environment';

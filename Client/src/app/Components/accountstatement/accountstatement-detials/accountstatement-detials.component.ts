@@ -4,6 +4,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ReportService } from '../../../Services/report.service';
 import { ToastrService } from 'ngx-toastr';
 import { CurrencyPipe, NgClass, SlicePipe } from '@angular/common';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-accountstatement-detials',
@@ -47,5 +48,14 @@ export class AccountstatementDetialsComponent implements OnInit {
             (this.accountStatement = accountStatement),
         });
     }
+  }
+
+  ShowDescription(msg) {
+    Swal.fire({
+      title: 'Journal Description',
+      html: msg.replace(/\n/g, '<br>'),
+      icon: 'info',
+      showConfirmButton: true,
+    });
   }
 }

@@ -58,7 +58,11 @@ export class CreateJournalComponent {
             this.Journal.set(result.data);
             this.intializeForm(result.data);
           } else {
-            Swal.fire('Invalid Journal', result.message, 'info');
+            Swal.fire('Invalid Journal', result.message, 'info').then((res) => {
+              if (res.isConfirmed) {
+                this.router.navigate(['/Journal', 'List']);
+              }
+            });
           }
         },
       });
@@ -70,7 +74,11 @@ export class CreateJournalComponent {
             this.Journal.set(result.data);
             this.intializeForm(result.data);
           } else {
-            Swal.fire('Invalid Journal', result.message, 'info');
+            Swal.fire('Invalid Journal', result.message, 'info').then((res) => {
+              if (res.isConfirmed) {
+                this.router.navigate(['/Journal', 'List']);
+              }
+            });
           }
         },
       });
