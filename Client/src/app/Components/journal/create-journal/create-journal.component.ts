@@ -110,27 +110,7 @@ export class CreateJournalComponent {
     // this.GetDebitBalance();
   }
 
-  GetCreditBalance() {
-    const accountId = this.JournalForm.get('credit').value;
-    this.accountService.GetAccountBalance(accountId).subscribe({
-      next: (result) => {
-        this.JournalForm.patchValue({ creditBalance: result.balance });
-        this.creditBalance = result.balance;
-        this.JournalForm.patchValue({
-          creditBalance: this.creditBalance - this.journalAmount,
-        });
-      },
-      error: (error) => {
-        Swal.fire({
-          title: 'Get Credit Balance',
-          text: error ?? 'An Error Happend',
-          icon: 'error',
-          showConfirmButton: true,
-          timer: environment.sweetAlertTimeOut,
-        });
-      },
-    });
-  }
+  GetCreditBalance() {}
   GetDebitBalance() {
     const accountId = this.JournalForm.get('debit').value;
     this.accountService.GetAccountBalance(accountId).subscribe({
@@ -266,6 +246,50 @@ export class CreateJournalComponent {
           },
         });
       }
+    });
+  }
+
+  GetAccountBalance(isDebit) {
+    const account = isDebit ? 'debit' : 'credit';
+
+    const accountId = this.JournalForm.get(account)?.value;
+
+    if (!accountId) {
+      Swal.fire({
+        title: 'Get Balance',
+        text: "Please Select Account To Get It's Balance",
+        icon: 'error',
+        showConfirmButton: true,
+        timer: environment.sweetAlertTimeOut,
+      });
+      return;
+    }
+
+    this.accountService.GetAccountBalance(accountId).subscribe({
+      next: (result) => {
+        const amount = result.balance;
+        const accountType = amount <= 0 ? 'Credit' : 'Debit';
+        const color = amount <= 0 ? 'red' : 'green';
+        const finalAmount =
+          amount < 0 ? (amount * -1).toFixed(2) : amount.toFixed(2);
+        const msgHtml = `<span style='font-size: 2rem; color: ${color};'>${finalAmount}</span> <br/> <span class='margin-top:0.5rem'>${accountType}</span>`;
+
+        Swal.fire({
+          title: 'Balance',
+          html: msgHtml,
+          icon: 'info',
+          showConfirmButton: true,
+        });
+      },
+      error: (error) => {
+        Swal.fire({
+          title: 'Get Credit Balance',
+          text: error ?? 'An Error Happend',
+          icon: 'error',
+          showConfirmButton: true,
+          timer: environment.sweetAlertTimeOut,
+        });
+      },
     });
   }
 

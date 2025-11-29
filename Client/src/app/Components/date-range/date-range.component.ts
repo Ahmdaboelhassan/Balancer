@@ -1,9 +1,10 @@
+import { NgClass } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-date-range',
-  imports: [FormsModule],
+  imports: [FormsModule, NgClass],
   templateUrl: './date-range.component.html',
   styleUrl: './date-range.component.css',
 })
@@ -11,6 +12,7 @@ export class DateRangeComponent implements OnInit {
   @Output() dates = new EventEmitter<object>();
   @Input() showMaxLevelFilter = false;
   @Input() isYearRange = false;
+  @Input() hideFromDate = false;
 
   from: any;
   to: any;

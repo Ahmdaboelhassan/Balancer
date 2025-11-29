@@ -1,216 +1,219 @@
-<div class="grid grid-cols-4 gap-3 select-none">
-  @for (item of balances(); track $index) {
-  <div
-    class="bg-white rounded-lg flex justify-between items-center shadow-sm p-5 cursor-pointer lg:hover:shadow-lg transition-all col-span-5 lg:col-span-1"
-    (click)="ToggleBalance($event)"
-  >
-    <div class="info">
-      <p class="text-sm text-gray-500">{{ item.accountName }}</p>
-      <p class="text-xl font-bold relative">
-        {{ item.balance }}
-        <span
-          class="cover absolute w-full h-full bg-gray-200 left-0 rounded-md bottom-0 transition"
-        ></span>
-      </p>
+<div class="container">
+  <div class="grid grid-cols-4 gap-3 select-none">
+    @for (item of balances(); track $index) {
+    <div
+      class="bg-white rounded-lg flex justify-between items-center shadow-sm p-5 cursor-pointer lg:hover:shadow-lg transition-all col-span-5 lg:col-span-1"
+      (click)="ToggleBalance($event)"
+    >
+      <div class="info">
+        <p class="text-sm text-gray-500">{{ item.accountName }}</p>
+        <p class="text-xl font-bold relative">
+          {{ item.balance }}
+          <span
+            class="cover absolute w-full h-full bg-gray-200 left-0 rounded-md bottom-0 transition"
+          ></span>
+        </p>
+      </div>
+      <div
+        class="rounded-3xl {{
+          colors[$index]
+        }}  flex justify-center items-center text-white"
+        style="height: 60px; width: 60px"
+      >
+        <i class="{{ icons[$index] }} fa-2xl"></i>
+      </div>
+    </div>
+    }
+  </div>
+
+  @if (home){
+  <div class="mt-4">
+    <div class="grid grid-cols-4 gap-3">
+      <div class="hidden sm:block col-span-4 lg:col-span-3">
+        <div class="bg-white rounded-lg p-5 relative">
+          <button
+            class="absolute top-2 right-2 transition-all hover:text-lg"
+            (click)="SwitchRevenueAndExpensesChartType()"
+          >
+            <i
+              [ngClass]="[
+                switchRevenuesAndExpensesIcon(),
+                'fa-solid',
+                'text-gray-700'
+              ]"
+            ></i>
+          </button>
+          @if(RevenuesAndExpensesChart()){
+          <canvas
+            baseChart
+            [data]="RevenuesAndExpensesChart()"
+            [type]="RevenuesAndExpensesChartType()"
+          >
+          </canvas>
+          }
+        </div>
+      </div>
+      <div class="col-span-4 lg:col-span-1">
+        <div class="bg-white rounded-xl mb-2 p-5">
+          @if(lineChart()){
+          <canvas baseChart [data]="lineChart()" [type]="'line'"> </canvas>
+          }
+        </div>
+        <div
+          class="bg-white relative transition-all overflow-y-auto hide-scrollbar rounded-xl mb-2 p-5 h-[323px] flex justify-center items-center"
+        >
+          <button
+            class="absolute top-2 right-2 hover:text-lg"
+            (click)="TogglePieChart()"
+          >
+            <i [ngClass]="[switchPieIcon(), 'fa-solid', 'text-gray-700']"></i>
+          </button>
+          @if(pieChart() && showPieChat()){
+          <canvas baseChart [data]="pieChart()" [type]="'pie'" @slideUp>
+          </canvas>
+          } @else{
+          <div
+            class="info flex-1 flex flex-nowrap focus-visible:outline-none focus:outline-none"
+            @slideUp
+          >
+            <div class="flex flex-col text-nowrap font-medium w-full mt-6">
+              @for (item of budgetProgresses; track $index) {
+              <div class="mb-6">
+                <div class="flex justify-between items-center">
+                  <p
+                    class="text-smrounded-sm ps-1 pe-4 py-.5 w-full"
+                    [ngStyle]="{ color: item.color }"
+                  >
+                    {{ item.displayName }}
+                  </p>
+                  <p
+                    class="text-end m-0 text-xl py-1.5 rounded-sm"
+                    [ngStyle]="{ color: item.color }"
+                    [title]="item.percentage + '%'"
+                  >
+                    {{ item.spent }}
+                    <span class="text-xs text-gray-500 transition-all">
+                      /{{ item.budget }}</span
+                    >
+                  </p>
+                </div>
+
+                <p class="h-1 mt-2 w-full bg-gray-200 relative">
+                  <span
+                    class="absolute transition-all left-0 top-0 h-full"
+                    [ngStyle]="{ width: '2%', backgroundColor: item.color }"
+                    BudgetBalue
+                    [amount]="item.spent"
+                    [target]="item.budget"
+                  >
+                  </span>
+                </p>
+              </div>
+
+              }
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-3 gap-3 mt-3">
+    <div
+      class="bg-white rounded-lg flex col-span-3 lg:col-span-1 justify-between items-center shadow-sm p-5 lg:hover:shadow-lg transition-all w-full"
+    >
+      <div
+        #scrollContainer
+        class="flex gap-2 overflow-x-auto [&::-webkit-scrollbar]:w-0 [&::-webkit-scrollbar]:h-0"
+        style="max-width: 75%"
+        (wheel)="scrollHorizontally(scrollContainer, $event)"
+      >
+        <!-- Available -->
+        <div class="min-w-[110px]">
+          <p
+            class="bg-green-100 text-green-800 text-xs font-medium px-1 py-0.5 rounded-sm mb-3"
+          >
+            Available Funds
+          </p>
+          <span class="text-xl font-bold block">
+            ${{ home?.availableFunds ?? 0 }}
+          </span>
+        </div>
+
+        <!-- Total -->
+        <div class="min-w-[110px]">
+          <p
+            class="bg-indigo-100 text-indigo-800 text-xs font-medium px-1 py-0.5 rounded-sm mb-3"
+          >
+            Total Funds
+          </p>
+          <span class="text-xl font-bold block">
+            ${{ home?.otherExpenses ?? 0 }}
+          </span>
+        </div>
+
+        <!-- Target -->
+        <div class="min-w-[110px]">
+          <p
+            class="bg-purple-100 text-purple-800 text-xs font-medium px-1 py-0.5 rounded-sm mb-3"
+          >
+            Target
+          </p>
+          <span class="text-xl font-bold block">
+            ${{ home?.otherExpensesTarget ?? 0 }}
+          </span>
+        </div>
+      </div>
+
+      <div
+        class="rounded-3xl ms-5 {{
+          colors[6]
+        }}  flex justify-center items-center text-white"
+        style="height: 60px; width: 60px"
+      >
+        <i class="{{ icons[6] }} fa-2xl"></i>
+      </div>
     </div>
     <div
-      class="rounded-3xl {{
-        colors[$index]
-      }}  flex justify-center items-center text-white"
-      style="height: 60px; width: 60px"
+      class="bg-white rounded-lg flex col-span-3 lg:col-span-1 justify-between items-center shadow-sm p-5 lg:hover:shadow-lg transition-all"
     >
-      <i class="{{ icons[$index] }} fa-2xl"></i>
+      <div class="info">
+        <p class="text-sm text-gray-600 mb-2">Estimated Money Need</p>
+        <span class="text-2xl font-bold"> {{ moneyNeed }} </span>
+        <span class="text-sm text-gray-500">${{ home.dayRate }} Per Day</span>
+      </div>
+      <div
+        class="rounded-3xl {{
+          colors[5]
+        }}  flex justify-center items-center text-white"
+        style="height: 60px; width: 60px"
+      >
+        <i class="{{ icons[5] }} fa-2xl"></i>
+      </div>
+    </div>
+    <div
+      class="bg-white rounded-lg col-span-3 lg:col-span-1 flex justify-between items-center shadow-sm p-5 lg:hover:shadow-lg transition-all"
+    >
+      <div class="info">
+        <p class="text-sm text-gray-600 mb-2">Time Left For The Month</p>
+        <p>
+          <span class="text-xl font-bold me-1">{{ timeLeft.days }}</span>
+          <span class="text-sm text-gray-500 me-3">Days</span>
+
+          <span class="text-xl font-bold me-1">{{ timeLeft.periods }}</span>
+          <span class="text-sm text-gray-500 me-3">Periods</span>
+        </p>
+      </div>
+      <div
+        class="rounded-3xl {{
+          colors[4]
+        }}  flex justify-center items-center text-white"
+        style="height: 60px; width: 60px"
+      >
+        <i class="{{ icons[4] }} fa-2xl"></i>
+      </div>
     </div>
   </div>
   }
 </div>
-
-@if (home){
-<div class="mt-4">
-  <div class="grid grid-cols-4 gap-3">
-    <div class="hidden sm:block col-span-4 lg:col-span-3">
-      <div class="bg-white rounded-lg p-5 relative">
-        <button
-          class="absolute top-2 right-2 transition-all hover:text-lg"
-          (click)="SwitchRevenueAndExpensesChartType()"
-        >
-          <i
-            [ngClass]="[
-              switchRevenuesAndExpensesIcon(),
-              'fa-solid',
-              'text-gray-700'
-            ]"
-          ></i>
-        </button>
-        @if(RevenuesAndExpensesChart()){
-        <canvas
-          baseChart
-          [data]="RevenuesAndExpensesChart()"
-          [type]="RevenuesAndExpensesChartType()"
-        >
-        </canvas>
-        }
-      </div>
-    </div>
-    <div class="col-span-4 lg:col-span-1">
-      <div class="bg-white rounded-xl mb-2 p-5">
-        @if(lineChart()){
-        <canvas baseChart [data]="lineChart()" [type]="'line'"> </canvas>
-        }
-      </div>
-      <div
-        class="bg-white relative transition-all overflow-y-auto hide-scrollbar rounded-xl mb-2 p-5 h-[323px]"
-      >
-        <button
-          class="absolute top-2 right-2 hover:text-lg"
-          (click)="TogglePieChart()"
-        >
-          <i [ngClass]="[switchPieIcon(), 'fa-solid', 'text-gray-700']"></i>
-        </button>
-        @if(pieChart() && showPieChat()){
-        <canvas baseChart [data]="pieChart()" [type]="'pie'" @slideUp> </canvas>
-        } @else{
-        <div
-          class="info flex-1 flex flex-nowrap focus-visible:outline-none focus:outline-none"
-          @slideUp
-        >
-          <div class="flex flex-col text-nowrap font-medium w-full mt-6">
-            @for (item of budgetProgresses; track $index) {
-            <div class="mb-6">
-              <div class="flex justify-between items-center">
-                <p
-                  class="text-smrounded-sm ps-1 pe-4 py-.5 w-full"
-                  [ngStyle]="{ color: item.color }"
-                >
-                  {{ item.displayName }}
-                </p>
-                <p
-                  class="text-end m-0 text-xl py-1.5 rounded-sm"
-                  [ngStyle]="{ color: item.color }"
-                  [title]="item.percentage + '%'"
-                >
-                  {{ item.spent }}
-                  <span class="text-xs text-gray-500 transition-all">
-                    /{{ item.budget }}</span
-                  >
-                </p>
-              </div>
-
-              <p class="h-1 mt-2 w-full bg-gray-200 relative">
-                <span
-                  class="absolute transition-all left-0 top-0 h-full"
-                  [ngStyle]="{ width: '2%', backgroundColor: item.color }"
-                  BudgetBalue
-                  [amount]="item.spent"
-                  [target]="item.budget"
-                >
-                </span>
-              </p>
-            </div>
-
-            }
-          </div>
-        </div>
-        }
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="grid grid-cols-3 gap-3 mt-3">
-  <div
-    class="bg-white rounded-lg flex col-span-3 lg:col-span-1 justify-between items-center shadow-sm p-5 lg:hover:shadow-lg transition-all w-full"
-  >
-    <div
-      #scrollContainer
-      class="flex gap-2 overflow-x-auto [&::-webkit-scrollbar]:w-0 [&::-webkit-scrollbar]:h-0"
-      style="max-width: 75%"
-      (wheel)="scrollHorizontally(scrollContainer, $event)"
-    >
-      <!-- Available -->
-      <div class="min-w-[110px]">
-        <p
-          class="bg-green-100 text-green-800 text-xs font-medium px-1 py-0.5 rounded-sm mb-3"
-        >
-          Available Funds
-        </p>
-        <span class="text-xl font-bold block">
-          ${{ home?.availableFunds ?? 0 }}
-        </span>
-      </div>
-
-      <!-- Total -->
-      <div class="min-w-[110px]">
-        <p
-          class="bg-indigo-100 text-indigo-800 text-xs font-medium px-1 py-0.5 rounded-sm mb-3"
-        >
-          Total Funds
-        </p>
-        <span class="text-xl font-bold block">
-          ${{ home?.otherExpenses ?? 0 }}
-        </span>
-      </div>
-
-      <!-- Target -->
-      <div class="min-w-[110px]">
-        <p
-          class="bg-purple-100 text-purple-800 text-xs font-medium px-1 py-0.5 rounded-sm mb-3"
-        >
-          Target
-        </p>
-        <span class="text-xl font-bold block">
-          ${{ home?.otherExpensesTarget ?? 0 }}
-        </span>
-      </div>
-    </div>
-
-    <div
-      class="rounded-3xl ms-5 {{
-        colors[6]
-      }}  flex justify-center items-center text-white"
-      style="height: 60px; width: 60px"
-    >
-      <i class="{{ icons[6] }} fa-2xl"></i>
-    </div>
-  </div>
-  <div
-    class="bg-white rounded-lg flex col-span-3 lg:col-span-1 justify-between items-center shadow-sm p-5 lg:hover:shadow-lg transition-all"
-  >
-    <div class="info">
-      <p class="text-sm text-gray-600 mb-2">Estimated Money Need</p>
-      <span class="text-2xl font-bold"> {{ moneyNeed }} </span>
-      <span class="text-sm text-gray-500">${{ home.dayRate }} Per Day</span>
-    </div>
-    <div
-      class="rounded-3xl {{
-        colors[5]
-      }}  flex justify-center items-center text-white"
-      style="height: 60px; width: 60px"
-    >
-      <i class="{{ icons[5] }} fa-2xl"></i>
-    </div>
-  </div>
-  <div
-    class="bg-white rounded-lg col-span-3 lg:col-span-1 flex justify-between items-center shadow-sm p-5 lg:hover:shadow-lg transition-all"
-  >
-    <div class="info">
-      <p class="text-sm text-gray-600 mb-2">Time Left For The Month</p>
-      <p>
-        <span class="text-xl font-bold me-1">{{ timeLeft.days }}</span>
-        <span class="text-sm text-gray-500 me-3">Days</span>
-
-        <span class="text-xl font-bold me-1">{{ timeLeft.periods }}</span>
-        <span class="text-sm text-gray-500 me-3">Periods</span>
-      </p>
-    </div>
-    <div
-      class="rounded-3xl {{
-        colors[4]
-      }}  flex justify-center items-center text-white"
-      style="height: 60px; width: 60px"
-    >
-      <i class="{{ icons[4] }} fa-2xl"></i>
-    </div>
-  </div>
-</div>
-}

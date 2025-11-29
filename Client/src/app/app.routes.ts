@@ -26,6 +26,7 @@ import { DashboardSettingsComponent } from './Components/dashboard-settings/dash
 import { AccountBudgetSettingsComponent } from './Components/dashboard-settings/account-budget-settings/account-budget-settings.component';
 import { EvaluationComponent } from './Components/evaluation/evaluation.component';
 import { CreateEvaluationComponent } from './Components/evaluation/create-evaluation/create-evaluation.component';
+import { BalanceSheetComponent } from './Components/balance-sheet/balance-sheet.component';
 
 export const routes: Routes = [
   {
@@ -126,6 +127,11 @@ export const routes: Routes = [
     path: 'AccountsOverview',
     canActivate: [authGuard],
     loadComponent: () => AccountsOverviewComponent,
+  },
+  {
+    path: 'BalanceSheet',
+    canActivate: [authGuard],
+    loadComponent: () => BalanceSheetComponent,
   },
   {
     path: 'AccountComparer',

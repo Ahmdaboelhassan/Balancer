@@ -31,7 +31,17 @@
           />
         </div>
         <div class="col-span-4 lg:col-span-2">
-          <label for="credit"> From Account </label>
+          <label for="credit">
+            <span>From Account</span>
+            <button
+              role="button"
+              type="button"
+              (click)="GetAccountBalance(false)"
+            >
+              <i
+                class="fa-solid fa-circle-info text-blue-700 hover:scale-125 cursor-pointer transition-all ms-1"
+              ></i></button
+          ></label>
           <ng-select
             [items]="Journal().accounts"
             bindLabel="name"
@@ -50,7 +60,18 @@
           />
         </div> -->
         <div class="col-span-4 lg:col-span-2">
-          <label for="debit"> To Account</label>
+          <label for="debit">
+            <span>To Account </span>
+            <button
+              role="button"
+              type="button"
+              (click)="GetAccountBalance(true)"
+            >
+              <i
+                class="fa-solid fa-circle-info text-blue-700 hover:scale-125 cursor-pointer transition-all ms-1"
+              ></i>
+            </button>
+          </label>
           <ng-select
             [items]="Journal().accounts"
             bindLabel="name"

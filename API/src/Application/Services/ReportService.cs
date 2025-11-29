@@ -1,7 +1,9 @@
 ﻿using Domain.DTO.Response;
+using Domain.Entities;
+using Domain.Enums;
 using Domain.IRepository;
 using Domain.IServices;
-using Domain.Enums;
+using System;
 using System.Globalization;
 
 namespace Application.Services;
@@ -322,6 +324,57 @@ public class ReportService : IReportService
         }
 
         return  accountsSummaries.OrderBy(s => s.AccountNumber);
+    }
+    public async Task<IEnumerable<AccountSummaryDTO>> GetBalanceSheet(DateTime to, int? maxLevel)
+    {
+
+        var settings = await _uow.Settings.GetFirst();
+        if (settings is null || settings.AssetsAccount is null || settings.LiabilitiesAccount is null)
+            return Enumerable.Empty<AccountSummaryDTO>();
+
+        int assetsAccountId = settings.AssetsAccount.Value;
+        int LiabilitiesAccountId = settings.LiabilitiesAccount.Value;
+
+        var accounts = await _uow.Accounts.GetAll(x => x.Id == assetsAccountId || x.Id == LiabilitiesAccountId);
+        var accountNumbers = accounts.ToDictionary(x => x.Id, x => x.Number);
+
+        var currentJournalAccounts = (await _uow.JournalDetail
+            .SelectAll(d => d.Journal.CreatedAt.Date <= to
+            && (d.Account.Number.StartsWith(accountNumbers[assetsAccountId]) || d.Account.Number.StartsWith(accountNumbers[LiabilitiesAccountId]))
+            , d => new { accountId = d.AccountId, AccountNumber = d.Account.Number, AccountName = d.Account.Name, balance = d.Debit - d.Credit, d.Credit, d.Debit }
+            , "Account", "Journal"));
+
+        if (!currentJournalAccounts.Any())
+            return Enumerable.Empty<AccountSummaryDTO>();
+
+        var childAccountNumber = await _uow.Accounts.GetAll(d => 
+            (!maxLevel.HasValue || d.Level <= maxLevel.Value) 
+            && (d.Number.StartsWith(accountNumbers[assetsAccountId]) || d.Number.StartsWith(accountNumbers[LiabilitiesAccountId])));
+
+        var accountsSummaries = new LinkedList<AccountSummaryDTO>();
+
+        foreach (var account in childAccountNumber)
+        {
+            var debit = currentJournalAccounts.Where(j => j.AccountNumber.StartsWith(account.Number)).Sum(d => d.Debit);
+            var credit = currentJournalAccounts.Where(j => j.AccountNumber.StartsWith(account.Number)).Sum(d => d.Credit);
+
+            var balance = debit - credit;
+
+            if (balance != 0)
+            {
+                accountsSummaries.AddLast(
+                    new AccountSummaryDTO()
+                    {
+                        AccountName = string.Concat(new string(' ', (account.Level - 1) * 5), account.Name),
+                        AccountNumber = account.Number,
+                        AccountId = account.Id,
+                        Debit = balance > 0 ? balance : 0,
+                        Credit = balance < 0 ? Math.Abs(balance) : 0,
+                    });
+            }
+        }
+
+        return accountsSummaries.OrderBy(s => s.AccountNumber);
     }
 
     public async Task<AccountComparerDTO> GetAccountComparer(DateTime? from, DateTime? to, int accountId, int? costCenterId, AccountComparerGroups groupType)

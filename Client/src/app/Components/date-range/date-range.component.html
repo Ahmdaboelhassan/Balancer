@@ -1,6 +1,8 @@
 <header
-  class="bg-white rounded-xl flex print:shadow-none justify-evenly text-center items-center flex-col lg:flex-row h-56 lg:h-20 print:h-fit shadow-sm py-3 px-4 print:p-0"
+  class="bg-white rounded-xl flex print:shadow-none text-center items-center flex-col lg:flex-row h-56 lg:h-20 print:h-fit shadow-sm py-3 px-4 print:p-0"
+  [ngClass]="hideFromDate ? 'justify-end gap-5' : 'justify-evenly'"
 >
+  @if(!hideFromDate){
   <input
     type="date"
     class="lg:w-1/4 w-full print:text-xs date-form-control"
@@ -11,13 +13,13 @@
     class="text-slate-900 font-bold text-lg print:text-lg hidden lg:inline-block"
     >To</label
   >
+  }
   <input
     type="date"
     class="lg:w-1/4 w-full date-form-control print:text-xs"
     required
     [(ngModel)]="to"
   />
-
   @if(showMaxLevelFilter){
   <select
     [(ngModel)]="maxLevel"

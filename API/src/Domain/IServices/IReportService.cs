@@ -9,6 +9,7 @@ public interface IReportService
     Task<AccountStatement> GetCostCenterStatement(DateTime? from, DateTime? to, int? costCenterId, bool openingBalance);
     Task<IEnumerable<AccountSummaryDTO>> GetIncomeStatement(DateTime from, DateTime to);
     Task<IEnumerable<AccountSummaryDTO>> GetAccountsSummary(DateTime from, DateTime to);
+    Task<IEnumerable<AccountSummaryDTO>> GetBalanceSheet(DateTime to, int? maxLevel);
     Task<IEnumerable<AccountSummaryDTO>> GetAccountsOverview(DateTime from, DateTime to, int? maxLevel);
     Task<AccountComparerDTO> GetAccountComparer(DateTime? from, DateTime? to, int accountId, int? costCenterId, AccountComparerGroups groupType);
 }

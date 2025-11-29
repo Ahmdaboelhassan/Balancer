@@ -50,4 +50,9 @@ public class ReportController : ControllerBase
     {
         return Ok(await _serviceContext.ReportService.GetAccountComparer(from, to ,account , costCenter , (AccountComparerGroups)groupType));
     }
+    [HttpGet("BalanceSheet")]
+    public async Task<IActionResult> GetBalanceSheet(DateTime to, int? maxLevel)
+    {
+        return Ok(await _serviceContext.ReportService.GetBalanceSheet(to , maxLevel));
+    }
 }

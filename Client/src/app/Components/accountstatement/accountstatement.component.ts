@@ -1,6 +1,11 @@
-import { Component, Signal, signal } from '@angular/core';
+import {
+  Component,
+  HostListener,
+  Signal,
+  signal,
+  ViewChild,
+} from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
-import { Router } from '@angular/router';
 import { AccountService } from '../../Services/account.service';
 import { CostcenterService } from '../../Services/costcenter.service';
 import { AccountSelectList } from '../../Interfaces/Response/AccountSelectList';
@@ -23,6 +28,7 @@ export class AccountstatementComponent {
   openingBalance: boolean = false;
   ignoreTo: boolean = false;
   ignoreFrom: boolean = false;
+  @ViewChild('myForm') myForm!: NgForm;
 
   constructor(
     private accountService: AccountService,
@@ -58,6 +64,8 @@ export class AccountstatementComponent {
 
   GetAccountStatement(form: NgForm) {
     const baseUrl = window.location.origin;
+    if (!form) Swal.fire('', 'Invalid Form', 'info');
+
     const formValue = form.value;
     if (!formValue.account && !formValue.costCenter) {
       Swal.fire('', 'Please Select Account Or Cost Center', 'info');
@@ -106,5 +114,13 @@ export class AccountstatementComponent {
 
     this.from.set(firstDay.toISOString().split('T')[0]);
     this.to.set(lastDay.toISOString().split('T')[0]);
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent) {
+    if (event.ctrlKey && event.key === 'Enter') {
+      event.preventDefault();
+      this.GetAccountStatement(this.myForm);
+    }
   }
 }

@@ -58,6 +58,14 @@ export class ReportService {
 
     return this.http.get<AccountSummary[]>(url);
   }
+  GetBalanceSheet(to, maxLevel) {
+    let url = this.url + `/BalanceSheet?&to=${to}`;
+
+    if (maxLevel) {
+      url += `&maxLevel=${maxLevel}`;
+    }
+    return this.http.get<AccountSummary[]>(url);
+  }
   GetAccountsOverview(from, to, maxLevel) {
     let url = this.url + `/AccountsOverview?from=${from}&to=${to}`;
 

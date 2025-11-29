@@ -1,7 +1,7 @@
 <nav>
   <div
     #nav
-    class="bg-slate-800 min-h-[calc(100vh-1.5rem)] mb-2 py-3 rounded-xl shadow-md transition-all absolute z-50 -translate-x-[102%] lg:relative lg:translate-x-0 w-3/4 lg:w-full"
+    class="bg-slate-800 h-[calc(100vh-1.5rem)] overflow-auto mb-2 py-3 rounded-xl shadow-md transition-all absolute z-50 -translate-x-[102%] lg:relative lg:translate-x-0 w-3/4 lg:w-full"
   >
     <div>
       <span
@@ -265,6 +265,15 @@
                   Income Statment</a
                 >
               </li>
+              <li>
+                <a
+                  routerLink="/BalanceSheet"
+                  routerLinkActive="route-active"
+                  class="p-2 inline-block hover:text-slate-950"
+                >
+                  Balance Sheet</a
+                >
+              </li>
               <!-- <li>
                 <a
                   routerLink="Journal/Create"
@@ -272,15 +281,6 @@
                   class="p-2 inline-block hover:text-slate-950"
                 >
                   Trail Balance</a
-                >
-              </li>
-              <li>
-                <a
-                  routerLink="Journal/List"
-                  routerLinkActive="route-active"
-                  class="p-2 inline-block hover:text-slate-950"
-                >
-                  Balance Sheet</a
                 >
               </li> -->
             </ul>
