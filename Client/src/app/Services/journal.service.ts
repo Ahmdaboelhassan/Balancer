@@ -15,6 +15,7 @@ import { Result } from '../Interfaces/Response/Result';
 export class JournalService {
   url = environment.baseUrl + 'Journal';
   advancedSearch$ = new Subject();
+  journalsSummary$ = new Subject();
 
   constructor(private http: HttpClient) {}
 

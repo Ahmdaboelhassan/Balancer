@@ -1,69 +1,105 @@
 <header
-  class="bg-white rounded-xl flex print:shadow-none text-center items-center flex-col lg:flex-row h-56 lg:h-20 print:h-fit shadow-sm py-3 px-4 print:p-0"
+  class="bg-white rounded-xl flex print:shadow-none text-center items-center flex-col lg:flex-row min-h-56 lg:min-h-20 print:h-fit shadow-sm py-3 px-4 print:p-0"
   [ngClass]="hideFromDate ? 'justify-end gap-5' : 'justify-evenly'"
 >
-  @if(!hideFromDate){
-  <input
-    type="date"
-    class="lg:w-1/4 w-full print:text-xs date-form-control"
-    required
-    [(ngModel)]="from"
-  />
-  <label
-    class="text-slate-900 font-bold text-lg print:text-lg hidden lg:inline-block"
-    >To</label
-  >
-  }
-  <input
-    type="date"
-    class="lg:w-1/4 w-full date-form-control print:text-xs"
-    required
-    [(ngModel)]="to"
-  />
-  @if(showMaxLevelFilter){
-  <select
-    [(ngModel)]="maxLevel"
-    (change)="EmitDatesValue()"
-    class="date-form-control print:text-xs lg:m-0 my-1 w-full lg:w-auto print:hidden"
-  >
-    <option value="">All Levels</option>
-    <option value="1">1st Level</option>
-    <option value="2">2nd Level</option>
-    <option value="3">3rd Level</option>
-    <option value="4">4th Level</option>
-    <option value="5">5th Level</option>
-  </select>
-  }
   <div
-    class="lg:flex justify-between w-full items-center lg:w-1/4 print:hidden"
+    class="w-full lg:w-7/12 flex justify-between items-center flex-col lg:flex-row"
+  >
+    @if(!hideFromDate){
+    <input
+      type="date"
+      class="lg:w-1/3 w-full print:text-xs date-form-control"
+      required
+      [(ngModel)]="from"
+    />
+    <label
+      class="text-slate-900 font-bold text-lg print:text-lg hidden lg:inline-block"
+      >To</label
+    >
+    }
+    <input
+      type="date"
+      class="lg:w-1/3 w-full date-form-control print:text-xs"
+      required
+      [(ngModel)]="to"
+    />
+    @if(showMaxLevelFilter){
+    <select
+      [(ngModel)]="maxLevel"
+      (change)="EmitDatesValue()"
+      class="date-form-control print:text-xs lg:m-0 my-1 w-full lg:w-auto print:hidden"
+    >
+      <option value="">All Levels</option>
+      <option value="1">1st Level</option>
+      <option value="2">2nd Level</option>
+      <option value="3">3rd Level</option>
+      <option value="4">4th Level</option>
+      <option value="5">5th Level</option>
+    </select>
+    }
+  </div>
+
+  <div
+    class="lg:flex lg:justify-end gap-2 w-full items-center lg:w-4/12 print:hidden"
   >
     @if(!isYearRange){
-    <div class="flex w-full justify-center lg:w-4/12 lg:m-0 mb-1" role="group">
+    <div
+      class="flex w-full justify-center overflow-hidden lg:w-8/12 lg:mb-0 mb-1 me-4"
+      role="group"
+    >
       <button
         type="button"
-        class="px-4 py-0.5 lg:py-2.5 w-1/2 text-gray-900 bg-white border border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-blue-700"
+        class="px-1 py-0.5 lg:py-2.5 w-1/4 text-gray-900 bg-white border border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-blue-700"
         (click)="DecrementMonth()"
       >
-        <i class="fa-solid fa-rotate-left"></i>
+        <i class="fa-solid fa-calendar-minus"></i>
       </button>
       <button
         type="button"
-        class="px-4 py-0.5 lg:py-2.5 lg:me-3 w-1/2 text-gray-900 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-blue-700"
+        class="px-1 py-0.5 w-1/4 text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 hover:text-blue-700"
+        (click)="GetCurrentDay()"
+      >
+        <i class="fa-solid fa-calendar-day"></i>
+      </button>
+
+      <button
+        type="button"
+        class="px-1 py-0.5 w-1/4 text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 hover:text-blue-700"
+        (click)="GetDefaultWeekDates()"
+      >
+        <i class="fa-solid fa-calendar-week"></i>
+      </button>
+      <button
+        type="button"
+        class="px-1 py-0.5 lg:py-2.5 w-1/4 text-gray-900 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-blue-700"
         (click)="IncrementMonth()"
       >
-        <i class="fa-solid fa-rotate-right"></i>
+        <i class="fa-solid fa-calendar-plus"></i>
       </button>
     </div>
+
     }
-    <button
-      type="button"
-      class="btn-primary w-full lg:w-8/12 flex-1"
-      (click)="EmitDatesValue()"
-    >
-      <div class="flex justify-between items-center">
-        <span>Search</span>
-        <i class="fa-solid fa-magnifying-glass"></i>
-      </div>
-    </button>
+    <div class="w-full flex gap-1">
+      @if(journalFilter){
+      <button
+        mat-button
+        (click)="openDialog()"
+        type="button"
+        class="btn-primary text-center"
+      >
+        <i class="fa-solid fa-list"></i>
+      </button>
+      }
+      <button
+        type="button"
+        class="btn-primary flex-1"
+        (click)="EmitDatesValue()"
+      >
+        <div class="flex justify-between items-center">
+          <span>Search</span>
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </div>
+      </button>
+    </div>
   </div>
 </header>

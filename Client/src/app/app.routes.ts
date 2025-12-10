@@ -5,7 +5,6 @@ import { CreatePeriodComponent } from './Components/period/create-period/create-
 import { SearchPeriodComponent } from './Components/period/search-period/search-period.component';
 import { PeriodComponent } from './Components/period/period.component';
 import { CreateJournalComponent } from './Components/journal/create-journal/create-journal.component';
-import { SearchJournalComponent } from './Components/journal/search-journal/search-journal.component';
 import { JournalComponent } from './Components/journal/journal.component';
 import { PeriodJournalsComponent } from './Components/period/period-journals/period-journals.component';
 import { AccountComponent } from './Components/account/account.component';
@@ -46,7 +45,6 @@ export const routes: Routes = [
       { path: 'Create', loadComponent: () => CreateJournalComponent },
       { path: 'Create/:periodId', loadComponent: () => CreateJournalComponent },
       { path: 'Edit/:id', loadComponent: () => CreateJournalComponent },
-      { path: 'Search', loadComponent: () => SearchJournalComponent },
       { path: 'List', loadComponent: () => JournalComponent },
     ],
   },

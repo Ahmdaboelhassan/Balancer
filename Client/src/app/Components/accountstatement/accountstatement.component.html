@@ -7,17 +7,32 @@
       <hr />
       <button
         type="button"
-        class="px-3 py-0.5 w-1/2 text-gray-900 bg-white border border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-blue-700"
+        class="px-1 py-0.5 lg:py-1 w-1/4 text-gray-900 bg-white border border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-blue-700"
         (click)="DecrementMonth()"
       >
-        <i class="fa-solid fa-rotate-left"></i>
+        <i class="fa-solid fa-calendar-minus"></i>
       </button>
       <button
         type="button"
-        class="px-3 py-0.5 w-1/2 text-gray-900 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-blue-700"
+        class="px-1 py-0.5 w-1/4 1t-gray-900 bg-white border border-gray-300 hover:bg-gray-100 hover:text-blue-700"
+        (click)="GetCurrentDay()"
+      >
+        <i class="fa-solid fa-calendar-day"></i>
+      </button>
+
+      <button
+        type="button"
+        class="px-1 w-1/4 text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 hover:text-blue-700"
+        (click)="GetDefaultWeekDates()"
+      >
+        <i class="fa-solid fa-calendar-week"></i>
+      </button>
+      <button
+        type="button"
+        class="px-1 py-0.5 lg:py-1 w-1/4 text-gray-900 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-blue-700"
         (click)="IncrementMonth()"
       >
-        <i class="fa-solid fa-rotate-right"></i>
+        <i class="fa-solid fa-calendar-plus"></i>
       </button>
     </div>
   </div>

@@ -1,4 +1,7 @@
-<app-date-range (dates)="GetJournals($event)"></app-date-range>
+<app-date-range
+  [journalFilter]="true"
+  (dates)="GetJournals($event)"
+></app-date-range>
 <main class="daterange-result mt-2 p-5 bg-white rounded-xl">
   <app-journal-list [journals]="journals"></app-journal-list>
 </main>

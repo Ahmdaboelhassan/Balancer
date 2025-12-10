@@ -100,10 +100,10 @@
             >
           </label>
         </div>
-        <div class="col-span-2 lg:flex lg:gap-2">
+        <div class="col-span-2 lg:flex lg:gap-1">
           <button
             type="button"
-            class="btn-primary w-full lg:w-3/4"
+            class="btn-primary w-full lg:flex-[2_1_0%]"
             (click)="Search()"
           >
             <div class="flex justify-between items-center">
@@ -112,10 +112,17 @@
             </div>
           </button>
           <button
+            type="button"
+            class="btn-save w-full lg:flex-1"
+            (click)="GetJournalsSummery()"
+          >
+            Summary
+          </button>
+          <button
             mat-dialog-close
             cdkFocusInitial
             type="button"
-            class="btn-danger w-full lg:w-1/4"
+            class="btn-danger w-full lg:flex-1"
           >
             Cancel
           </button>

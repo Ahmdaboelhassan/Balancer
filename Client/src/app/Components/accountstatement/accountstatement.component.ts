@@ -116,6 +116,35 @@ export class AccountstatementComponent {
     this.to.set(lastDay.toISOString().split('T')[0]);
   }
 
+  GetCurrentDay() {
+    const currentDate = new Date();
+    this.from.set(this.formatLocalDate(currentDate));
+    this.to.set(this.formatLocalDate(currentDate));
+  }
+
+  GetDefaultWeekDates() {
+    const currentDate = new Date();
+    const day = currentDate.getDay();
+
+    const diffToSaturday = day === 6 ? 0 : day + 1;
+
+    const firstDayOfWeek = new Date(currentDate);
+    firstDayOfWeek.setDate(currentDate.getDate() - diffToSaturday);
+
+    const lastDayOfWeek = new Date(firstDayOfWeek);
+    lastDayOfWeek.setDate(firstDayOfWeek.getDate() + 6);
+
+    this.from.set(this.formatLocalDate(firstDayOfWeek));
+    this.to.set(this.formatLocalDate(lastDayOfWeek));
+  }
+
+  private formatLocalDate(date: Date): string {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent) {
     if (event.ctrlKey && event.key === 'Enter') {

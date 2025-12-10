@@ -1,7 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { MatDialogClose, MatDialogRef } from '@angular/material/dialog';
-import { JournalService } from '../../../../../Services/journal.service';
+import {
+  MAT_DIALOG_DATA,
+  MatDialogClose,
+  MatDialogRef,
+} from '@angular/material/dialog';
+import { JournalService } from '../../../Services/journal.service';
+import { Inject } from '@angular/core';
 
 @Component({
   selector: 'app-journal-search-modal',
@@ -9,17 +14,17 @@ import { JournalService } from '../../../../../Services/journal.service';
   templateUrl: './journal-search-modal.component.html',
   styleUrl: './journal-search-modal.component.css',
 })
-export class JournalSearchModalComponent implements OnInit {
+export class JournalSearchModalComponent {
   journalForm!: FormGroup;
-
+  from: string;
+  to: string;
   constructor(
     private fb: FormBuilder,
     private journalService: JournalService,
-    private dialogRef: MatDialogRef<JournalSearchModalComponent>
-  ) {}
-
-  ngOnInit(): void {
-    this.intializeForm();
+    private dialogRef: MatDialogRef<JournalSearchModalComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any
+  ) {
+    this.intializeForm(data.from, data.to);
   }
 
   Search() {
@@ -27,27 +32,14 @@ export class JournalSearchModalComponent implements OnInit {
     this.dialogRef.close();
   }
 
-  intializeForm() {
-    const currentDate = new Date();
-    const firstDay = new Date(
-      currentDate.getFullYear(),
-      currentDate.getMonth(),
-      2
-    );
-
-    const lastDay = new Date(
-      currentDate.getFullYear(),
-      currentDate.getMonth() + 1,
-      1
-    );
-
+  intializeForm(from, to) {
     this.journalForm = this.fb.group({
       key: [{ value: '', disabled: true }],
       filterByDate: [true],
       filterByKey: [false],
-      from: firstDay.toISOString().split('T')[0],
-      to: lastDay.toISOString().split('T')[0],
-      orderBy: ['1'],
+      from: from,
+      to: to,
+      orderBy: ['2'],
       type: ['0'],
     });
   }
@@ -65,8 +57,15 @@ export class JournalSearchModalComponent implements OnInit {
   ChangeFilterByKey() {
     if (this.journalForm.get('filterByKey').value) {
       this.journalForm.get('key')?.enable();
+      this.journalForm.get('from')?.disable();
+      this.journalForm.get('to')?.disable();
+      this.journalForm.patchValue({ filterByDate: false });
     } else {
       this.journalForm.get('key')?.disable();
     }
+  }
+  GetJournalsSummery() {
+    this.journalService.journalsSummary$.next(true);
+    this.dialogRef.close();
   }
 }
