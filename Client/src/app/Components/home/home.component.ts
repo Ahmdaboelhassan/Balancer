@@ -68,7 +68,7 @@ export class HomeComponent implements OnInit {
         this.budgetProgresses = this.GetBudgetProgress(this.home, false);
         this.balances.set(result.accountsSummary);
         this.InitializeLineChart(result.lastPeriods);
-        this.IntializePieChart(result.currentAndLastMonthExpenses);
+        this.IntializePieChart(result.journalsTypesSummary);
         this.IntializeRevenuesAndExpensesChart(
           result.currentYearRevenues,
           result.currentYearExpenses
@@ -124,11 +124,19 @@ export class HomeComponent implements OnInit {
 
   IntializePieChart(data: number[]) {
     this.pieChart.set({
-      labels: ['Current', 'Last'],
+      labels: ['Add', 'Subtract', 'Forward', 'Due'],
       datasets: [
         {
           label: 'Amount',
           data: data,
+          backgroundColor: [
+            'rgba(34, 197, 94, 0.8)', // Add
+            'rgba(239, 68, 68, 0.8)', // Subtract
+            'rgba(234, 179, 8, 0.8)', // Forward
+            'rgba(59, 130, 246, 0.8)', // Due
+          ],
+          borderColor: '#fff',
+          borderWidth: 2,
         },
       ],
     });

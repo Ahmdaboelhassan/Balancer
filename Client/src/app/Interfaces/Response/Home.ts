@@ -4,7 +4,7 @@ import { BudgetProgress } from './BudgetProgress';
 export interface Home {
   accountsSummary: AccountsBalance[];
   lastPeriods: number[];
-  currentAndLastMonthExpenses: number[];
+  journalsTypesSummary: number[];
   currentYearExpenses: number[];
   currentYearRevenues: number[];
   budgetProgress: BudgetProgress[];

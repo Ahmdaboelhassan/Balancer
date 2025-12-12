@@ -79,7 +79,7 @@ export class JournalComponent implements OnInit {
           width: '600px',
           html: `
             <div class="overflow-x-auto">
-              <table class="min-w-full border border-gray-300 rounded-lg">
+              <table class="min-w-full border border-gray-300 rounded-lg text-sm lg:text-lg">
                 <thead class="bg-gray-100 border-b text-center">
                   <tr>
                     <th class="px-4 py-2 text-left font-semibold border-r">Journal Type</th>

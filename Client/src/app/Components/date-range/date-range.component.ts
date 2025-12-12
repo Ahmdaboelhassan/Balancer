@@ -63,7 +63,7 @@ export class DateRangeComponent implements OnInit {
   }
 
   DecrementMonth() {
-    let f = new Date(this.from);
+    let f = this.from ? new Date(this.from) : new Date();
     f.setMonth(f.getMonth() - 1);
 
     const firstDay = new Date(f.getFullYear(), f.getMonth(), 2);
@@ -73,8 +73,10 @@ export class DateRangeComponent implements OnInit {
     this.to = lastDay.toISOString().split('T')[0];
     this.dates.emit({ from: this.from, to: this.to, maxLevel: this.maxLevel });
   }
+
   IncrementMonth() {
-    let f = new Date(this.from);
+    let f = this.from ? new Date(this.from) : new Date();
+
     f.setMonth(f.getMonth() + 1);
 
     const firstDay = new Date(f.getFullYear(), f.getMonth(), 2);

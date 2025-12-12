@@ -68,7 +68,7 @@ public class HomeService : IHomeService
         var lastPeriods = await GetLastPeriodsBalancesAsync(4);
 
         // Pie Chart
-        var currentAndLastMonthExpenses = await GetCurrentAndLastMonthExpensesAsync(current);
+        var journalsTypesSummary = await GetJournalsTypesSummary(current);
 
         // Bar Chart
         var currentYearJournal = await GetCurrentYearJournalAsync(current);
@@ -89,7 +89,7 @@ public class HomeService : IHomeService
             LastPeriods = lastPeriods,
             CurrentYearExpenses = currentYearJournal.expenses,
             CurrentYearRevenues = currentYearJournal.revenues,
-            CurrentAndLastMonthExpenses = currentAndLastMonthExpenses,
+            JournalsTypesSummary = journalsTypesSummary,
             AvailableFunds = availableFunds,
             OtherExpenses = otherExpenses,
             OtherExpensesTarget = dashboard.OtherExpensesTarget + dashboard.AddOnExpensesTarget,
@@ -165,18 +165,23 @@ public class HomeService : IHomeService
                 TakeLastOrderBy(count, p => new { p.From, p.TotalAmount }, p => p.From.Date))
                 .OrderBy(p => p.From).Select(p => p.TotalAmount);
     }
-    private async Task<IEnumerable<decimal>> GetCurrentAndLastMonthExpensesAsync(DateTime current)
+    private async Task<IEnumerable<decimal>> GetJournalsTypesSummary(DateTime current)
     {
         // Pie Chart
-        var lastMonth = current.AddMonths(-1);
 
-        var currentExpensesSum = (await _unitOfWork.Journal
-               .GetAll(j => j.CreatedAt.Date.Month == current.Month && j.CreatedAt.Date.Year == current.Year && j.Type == (byte)JournalTypes.Subtract)).Sum(j => j.Amount * -1);
+        var journalsTypesSummary = (await _unitOfWork.Journal
+               .GetAll(j => j.CreatedAt.Date.Month == current.Month && j.CreatedAt.Date.Year == current.Year))
+               .GroupBy(j => j.Type)
+               .Select(j => new { j.Key, total = j.Sum(j => Math.Abs(j.Amount)) })
+               .ToDictionary(x => x.Key, x => x.total);
 
-        var lastExpensesSum = (await _unitOfWork.Journal
-               .GetAll(j => j.CreatedAt.Date.Month == lastMonth.Month && j.CreatedAt.Date.Year == lastMonth.Year && j.Type == (byte)JournalTypes.Subtract)).Sum(j => j.Amount * -1);
+        return new List<decimal> {
+            journalsTypesSummary.GetValueOrDefault((byte)JournalTypes.Add),
+            journalsTypesSummary.GetValueOrDefault((byte)JournalTypes.Subtract),
+            journalsTypesSummary.GetValueOrDefault((byte)JournalTypes.Forward),
+            journalsTypesSummary.GetValueOrDefault((byte)JournalTypes.Due),
+        };
 
-        return new List<decimal> { currentExpensesSum, lastExpensesSum };
     }
     private async Task<(List<decimal> expenses, List<decimal> revenues)> GetCurrentYearJournalAsync(DateTime current)
     {
@@ -218,7 +223,7 @@ public class HomeService : IHomeService
                  new AccountBalanceDTO { AccountName = "No Account", Balance = "0" },
             },
             LastPeriods = new List<decimal> { 0 , 0 , 0 , 0},
-            CurrentAndLastMonthExpenses = new List<decimal> { 0, 0},
+            JournalsTypesSummary = new List<decimal> { 0, 0},
             CurrentYearExpenses = new List<decimal> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
             CurrentYearRevenues = new List<decimal> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
             AvailableFunds = 0,

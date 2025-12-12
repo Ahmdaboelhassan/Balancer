@@ -69,7 +69,13 @@
             <i [ngClass]="[switchPieIcon(), 'fa-solid', 'text-gray-700']"></i>
           </button>
           @if(pieChart() && showPieChat()){
-          <canvas baseChart [data]="pieChart()" [type]="'pie'" @slideUp>
+          <canvas
+            baseChart
+            [data]="pieChart()"
+            [type]="'pie'"
+            @slideUp
+            class="mx-auto"
+          >
           </canvas>
           } @else{
           <div
