@@ -160,10 +160,11 @@ export class CreateEvaluationComponent implements OnInit {
               table.setData(newData);
               table.setSort('amount', 'desc');
 
-              const profit = Math.round(income - totalAmount);
+              const profit = income - totalAmount;
+              const profitPercentage = (profit / income) * 100;
               this.evaluationForm.patchValue({
-                profit: profit,
-                profitPercentage: Math.round((profit / income) * 100),
+                profit: profit.toFixed(2),
+                profitPercentage: profitPercentage.toFixed(2),
               });
             },
           },
@@ -370,7 +371,9 @@ export class CreateEvaluationComponent implements OnInit {
 
     const profitPercentage = Math.round((profit / income) * 100);
 
-    this.evaluationForm.patchValue({ profitPercentage: profitPercentage });
+    this.evaluationForm.patchValue({
+      profitPercentage: profitPercentage.toFixed(2),
+    });
   }
   calculateProfit() {
     const income = Number(this.evaluationForm.get('income').value);
@@ -380,8 +383,8 @@ export class CreateEvaluationComponent implements OnInit {
     const profit = income - totalAmount;
     const profitPercentage = Math.round((profit / income) * 100);
     this.evaluationForm.patchValue({
-      profitPercentage: profitPercentage,
-      profit: profit,
+      profitPercentage: profitPercentage.toFixed(2),
+      profit: profit.toFixed(2),
     });
   }
 }

@@ -111,7 +111,17 @@ internal class JournalService : IJournalService
             return Enumerable.Empty<JournalListItemDTO>();
 
         if (DTO.filterByKey)
-            query = query.Where(j => j.Detail.Contains(DTO.key) || j.Code.ToString().Contains(DTO.key) || (j.Description != null && j.Description.Contains(DTO.key)));
+        {
+            if (DTO.key.StartsWith("C:"))
+            {
+                var parsedKey = DTO.key.Substring(2, DTO.key.Length - 2).Trim();
+                query = query.Where(j => j.Code.ToString().Equals(parsedKey));
+            }
+            else
+            {
+                query = query.Where(j => j.Detail.Contains(DTO.key) || j.Code.ToString().Contains(DTO.key) || (j.Description != null && j.Description.Contains(DTO.key)));
+            }
+        }
 
         if (DTO.filterByDate && DTO.from.HasValue && DTO.to.HasValue)
             query = query.Where(j => j.CreatedAt.Date >= DTO.from.Value.Date && j.CreatedAt.Date <= DTO.to.Value.Date);

@@ -3,7 +3,9 @@ using Domain.Entities;
 using Domain.Enums;
 using Domain.IRepository;
 using Domain.IServices;
+using Microsoft.AspNetCore.Localization;
 using System.Collections;
+using System.Globalization;
 using System.Text;
 
 namespace Application.Services;
@@ -71,7 +73,7 @@ public class HomeService : IHomeService
         var journalsTypesSummary = await GetJournalsTypesSummary(current);
 
         // Bar Chart
-        var currentYearJournal = await GetCurrentYearJournalAsync(current);
+        var lastMonthsJournals = await GetLast12MonthJournalAsync(current);
 
         // Progress Bar 
         var accountsSet = new HashSet<string>(new string[] 
@@ -87,8 +89,9 @@ public class HomeService : IHomeService
         {
             AccountsSummary = balances,
             LastPeriods = lastPeriods,
-            CurrentYearExpenses = currentYearJournal.expenses,
-            CurrentYearRevenues = currentYearJournal.revenues,
+            Expenses = lastMonthsJournals.expenses,
+            Revenues = lastMonthsJournals.revenues,
+            MonthsNames = lastMonthsJournals.months,
             JournalsTypesSummary = journalsTypesSummary,
             AvailableFunds = availableFunds,
             OtherExpenses = otherExpenses,
@@ -183,14 +186,21 @@ public class HomeService : IHomeService
         };
 
     }
-    private async Task<(List<decimal> expenses, List<decimal> revenues)> GetCurrentYearJournalAsync(DateTime current)
+    private async Task<(List<decimal> expenses, List<decimal> revenues, List<string> months)> GetLast12MonthJournalAsync(DateTime current)
     {
         // Bar Chart 
-        List<decimal> currentYearExpenses = new List<decimal>();
-        List<decimal> currentYearRevenue = new List<decimal>();
+        var last11Month = current.AddMonths(-11).Date;
+        var firstDayInLast11Month = new DateTime(last11Month.Year, last11Month.Month, 1);
+        var lastDayOfCurrentMonth = current.AddMonths(1).AddDays(-1).Date;
+        
 
-        var currentYearJournal = await _unitOfWork.Journal
-                .GetAll(j => j.CreatedAt.Date.Year == current.Year && (j.Type == (byte)JournalTypes.Subtract || j.Type == (byte)JournalTypes.Add));
+        List<decimal> expenses = new List<decimal>();
+        List<decimal> revenues = new List<decimal>();
+        List<string> months = new List<string>();
+
+        var currentYearJournal = (await _unitOfWork.Journal
+                .GetAll(j => j.CreatedAt.Date >= firstDayInLast11Month.Date && j.CreatedAt.Date <= lastDayOfCurrentMonth.Date && (j.Type == (byte)JournalTypes.Subtract || j.Type == (byte)JournalTypes.Add)))
+                .OrderBy(j => j.CreatedAt);
 
         var expensesMonthlyGrouped = currentYearJournal.Where(j => j.Type == (byte)JournalTypes.Subtract)
                                                        .GroupBy(j => j.CreatedAt.Month)
@@ -203,14 +213,20 @@ public class HomeService : IHomeService
                                                        .Select(j => new { j.Key, Total = j.Sum(j => j.Amount) })
                                                        .ToDictionary(j => j.Key, j => j.Total);
 
-        for (int i = 1; i <= 12; i++)
-        {
-            currentYearExpenses.Add(expensesMonthlyGrouped.TryGetValue(i, out decimal expensesValue) ? expensesValue : 0);
 
-            currentYearRevenue.Add(revenuesMonthlyGrouped.TryGetValue(i, out decimal revenueValue) ? revenueValue : 0);
+        var keys = expensesMonthlyGrouped.Keys;
+
+        foreach (var k in keys)
+        {
+            expenses.Add(expensesMonthlyGrouped.TryGetValue(k, out decimal expensesValue) ? expensesValue : 0);
+
+            revenues.Add(revenuesMonthlyGrouped.TryGetValue(k, out decimal revenueValue) ? revenueValue : 0);
+
+            string monthName = CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(k);
+            months.Add(monthName);
         }
 
-        return (currentYearExpenses, currentYearRevenue);
+        return (expenses, revenues, months);
     }
     private GetHomeDTO GetEmptyHome()
     {
@@ -224,8 +240,12 @@ public class HomeService : IHomeService
             },
             LastPeriods = new List<decimal> { 0 , 0 , 0 , 0},
             JournalsTypesSummary = new List<decimal> { 0, 0},
-            CurrentYearExpenses = new List<decimal> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            CurrentYearRevenues = new List<decimal> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+            Expenses = new List<decimal> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+            Revenues = new List<decimal> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+            MonthsNames = new List<string> {
+                "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+            },
             AvailableFunds = 0,
             DayRate = 0,
             PeriodDays = 0,

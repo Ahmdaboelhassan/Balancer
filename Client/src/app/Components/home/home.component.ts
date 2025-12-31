@@ -70,15 +70,20 @@ export class HomeComponent implements OnInit {
         this.InitializeLineChart(result.lastPeriods);
         this.IntializePieChart(result.journalsTypesSummary);
         this.IntializeRevenuesAndExpensesChart(
-          result.currentYearRevenues,
-          result.currentYearExpenses
+          result.revenues,
+          result.expenses,
+          result.monthsNames
         );
         this.GetEstimatedMonthNeed(result.periodDays, result.dayRate);
       },
     });
   }
 
-  IntializeRevenuesAndExpensesChart(revenues: number[], expenses: number[]) {
+  IntializeRevenuesAndExpensesChart(
+    revenues: number[],
+    expenses: number[],
+    monthsNames: string[]
+  ) {
     revenues = revenues ? revenues.map((x) => (x === 0 ? null : x)) : [];
     expenses = expenses ? expenses.map((x) => (x === 0 ? null : x)) : [];
 
@@ -87,20 +92,7 @@ export class HomeComponent implements OnInit {
     );
 
     this.RevenuesAndExpensesChart.set({
-      labels: [
-        'Jan',
-        'Feb',
-        'Mar',
-        'Apr',
-        'May',
-        'Jun',
-        'Jul',
-        'Aug',
-        'Sep',
-        'Oct',
-        'Nov',
-        'Dec',
-      ],
+      labels: monthsNames,
       datasets: [
         {
           label: 'Revenues',

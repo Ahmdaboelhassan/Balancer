@@ -17,7 +17,7 @@ namespace Infrastructure
     {
         public static IServiceCollection AddInfrastructureLayer(this IServiceCollection services, IConfiguration Config)
         {
-           string? ConnectionString = Config.GetConnectionString("Defaults"); // Stage
+           string? ConnectionString = Config.GetConnectionString("Stage"); // Stage
             if (ConnectionString == null)
                 throw new InvalidOperationException();
 

@@ -5,8 +5,9 @@ export interface Home {
   accountsSummary: AccountsBalance[];
   lastPeriods: number[];
   journalsTypesSummary: number[];
-  currentYearExpenses: number[];
-  currentYearRevenues: number[];
+  expenses: number[];
+  revenues: number[];
+  monthsNames: string[];
   budgetProgress: BudgetProgress[];
   dayRate: number;
   periodDays: number;

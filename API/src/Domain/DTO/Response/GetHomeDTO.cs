@@ -7,8 +7,9 @@ public class GetHomeDTO
     public IEnumerable<AccountBalanceDTO> AccountsSummary { get; set; }
     public IEnumerable<decimal> LastPeriods { get; set; }
     public IEnumerable<decimal> JournalsTypesSummary { get; set; }
-    public IEnumerable<decimal> CurrentYearExpenses { get; set; }
-    public IEnumerable<decimal> CurrentYearRevenues{ get; set; }
+    public IEnumerable<decimal> Expenses { get; set; }
+    public IEnumerable<decimal> Revenues{ get; set; }
+    public IEnumerable<string> MonthsNames{ get; set; }
     public IEnumerable<BudgetAccountDTO> BudgetProgress { get; set; }
     public decimal AvailableFunds { get; set; }
     public decimal OtherExpensesTarget { get; set; }

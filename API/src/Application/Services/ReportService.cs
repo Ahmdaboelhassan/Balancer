@@ -5,6 +5,7 @@ using Domain.IRepository;
 using Domain.IServices;
 using System;
 using System.Globalization;
+using System.Linq.Expressions;
 
 namespace Application.Services;
 public class ReportService : IReportService
@@ -36,7 +37,7 @@ public class ReportService : IReportService
                     .GetAll(d =>
                          d.Account.Number.StartsWith(account.Number)
                        && d.Journal.CreatedAt < from.Value.Date
-                      && (!costCenterId.HasValue ||  d.CostCenterId == costCenterId )
+                      && (!costCenterId.HasValue || d.CostCenterId == costCenterId)
                     , "Account", "Journal");
 
             if (openingJournals.Count > 0)
@@ -60,7 +61,7 @@ public class ReportService : IReportService
         {
             balance += journal.Debit - journal.Credit;
 
-            journalsLinkedList.AddLast( new AccountStatementDetail
+            journalsLinkedList.AddLast(new AccountStatementDetail
             {
                 Balance = balance,
                 Credit = journal.Credit,
@@ -104,16 +105,28 @@ public class ReportService : IReportService
 
     public async Task<AccountStatement> GetCostCenterStatement(DateTime? from, DateTime? to, int? costCenterId, bool openingBalance)
     {
+        var settings = await _uow.Settings.GetFirst();
         var costCenter = await _uow.CostCenter.Get(costCenterId.GetValueOrDefault());
-        if (costCenter == null)
+
+        if (costCenter is null || settings is null || !settings.BanksAccount.HasValue || !settings.DrawersAccount.HasValue)
+            return GetEmptyAccountStatement();
+
+        var banksAndSafes = (await _uow.Accounts
+            .GetAll(d => d.Id == settings.BanksAccount.GetValueOrDefault() || d.Id == settings.DrawersAccount.GetValueOrDefault()))
+            .ToDictionary(d => d.Id, d => d.Number); ;
+
+        var bankNumber = banksAndSafes[settings.BanksAccount.Value];
+        var drawerNumber = banksAndSafes[settings.DrawersAccount.Value];
+
+        if (string.IsNullOrEmpty(bankNumber) || string.IsNullOrEmpty(drawerNumber))
             return GetEmptyAccountStatement();
 
         var journals = (await _uow.JournalDetail
                    .GetAll(d =>
-                     (d.CostCenterId == costCenterId && d.Debit > 0)
+                     (d.CostCenterId == costCenterId && !d.Account.Number.StartsWith(bankNumber) && !d.Account.Number.StartsWith(drawerNumber))
                      && (!from.HasValue || d.Journal.CreatedAt.Date >= from.Value.Date)
                      && (!to.HasValue || d.Journal.CreatedAt.Date <= to.Value.Date)
-                   , "CostCenter", "Journal"))
+                   , "Account", "Journal"))
                    .OrderBy(d => d.Journal.CreatedAt);
 
         var journalsLinkedList = new LinkedList<AccountStatementDetail>();
@@ -122,17 +135,20 @@ public class ReportService : IReportService
         if (openingBalance && from.HasValue)
         {
             var openingJournals = await _uow.JournalDetail
-                    .GetAll(d => d.CostCenterId == costCenterId && d.Journal.CreatedAt < from.Value.Date && d.Debit > 0, "Journal");
+                    .GetAll(d => d.CostCenterId == costCenterId 
+                    && !d.Account.Number.StartsWith(bankNumber) 
+                    && !d.Account.Number.StartsWith(drawerNumber) 
+                    && d.Journal.CreatedAt < from.Value.Date, "Journal", "Account");
 
             if (openingJournals.Count > 0)
             {
-                balance = Math.Abs(openingJournals.Sum(j => j.Debit));
+                balance = openingJournals.Sum(j => j.Debit - j.Credit);
 
                 journalsLinkedList.AddFirst(new AccountStatementDetail
                 {
                     Balance = balance,
-                    Credit = 0,
-                    Debit = 0,
+                    Credit = openingJournals.Sum(j => j.Credit),
+                    Debit = openingJournals.Sum(j => j.Debit),
                     Detail = "Opening Balance",
                     notes = "Opening Balance",
                     Date = openingJournals.First().Journal.CreatedAt.ToShortDateString(),
@@ -143,13 +159,13 @@ public class ReportService : IReportService
 
         foreach (var journal in journals)
         {
-            balance += journal.Debit;
+            balance += journal.Debit - journal.Credit;
 
             journalsLinkedList.AddLast(new AccountStatementDetail
             {
                 Balance = balance,
-                Credit = 0,
-                Debit = 0,
+                Credit = journal.Credit,
+                Debit = journal.Debit,
                 CostCenter = costCenter.Name,
                 Detail = journal.Journal.Detail,
                 JournalId = journal.JournalId,
