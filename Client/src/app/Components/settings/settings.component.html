@@ -3,209 +3,244 @@
   <hr />
   <div>
     @if (settingsForm) {
-    <form [formGroup]="settingsForm" (ngSubmit)="onSubmit()" class="py-5">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <input type="hidden" formControlName="id" />
+      <form [formGroup]="settingsForm" (ngSubmit)="onSubmit()" class="py-5">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <input type="hidden" formControlName="id" />
 
-        <!-- Account Selection Fields -->
-        <div class="form-group">
-          <label for="defaultCreditAccount">Default Credit Account</label>
-          <ng-select
-            [items]="accounts"
-            bindLabel="name"
-            bindValue="id"
-            id="defaultCreditAccount"
-            formControlName="defaultCreditAccount"
+          <!-- Account Selection Fields -->
+          <div class="form-group">
+            <label for="defaultCreditAccount">Default Credit Account</label>
+            <ng-select
+              [items]="accounts"
+              bindLabel="name"
+              bindValue="id"
+              id="defaultCreditAccount"
+              formControlName="defaultCreditAccount"
+            >
+            </ng-select>
+          </div>
+
+          <div class="form-group">
+            <label for="defaultDebitAccount">Default Debit Account</label>
+            <ng-select
+              [items]="accounts"
+              bindLabel="name"
+              bindValue="id"
+              id="defaultDebitAccount"
+              formControlName="defaultDebitAccount"
+            >
+            </ng-select>
+          </div>
+
+          <!-- Account Type Selection Fields -->
+          <!-- Asset Accounts -->
+          <div class="form-group">
+            <label for="assetsAccount">Assets Account</label>
+            <ng-select
+              [items]="accounts"
+              bindLabel="name"
+              bindValue="id"
+              id="assetsAccount"
+              formControlName="assetsAccount"
+            >
+            </ng-select>
+          </div>
+          <div class="form-group">
+            <label for="liabilitiesAccount">Liabilities Account</label>
+            <ng-select
+              [items]="accounts"
+              bindLabel="name"
+              bindValue="id"
+              id="liabilitiesAccount"
+              formControlName="liabilitiesAccount"
+            >
+            </ng-select>
+          </div>
+          <div class="form-group">
+            <label for="expensesAccount">Expenses Account</label>
+            <ng-select
+              [items]="accounts"
+              bindLabel="name"
+              bindValue="id"
+              id="expensesAccount"
+              formControlName="expensesAccount"
+            >
+            </ng-select>
+          </div>
+
+          <div class="form-group">
+            <label for="revenueAccount">Revenue Account</label>
+            <ng-select
+              [items]="accounts"
+              bindLabel="name"
+              bindValue="id"
+              id="revenueAccount"
+              formControlName="revenueAccount"
+            >
+            </ng-select>
+          </div>
+          <div class="form-group">
+            <label for="investmentAccount">Investment Account</label>
+            <ng-select
+              [items]="accounts"
+              bindLabel="name"
+              bindValue="id"
+              id="investmentAccount"
+              formControlName="investmentAccount"
+            >
+            </ng-select>
+          </div>
+
+          <div class="form-group">
+            <label for="banksAccount">Bank Account</label>
+            <ng-select
+              [items]="accounts"
+              bindLabel="name"
+              bindValue="id"
+              id="banksAccount"
+              formControlName="banksAccount"
+            >
+            </ng-select>
+          </div>
+
+          <div class="form-group">
+            <label for="drawersAccount">Drawers Account</label>
+            <ng-select
+              [items]="accounts"
+              bindLabel="name"
+              bindValue="id"
+              id="drawersAccount"
+              formControlName="drawersAccount"
+            >
+            </ng-select>
+          </div>
+
+          <div class="form-group">
+            <label for="currentAssetsAccount">Current Assets Account</label>
+            <ng-select
+              [items]="accounts"
+              bindLabel="name"
+              bindValue="id"
+              id="currentAssetsAccount"
+              formControlName="currentAssetsAccount"
+            >
+            </ng-select>
+          </div>
+          <div class="form-group">
+            <label for="notBudgetCostCenter">Not-Budget Cost Center</label>
+            <select
+              class="form-control w-full"
+              formControlName="notBudgetCostCenter"
+            >
+              <option value="">---- Not Selected ----</option>
+              <option *ngFor="let cost of costCenters" [value]="cost.id">
+                {{ cost.name }}
+              </option>
+            </select>
+          </div>
+          <!-- Period and Rate Settings -->
+          <div class="form-group">
+            <label for="defaultPeriodDays">Default Period Days</label>
+            <input
+              type="number"
+              id="defaultPeriodDays"
+              formControlName="defaultPeriodDays"
+              class="form-control w-full"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="defaultDayRate">Default Day Rate</label>
+            <input
+              type="number"
+              id="defaultDayRate"
+              formControlName="defaultDayRate"
+              class="form-control w-full"
+            />
+          </div>
+
+          <!-- Level Settings -->
+          <div class="form-group">
+            <label for="levelOneDigits">Level One Digits</label>
+            <input
+              type="number"
+              id="levelOneDigits"
+              formControlName="levelOneDigits"
+              class="form-control w-full"
+              [readonly]="settingsForm.get('levelOneDigits')?.value > 0"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="levelTwoDigits">Level Two Digits</label>
+            <input
+              type="number"
+              id="levelTwoDigits"
+              formControlName="levelTwoDigits"
+              class="form-control w-full"
+              [readonly]="settingsForm.get('levelTwoDigits')?.value > 0"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="levelThreeDigits">Level Three Digits</label>
+            <input
+              type="number"
+              id="levelThreeDigits"
+              formControlName="levelThreeDigits"
+              class="form-control w-full"
+              [readonly]="settingsForm.get('levelThreeDigits')?.value > 0"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="levelFourDigits">Level Four Digits</label>
+            <input
+              type="number"
+              id="levelFourDigits"
+              formControlName="levelFourDigits"
+              class="form-control w-full"
+              [readonly]="settingsForm.get('levelFourDigits')?.value > 0"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="levelFiveDigits">Level Five Digits</label>
+            <input
+              type="number"
+              id="levelFiveDigits"
+              formControlName="levelFiveDigits"
+              class="form-control w-full"
+              [readonly]="settingsForm.get('levelFiveDigits')?.value > 0"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="maxAccountLevel">Max Account Level</label>
+            <input
+              type="number"
+              id="maxAccountLevel"
+              formControlName="maxAccountLevel"
+              class="form-control w-full"
+              [readonly]="settingsForm.get('maxAccountLevel')?.value > 0"
+            />
+          </div>
+        </div>
+
+        <div class="mt-5">
+          <button
+            type="submit"
+            class="btn-save md:w-1/4 w-full"
+            [disabled]="!settingsForm.valid"
           >
-          </ng-select>
-        </div>
-
-        <div class="form-group">
-          <label for="defaultDebitAccount">Default Debit Account</label>
-          <ng-select
-            [items]="accounts"
-            bindLabel="name"
-            bindValue="id"
-            id="defaultDebitAccount"
-            formControlName="defaultDebitAccount"
+            Save
+          </button>
+          <span
+            class="inline-block md:ms-3 w-full md:w-auto text-center bg-gray-300 text-gray-800 text-sm font-medium me-2 px-4 py-3 rounded-md"
+            >V4.0</span
           >
-          </ng-select>
         </div>
-
-        <!-- Account Type Selection Fields -->
-        <!-- Asset Accounts -->
-        <div class="form-group">
-          <label for="assetsAccount">Assets Account</label>
-          <ng-select
-            [items]="accounts"
-            bindLabel="name"
-            bindValue="id"
-            id="assetsAccount"
-            formControlName="assetsAccount"
-          >
-          </ng-select>
-        </div>
-        <div class="form-group">
-          <label for="liabilitiesAccount">Liabilities Account</label>
-          <ng-select
-            [items]="accounts"
-            bindLabel="name"
-            bindValue="id"
-            id="liabilitiesAccount"
-            formControlName="liabilitiesAccount"
-          >
-          </ng-select>
-        </div>
-        <div class="form-group">
-          <label for="expensesAccount">Expenses Account</label>
-          <ng-select
-            [items]="accounts"
-            bindLabel="name"
-            bindValue="id"
-            id="expensesAccount"
-            formControlName="expensesAccount"
-          >
-          </ng-select>
-        </div>
-
-        <div class="form-group">
-          <label for="revenueAccount">Revenue Account</label>
-          <ng-select
-            [items]="accounts"
-            bindLabel="name"
-            bindValue="id"
-            id="revenueAccount"
-            formControlName="revenueAccount"
-          >
-          </ng-select>
-        </div>
-
-        <div class="form-group">
-          <label for="currentAssetsAccount">Current Assets Account</label>
-          <ng-select
-            [items]="accounts"
-            bindLabel="name"
-            bindValue="id"
-            id="currentAssetsAccount"
-            formControlName="currentAssetsAccount"
-          >
-          </ng-select>
-        </div>
-        <div class="form-group">
-          <label for="notBudgetCostCenter">Not-Budget Cost Center</label>
-          <select
-            class="form-control w-full"
-            formControlName="notBudgetCostCenter"
-          >
-            <option value="">---- Not Selected ----</option>
-            <option *ngFor="let cost of costCenters" [value]="cost.id">
-              {{ cost.name }}
-            </option>
-          </select>
-        </div>
-        <!-- Period and Rate Settings -->
-        <div class="form-group">
-          <label for="defaultPeriodDays">Default Period Days</label>
-          <input
-            type="number"
-            id="defaultPeriodDays"
-            formControlName="defaultPeriodDays"
-            class="form-control w-full"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="defaultDayRate">Default Day Rate</label>
-          <input
-            type="number"
-            id="defaultDayRate"
-            formControlName="defaultDayRate"
-            class="form-control w-full"
-          />
-        </div>
-
-        <!-- Level Settings -->
-        <div class="form-group">
-          <label for="levelOneDigits">Level One Digits</label>
-          <input
-            type="number"
-            id="levelOneDigits"
-            formControlName="levelOneDigits"
-            class="form-control w-full"
-            [readonly]="settingsForm.get('levelOneDigits')?.value > 0"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="levelTwoDigits">Level Two Digits</label>
-          <input
-            type="number"
-            id="levelTwoDigits"
-            formControlName="levelTwoDigits"
-            class="form-control w-full"
-            [readonly]="settingsForm.get('levelTwoDigits')?.value > 0"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="levelThreeDigits">Level Three Digits</label>
-          <input
-            type="number"
-            id="levelThreeDigits"
-            formControlName="levelThreeDigits"
-            class="form-control w-full"
-            [readonly]="settingsForm.get('levelThreeDigits')?.value > 0"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="levelFourDigits">Level Four Digits</label>
-          <input
-            type="number"
-            id="levelFourDigits"
-            formControlName="levelFourDigits"
-            class="form-control w-full"
-            [readonly]="settingsForm.get('levelFourDigits')?.value > 0"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="levelFiveDigits">Level Five Digits</label>
-          <input
-            type="number"
-            id="levelFiveDigits"
-            formControlName="levelFiveDigits"
-            class="form-control w-full"
-            [readonly]="settingsForm.get('levelFiveDigits')?.value > 0"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="maxAccountLevel">Max Account Level</label>
-          <input
-            type="number"
-            id="maxAccountLevel"
-            formControlName="maxAccountLevel"
-            class="form-control w-full"
-            [readonly]="settingsForm.get('maxAccountLevel')?.value > 0"
-          />
-        </div>
-      </div>
-
-      <div class="mt-5">
-        <button
-          type="submit"
-          class="btn-save md:w-1/4 w-full"
-          [disabled]="!settingsForm.valid"
-        >
-          Save
-        </button>
-        <span
-          class="inline-block md:ms-3 w-full md:w-auto text-center bg-gray-300 text-gray-800 text-sm font-medium me-2 px-4 py-3 rounded-md"
-          >V3.5</span
-        >
-      </div>
-    </form>
+      </form>
     }
   </div>
 </div>

@@ -5,4 +5,5 @@ public enum JournalTypes
     Subtract = 2,
     Due = 3,
     Forward = 4,
+    Investment = 5
 }

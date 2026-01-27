@@ -15,6 +15,7 @@ public class Settings
     public int? FixedAssetsAccount { get; set; }
     public int? CurrentCashAccount { get; set; }
     public int? LiabilitiesAccount { get; set; }
+    public int? InvestmentAccount { get; set; }
     public int? BanksAccount { get; set; }
     public int? DrawersAccount { get; set; }
     public int? NotBudgetCostCenter { get; set; }

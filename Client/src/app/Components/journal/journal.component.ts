@@ -19,7 +19,7 @@ export class JournalComponent implements OnInit {
   constructor(
     private titleService: Title,
     private journalService: JournalService,
-    private currency: CurrencyPipe
+    private currency: CurrencyPipe,
   ) {
     this.titleService.setTitle('Journals');
   }
@@ -52,27 +52,32 @@ export class JournalComponent implements OnInit {
           grouped[1]?.totalAmount || 0,
           'USD',
           'symbol',
-          '1.2-2'
+          '1.2-2',
         );
         const subtractAmount = this.currency.transform(
           grouped[2]?.totalAmount * -1 || 0,
           'USD',
           'symbol',
-          '1.2-2'
+          '1.2-2',
         );
         const dueAmount = this.currency.transform(
           grouped[3]?.totalAmount || 0,
           'USD',
           'symbol',
-          '1.2-2'
+          '1.2-2',
         );
         const forwardAmount = this.currency.transform(
           grouped[4]?.totalAmount || 0,
           'USD',
           'symbol',
-          '1.2-2'
+          '1.2-2',
         );
-
+        const investmentAmount = this.currency.transform(
+          grouped[5]?.totalAmount || 0,
+          'USD',
+          'symbol',
+          '1.2-2',
+        );
         Swal.fire({
           title: 'Journals Summery',
           icon: 'info',
@@ -109,6 +114,13 @@ export class JournalComponent implements OnInit {
                       grouped[4]?.count || 0
                     }</td>
                     <td class="px-4 py-2 text-orange-500">${forwardAmount}</td>
+                  </tr>
+                   <tr class="border-b bg-gray-50 text-end">
+                    <td class="px-4 py-2 border-r font-semibold text-start bg-gray-100 border-b">Investment</td>
+                    <td class="px-4 py-2 border-r text-purple-500">${
+                      grouped[5]?.count || 0
+                    }</td>
+                    <td class="px-4 py-2 text-purple-500">${investmentAmount}</td>
                   </tr>
                   <tr class="border-b bg-gray-50 text-end">
                     <td class="px-4 py-2 border-r font-semibold text-start bg-gray-100 border-b">Due</td>

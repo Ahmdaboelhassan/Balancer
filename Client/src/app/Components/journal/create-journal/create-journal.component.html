@@ -1,57 +1,71 @@
 <div class="bg-white rounded-lg p-7 lg:p-10 mb-3">
-  <div>
+  <div class="flex justify-between items-center">
     <h1 class="text-slate-800 font-bold text-3xl mb-4">
       {{ isEdit ? "Edit Journal" : "Create Journal" }}
     </h1>
-    <hr />
+    <div>
+      <button (click)="GetAdjacentJournal(false)">
+        <i
+          class="fa fa-arrow-left fa-1x hover:scale-110 bg-slate-800 text-white rounded-lg transition-all me-3 p-2"
+        ></i>
+      </button>
+      <button (click)="GetAdjacentJournal(true)" [disabled]="!isEdit">
+        <i
+          class="fa fa-arrow-right fa-1x hover:scale-110 text-white rounded-lg transition-all p-2"
+          [ngClass]="isEdit ? 'bg-slate-800' : 'bg-slate-600'"
+        ></i>
+      </button>
+    </div>
   </div>
-  @if(Journal() && JournalForm){
-  <div class="py-5">
-    <form [formGroup]="JournalForm" (submit)="SaveJournal()">
-      <input type="hidden" formControlName="id" />
-      <input type="hidden" formControlName="periodId" />
-      <div class="controls grid grid-cols-4 gap-5">
-        <div class="col-span-4 lg:col-span-2">
-          <label for="details"> Detials </label>
-          <input
-            type="text"
-            id="details"
-            formControlName="details"
-            class="form-control w-full"
-            dir="auto"
-          />
-        </div>
-        <div class="col-span-4 lg:col-span-2">
-          <label for="amount"> Amount </label>
-          <input
-            type="number"
-            id="amount"
-            formControlName="amount"
-            class="form-control w-full"
-          />
-        </div>
-        <div class="col-span-4 lg:col-span-2">
-          <label for="credit">
-            <span>From Account</span>
-            <button
-              role="button"
-              type="button"
-              (click)="GetAccountBalance(false)"
+  <hr />
+  @if (Journal() && JournalForm) {
+    <div class="py-5">
+      <form [formGroup]="JournalForm" (submit)="SaveJournal()">
+        <input type="hidden" formControlName="id" />
+        <input type="hidden" formControlName="periodId" />
+        <div class="controls grid grid-cols-4 gap-5">
+          <div class="col-span-4 lg:col-span-2">
+            <label for="details"> Detials </label>
+            <input
+              type="text"
+              id="details"
+              formControlName="details"
+              class="form-control w-full"
+              dir="auto"
+            />
+          </div>
+          <div class="col-span-4 lg:col-span-2">
+            <label for="amount"> Amount </label>
+            <input
+              type="number"
+              id="amount"
+              formControlName="amount"
+              class="form-control w-full"
+            />
+          </div>
+          <div class="col-span-4 lg:col-span-2">
+            <label for="credit">
+              <span>From Account</span>
+              <button
+                role="button"
+                type="button"
+                tabindex="-1"
+                (click)="GetAccountBalance(false)"
+              >
+                <i
+                  class="fa-solid fa-circle-info text-blue-700 hover:scale-125 cursor-pointer transition-all ms-1"
+                ></i></button
+            ></label>
+            <ng-select
+              [items]="Journal().accounts"
+              bindLabel="name"
+              bindValue="id"
+              formControlName="credit"
             >
-              <i
-                class="fa-solid fa-circle-info text-blue-700 hover:scale-125 cursor-pointer transition-all ms-1"
-              ></i></button
-          ></label>
-          <ng-select
-            [items]="Journal().accounts"
-            bindLabel="name"
-            bindValue="id"
-            formControlName="credit"
-          >
-          </ng-select>
-        </div>
-        <!-- Credit Balance -->
-        <!-- <div class="col-span-4 lg:col-span-1">
+            </ng-select>
+          </div>
+          <!-- Credit Balance -->
+          <!-- <div class="col-span-4 lg:col-span-1">
           <label for="credit balance"> Source Current Balance </label>
           <input
             type="number"
@@ -59,138 +73,131 @@
             formControlName="creditBalance"
           />
         </div> -->
-        <div class="col-span-4 lg:col-span-2">
-          <label for="debit">
-            <span>To Account </span>
-            <button
+          <div class="col-span-4 lg:col-span-2">
+            <label for="debit">
+              <span>To Account </span>
+              <button
+                role="button"
+                type="button"
+                tabindex="-1"
+                (click)="GetAccountBalance(true)"
+              >
+                <i
+                  class="fa-solid fa-circle-info text-blue-700 hover:scale-125 cursor-pointer transition-all ms-1"
+                ></i>
+              </button>
+            </label>
+            <ng-select
+              [items]="Journal().accounts"
+              bindLabel="name"
+              bindValue="id"
+              formControlName="debit"
+            >
+            </ng-select>
+          </div>
+
+          <div class="col-span-4 lg:col-span-1">
+            <label for="costCenter"> Cost Center </label>
+            <select
+              id="costCenter"
+              formControlName="costCenter"
+              class="form-control w-full"
+            >
+              <option selected value="">Without Cost Center</option>
+              <option
+                *ngFor="let account of Journal().costCenters"
+                [value]="account.id"
+              >
+                {{ account.name }}
+              </option>
+            </select>
+          </div>
+          <div class="col-span-4 lg:col-span-1">
+            <label for="detail"> Code </label>
+            <input
+              type="number"
+              class="form-control w-full"
+              formControlName="code"
+            />
+          </div>
+
+          <div
+            class="col-span-4"
+            [ngClass]="
+              Journal().lastUpdatedAt ? 'lg:col-span-1' : 'lg:col-span-2'
+            "
+          >
+            <label for="created"> Date </label>
+            <input
+              type="datetime-local"
+              class="form-control w-full"
+              formControlName="created"
+            />
+          </div>
+          @if (Journal().lastUpdatedAt) {
+            <div class="col-span-4 lg:col-span-1">
+              <label for="detail"> Last Update </label>
+              <input
+                type="text"
+                class="form-control w-full"
+                formControlName="lastUpdate"
+              />
+            </div>
+          }
+          <div class="col-span-4">
+            <label for="descroption"> Description </label>
+            <textarea
+              class="form-control w-full resize-none"
+              formControlName="description"
+              placeholder="Describe What This Transaction For..."
+              rows="4"
+              style="resize: vertical"
+              dir="auto"
+            ></textarea>
+          </div>
+        </div>
+        <div
+          class="mt-5 flex text-center lg:justify-items-start lg:flex-row flex-col"
+        >
+          <button
+            type="submit"
+            class="btn-save me-2"
+            [disabled]="!JournalForm.valid"
+          >
+            <i class="fa-solid fa-floppy-disk me-1"></i> Save
+          </button>
+
+          <a routerLink="/Journal/List" class="btn-primary me-2">
+            <i class="fa-solid fa-list me-1"></i> List
+          </a>
+
+          @if (isEdit) {
+            <a
+              (click)="DeleteJournal(Journal().id)"
+              class="btn-danger me-2"
               role="button"
               type="button"
-              (click)="GetAccountBalance(true)"
             >
-              <i
-                class="fa-solid fa-circle-info text-blue-700 hover:scale-125 cursor-pointer transition-all ms-1"
-              ></i>
-            </button>
-          </label>
-          <ng-select
-            [items]="Journal().accounts"
-            bindLabel="name"
-            bindValue="id"
-            formControlName="debit"
+              <i class="fa-solid fa-trash me-1"></i> Delete
+            </a>
+          }
+
+          <a [routerLink]="['/Journal', 'Create']" class="btn-add me-2">
+            <i class="fa-solid fa-plus me-1"></i> New Journal
+          </a>
+
+          <a [routerLink]="['/Period', 'Create']" class="btn-add me-2">
+            <i class="fa-solid fa-calendar-plus me-1"></i> New Period
+          </a>
+
+          <a
+            [routerLink]="['/Period', 'PeriodJournals', Journal().periodId]"
+            class="btn-add me-2"
           >
-          </ng-select>
+            <i class="fa-solid fa-book me-1"></i> Period Journals
+          </a>
         </div>
-        <!-- Debit Balance -->
-        <!-- <div class="col-span-4 lg:col-span-1">
-          <label for="detail"> Distination Current Balance </label>
-          <input
-            type="number"
-            class="form-control w-full"
-            formControlName="debitBalance"
-          />
-        </div> -->
-        <div class="col-span-4 lg:col-span-1">
-          <label for="costCenter"> Cost Center </label>
-          <select
-            id="costCenter"
-            formControlName="costCenter"
-            class="form-control w-full"
-          >
-            <option selected value="">Without Cost Center</option>
-            <option
-              *ngFor="let account of Journal().costCenters"
-              [value]="account.id"
-            >
-              {{ account.name }}
-            </option>
-          </select>
-        </div>
-        <div class="col-span-4 lg:col-span-1">
-          <label for="detail"> Code </label>
-          <input
-            type="number"
-            class="form-control w-full"
-            formControlName="code"
-          />
-        </div>
-
-        <div
-          class="col-span-4"
-          [ngClass]="
-            Journal().lastUpdatedAt ? 'lg:col-span-1' : 'lg:col-span-2'
-          "
-        >
-          <label for="created"> Date </label>
-          <input
-            type="datetime-local"
-            class="form-control w-full"
-            formControlName="created"
-          />
-        </div>
-        @if (Journal().lastUpdatedAt) {
-        <div class="col-span-4 lg:col-span-1">
-          <label for="detail"> Last Update </label>
-          <input
-            type="text"
-            class="form-control w-full"
-            formControlName="lastUpdate"
-          />
-        </div>
-        }
-        <div class="col-span-4">
-          <label for="descroption"> Description </label>
-          <textarea
-            class="form-control w-full resize-none"
-            formControlName="description"
-            placeholder="Describe What This Transaction For..."
-            rows="4"
-            style="resize: vertical"
-            dir="auto"
-          ></textarea>
-        </div>
-      </div>
-      <div
-        class="mt-5 flex text-center lg:justify-items-start lg:flex-row flex-col"
-      >
-        <button
-          type="submit"
-          class="btn-save me-2"
-          [disabled]="!JournalForm.valid"
-        >
-          <i class="fa-solid fa-floppy-disk me-1"></i> Save
-        </button>
-
-        <a routerLink="/Journal/List" class="btn-primary me-2">
-          <i class="fa-solid fa-list me-1"></i> List
-        </a>
-
-        @if (isEdit) {
-        <a
-          (click)="DeleteJournal(Journal().id)"
-          class="btn-danger me-2"
-          role="button"
-          type="button"
-        >
-          <i class="fa-solid fa-trash me-1"></i> Delete
-        </a>
-        }
-
-        <a [routerLink]="['/Journal', 'Create']" class="btn-add me-2">
-          <i class="fa-solid fa-plus me-1"></i> New Journal
-        </a>
-
-        <a [routerLink]="['/Period', 'Create']" class="btn-add me-2">
-          <i class="fa-solid fa-calendar-plus me-1"></i> New Period
-        </a>
-
-        <a
-          [routerLink]="['/Period', 'PeriodJournals', Journal().periodId]"
-          class="btn-add me-2"
-        >
-          <i class="fa-solid fa-book me-1"></i> Period Journals
-        </a>
-      </div>
-    </form>
-  </div>
+      </form>
+    </div>
   }
 </div>

@@ -64,16 +64,23 @@ export class JournalService {
 
   SaveJournal(journal: CreateJournal) {
     const url = this.url + `/Create`;
-    return this.http.post<ConfirmationRespose>(url, journal);
+    return this.http.post<Result<number>>(url, journal);
   }
 
   EditJournal(journal: CreateJournal) {
     const url = this.url + `/Edit`;
-    return this.http.put<ConfirmationRespose>(url, journal);
+    return this.http.put<Result<number>>(url, journal);
   }
 
   DeleteJournal(id: number) {
     const url = this.url + `/Delete/${id}`;
     return this.http.delete<ConfirmationRespose>(url);
+  }
+
+  GetAdjacentJournal(id, isNext) {
+    const action = isNext ? '/GetNextJournal' : '/GetPrevJournal';
+    const url = this.url + action + `/${id}`;
+
+    return this.http.get<Result<Journal>>(url);
   }
 }

@@ -32,7 +32,7 @@ export class SettingsComponent implements OnInit {
     private costCenterService: CostcenterService,
     private settingsService: SettingsService,
     private toastr: ToastrService,
-    private titleServive: Title
+    private titleServive: Title,
   ) {}
 
   ngOnInit() {
@@ -70,6 +70,7 @@ export class SettingsComponent implements OnInit {
       notBudgetCostCenter: [settings.notBudgetCostCenter ?? ''],
       banksAccount: [settings.banksAccount ?? ''],
       drawersAccount: [settings.drawersAccount ?? ''],
+      investmentAccount: [settings.investmentAccount ?? ''],
       levelOneDigits: [settings.levelOneDigits, [Validators.required]],
       levelTwoDigits: [settings.levelTwoDigits, [Validators.required]],
       levelThreeDigits: [settings.levelThreeDigits, [Validators.required]],

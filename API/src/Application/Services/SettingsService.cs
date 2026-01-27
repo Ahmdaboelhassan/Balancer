@@ -50,6 +50,7 @@ namespace Application.Services
             existingSettings.FixedAssetsAccount = settings.FixedAssetsAccount;
             existingSettings.CurrentCashAccount = settings.CurrentCashAccount;
             existingSettings.LiabilitiesAccount = settings.LiabilitiesAccount;
+            existingSettings.InvestmentAccount = settings.InvestmentAccount;
             existingSettings.BanksAccount = settings.BanksAccount;
             existingSettings.DrawersAccount = settings.DrawersAccount;
             existingSettings.LevelOneDigits = settings.LevelOneDigits;

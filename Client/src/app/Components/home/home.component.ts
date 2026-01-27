@@ -59,7 +59,10 @@ export class HomeComponent implements OnInit {
     'fa-solid fa-house',
   ];
 
-  constructor(private homeService: HomeService, private titleService: Title) {}
+  constructor(
+    private homeService: HomeService,
+    private titleService: Title,
+  ) {}
   ngOnInit(): void {
     this.titleService.setTitle('Balancer');
     this.homeService.GetHome().subscribe({
@@ -72,7 +75,7 @@ export class HomeComponent implements OnInit {
         this.IntializeRevenuesAndExpensesChart(
           result.revenues,
           result.expenses,
-          result.monthsNames
+          result.monthsNames,
         );
         this.GetEstimatedMonthNeed(result.periodDays, result.dayRate);
       },
@@ -82,13 +85,13 @@ export class HomeComponent implements OnInit {
   IntializeRevenuesAndExpensesChart(
     revenues: number[],
     expenses: number[],
-    monthsNames: string[]
+    monthsNames: string[],
   ) {
     revenues = revenues ? revenues.map((x) => (x === 0 ? null : x)) : [];
     expenses = expenses ? expenses.map((x) => (x === 0 ? null : x)) : [];
 
     const difference = revenues.map((el, i) =>
-      el && expenses[i] ? el - expenses[i] : null
+      el && expenses[i] ? el - expenses[i] : null,
     );
 
     this.RevenuesAndExpensesChart.set({
@@ -116,7 +119,7 @@ export class HomeComponent implements OnInit {
 
   IntializePieChart(data: number[]) {
     this.pieChart.set({
-      labels: ['Add', 'Subtract', 'Forward', 'Due'],
+      labels: ['Add', 'Subtract', 'Forward', 'Due', 'Investment'],
       datasets: [
         {
           label: 'Amount',
@@ -126,6 +129,7 @@ export class HomeComponent implements OnInit {
             'rgba(239, 68, 68, 0.8)', // Subtract
             'rgba(234, 179, 8, 0.8)', // Forward
             'rgba(59, 130, 246, 0.8)', // Due
+            'rgba(168, 85, 247, 0.8)', // Investment
           ],
           borderColor: '#fff',
           borderWidth: 2,
@@ -158,7 +162,7 @@ export class HomeComponent implements OnInit {
     const lastDay = new Date(
       currentDate.getFullYear(),
       currentDate.getMonth() + 1,
-      1
+      1,
     );
 
     const timeDifference = lastDay.getTime() - currentDate.getTime();
@@ -184,17 +188,17 @@ export class HomeComponent implements OnInit {
 
   SwitchRevenueAndExpensesChartType() {
     this.RevenuesAndExpensesChartType.update((x) =>
-      x == 'bar' ? 'line' : 'bar'
+      x == 'bar' ? 'line' : 'bar',
     );
     this.switchRevenuesAndExpensesIcon.update((x) =>
-      x == 'fa-chart-line' ? 'fa-chart-column' : 'fa-chart-line'
+      x == 'fa-chart-line' ? 'fa-chart-column' : 'fa-chart-line',
     );
   }
 
   TogglePieChart() {
     this.showPieChat.update((x) => !x);
     this.switchPieIcon.update((x) =>
-      x === 'fa-bars-progress' ? 'fa-chart-pie' : 'fa-bars-progress'
+      x === 'fa-bars-progress' ? 'fa-chart-pie' : 'fa-bars-progress',
     );
 
     if (this.showPieChat()) {

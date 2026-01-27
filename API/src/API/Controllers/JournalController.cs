@@ -2,6 +2,7 @@
 using Domain.IServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace API.Controllers;
 
@@ -55,6 +56,18 @@ public class JournalController : ControllerBase
     public async Task<IActionResult> GetJournals(int periodId)
     {
         return Ok(await _serviceContext.JournalService.GetPeriodJournals(periodId));
+    }
+
+    [HttpGet("GetNextJournal/{date}")]
+    public async Task<IActionResult> GetNextJournal(string date)
+    {
+        return Ok(await _serviceContext.JournalService.GetNextJournal(date));
+    }
+
+    [HttpGet("GetPrevJournal/{date}")]
+    public async Task<IActionResult> GetPrevJournal(string date)
+    {
+        return Ok(await _serviceContext.JournalService.GetPrevJournal(date));
     }
 
     [HttpPost("Create")]

@@ -249,7 +249,70 @@ internal class JournalService : IJournalService
 
         return 1;
     }
-    public async Task<ConfirmationResponse> Create(CreateJournalDTO model)
+
+    public async Task<Result<GetJournalDTO>> GetNextJournal(string date)
+    {
+        var journal = await _uow.Journal.GetNextJournal(date);
+
+        if (journal is null)
+            return new Result<GetJournalDTO> { Message = "No Next Journal Found", IsSucceed = false };
+
+        return new Result<GetJournalDTO>
+        {
+            IsSucceed = true,
+            Data = new GetJournalDTO()
+            {
+                Id = journal.Id,
+                CostCenterId = journal.JournalDetails.FirstOrDefault()?.CostCenterId,
+                DebitAccountId = journal.JournalDetails.First(d => d.Debit > 0).AccountId,
+                CreditAccountId = journal.JournalDetails.First(d => d.Credit > 0).AccountId,
+                CreatedAt = journal.CreatedAt,
+                Amount = Math.Abs(journal.Amount),
+                Type = journal.Type,
+                Code = journal.Code,
+                Notes = journal.Notes,
+                LastUpdatedAt = journal.LastUpdatedAt?.ToString("g"),
+                PeriodId = journal.PeriodId,
+                Detail = journal.Detail,
+                Description = journal.Description,
+                CostCenters = await _costCenterService.GetAllSelectList(),
+                Accounts = await _accountService.GetSelectList(a => !a.IsParent && !a.IsArchive),
+            }
+        };
+    }
+    public async Task<Result<GetJournalDTO>> GetPrevJournal(string date)
+    {
+        var journal = await _uow.Journal.GetPrevJournal(date);
+
+        if (journal is null)
+            return new Result<GetJournalDTO> { Message = "No Previous Journal Found", IsSucceed = false };
+
+        return new Result<GetJournalDTO>
+        {
+            IsSucceed = true,
+            Data = new GetJournalDTO()
+            {
+                Id = journal.Id,
+                CostCenterId = journal.JournalDetails.FirstOrDefault()?.CostCenterId,
+                DebitAccountId = journal.JournalDetails.First(d => d.Debit > 0).AccountId,
+                CreditAccountId = journal.JournalDetails.First(d => d.Credit > 0).AccountId,
+                CreatedAt = journal.CreatedAt,
+                Amount = Math.Abs(journal.Amount),
+                Type = journal.Type,
+                Code = journal.Code,
+                Notes = journal.Notes,
+                LastUpdatedAt = journal.LastUpdatedAt?.ToString("g"),
+                PeriodId = journal.PeriodId,
+                Detail = journal.Detail,
+                Description = journal.Description,
+                CostCenters = await _costCenterService.GetAllSelectList(),
+                Accounts = await _accountService.GetSelectList(a => !a.IsParent && !a.IsArchive),
+            }
+        };
+    }
+
+
+    public async Task<Result<int>> Create(CreateJournalDTO model)
     {
         using (var transaction = _uow.StartTransaction())
         {
@@ -262,18 +325,18 @@ internal class JournalService : IJournalService
                 Period? period = model.PeriodId == 0 ? await _uow.Periods.GetLastOrderBy(p => p.From) : await _uow.Periods.Get(model.PeriodId);
 
                 if (credit == null || debit == null)
-                    return new ConfirmationResponse { Message = "Credit Account or Debit Account is Wrong" };
+                    return new Result<int> { Message = "Credit Account or Debit Account is Wrong" };
 
                 if (credit.IsParent || debit.IsParent)
-                    return new ConfirmationResponse { Message = "Can Not Make Journal From Using Parent Accounts" };
+                    return new Result<int> { Message = "Can Not Make Journal From Using Parent Accounts" };
 
                 if (period == null)
-                    return new ConfirmationResponse { Message = "Some Thing Wrong While Selecting Journal Period" };
+                    return new Result<int> { Message = "Some Thing Wrong While Selecting Journal Period" };
 
                 if (model.CreatedAt.Date > period.To.Date)
                 {
                     var difference = model.CreatedAt.Date.Subtract(period.To.Date).TotalDays;
-                    return new ConfirmationResponse { Message = $"Period Has Been Expired From {difference} Days Ago" };
+                    return new Result<int> { Message = $"Period Has Been Expired From {difference} Days Ago" };
                 }
                 
                 var code = await GetNextCode();
@@ -283,7 +346,7 @@ internal class JournalService : IJournalService
                 var journalType = await GetJournalType(credit.Number , debit.Number);
                 var journalAmount = journalType == JournalTypes.Subtract ? model.Amount * -1 : model.Amount;
 
-                if (journalType != JournalTypes.Due && journalType != JournalTypes.Forward)
+                if (journalType == JournalTypes.Add || journalType == JournalTypes.Subtract)
                 {
                     await _uow.Periods.ExecuteUpdateAsync(p => p.Id == period.Id, e => e.SetProperty(p => p.TotalAmount, p => p.TotalAmount + journalAmount));
                 }
@@ -334,15 +397,15 @@ internal class JournalService : IJournalService
 
                 transaction.Commit();
 
-                return new ConfirmationResponse { Message = "Journal Has Been Created Successfully", IsSucceed = true };
+                return new Result<int> { Message = "Journal Has Been Created Successfully", Data = newJournal.Id, IsSucceed = true };
             }
             catch (Exception ex) {
                 transaction.Rollback();
-                return new ConfirmationResponse { Message = $"Exception Happens => {ex.Message}" };
+                return new Result<int> { Message = $"Exception Happens => {ex.Message}" };
             }
           }
     }
-    public async Task<ConfirmationResponse> Edit(CreateJournalDTO model)
+    public async Task<Result<int>> Edit(CreateJournalDTO model)
         {
         using (var transaction = _uow.StartTransaction())
         {
@@ -354,10 +417,10 @@ internal class JournalService : IJournalService
                 var journal = await _uow.Journal.Get(j => j.Id == model.Id, "JournalDetails");
 
                 if (journal is null)
-                    return new ConfirmationResponse { Message = "Invalid Journal" };
+                    return new Result<int> { Message = "Invalid Journal" };
 
                 // Reset Period Value 
-                if (journal.Type != (byte)JournalTypes.Due && journal.Type != (byte)JournalTypes.Forward)
+                if (journal.Type == (byte)JournalTypes.Add || journal.Type == (byte)JournalTypes.Subtract)
                     await ResetPeriodValueBeforeJournal(journal.PeriodId, journal.Amount);
 
                 var credit = await _uow.Accounts.Get(model.CreditAccountId);
@@ -365,18 +428,18 @@ internal class JournalService : IJournalService
                 var period = await _uow.Periods.Get(model.PeriodId);
 
                 if (credit is null || debit is null)
-                    return new ConfirmationResponse { Message = "Credit Account or Debit Account is Wrong" };
+                    return new Result<int> { Message = "Credit Account or Debit Account is Wrong" };
 
                 if (credit.IsParent || debit.IsParent)
-                    return new ConfirmationResponse { Message = "Can Not Make Journal Using Parent Accounts" };
+                    return new Result<int> { Message = "Can Not Make Journal Using Parent Accounts" };
 
                 if (period is null)
-                    return new ConfirmationResponse { Message = "Some Thing Wrong While Selecting Journal Period" };
+                    return new Result<int> { Message = "Some Thing Wrong While Selecting Journal Period" };
 
                 if (model.CreatedAt.Date > period.To.Date)
                 {
                     var difference = model.CreatedAt.Date.Subtract(period.To.Date).TotalDays;
-                    return new ConfirmationResponse { Message = $"Created Date Is Greater Than Period End Date With {difference} Days" };
+                    return new Result<int> { Message = $"Created Date Is Greater Than Period End Date With {difference} Days" };
                 }
 
                 var notes = $"{credit.Name} : {debit.Name} (U)";
@@ -385,7 +448,7 @@ internal class JournalService : IJournalService
 
                 var journalAmount = journalType == JournalTypes.Subtract ? model.Amount * -1 : model.Amount;
 
-                if (journalType != JournalTypes.Due && journalType != JournalTypes.Forward)
+                if (journal.Type == (byte)JournalTypes.Add || journal.Type == (byte)JournalTypes.Subtract)
                 {
                     await _uow.Periods.ExecuteUpdateAsync(p => p.Id == model.PeriodId, e => e.SetProperty(p => p.TotalAmount, p => p.TotalAmount + journalAmount));
                 }
@@ -436,11 +499,11 @@ internal class JournalService : IJournalService
 
                 transaction.Commit();
 
-                return new ConfirmationResponse { Message = "Journal Has Been Updated Successfully", IsSucceed = true };
+                return new Result<int> { Message = "Journal Has Been Updated Successfully", Data = journal.Id ,IsSucceed = true };
             }
             catch (Exception ex) {
                 transaction.Rollback();
-                return new ConfirmationResponse { Message = $"Exception Happens => {ex.Message}" };
+                return new Result<int> { Message = $"Exception Happens => {ex.Message}" };
 
             }
         }
@@ -461,7 +524,7 @@ internal class JournalService : IJournalService
                 await _uow.SaveChangesAync();
 
 
-                if (journal.Type != (byte)JournalTypes.Due && journal.Type != (byte)JournalTypes.Forward)
+                if (journal.Type == (byte)JournalTypes.Add || journal.Type == (byte)JournalTypes.Subtract)
                 {
                     await ResetPeriodValueBeforeJournal(journal.PeriodId, journal.Amount);
                     await _uow.SaveChangesAync();
@@ -490,17 +553,32 @@ internal class JournalService : IJournalService
         if (setting == null)
             throw new InvalidDataException("Application Has No Settings");
 
+        var basicAccounts = new int[]
+        {
+            setting.DrawersAccount.GetValueOrDefault(),
+            setting.BanksAccount.GetValueOrDefault(),
+            setting.LiabilitiesAccount.GetValueOrDefault(),
+            setting.InvestmentAccount.GetValueOrDefault()
+        };
+
         // From Banks and Drawers Then Decrease Balance 
-        var drawerAccount = await _uow.Accounts.Get(setting.DrawersAccount.GetValueOrDefault());
-        var banksAccount = await _uow.Accounts.Get(setting.BanksAccount.GetValueOrDefault());
-        var liabilitiesAccount = await _uow.Accounts.Get(setting.LiabilitiesAccount.GetValueOrDefault());
+        var accounts = await _uow.Accounts.GetAll(a => basicAccounts.Contains(a.Id));   
+        var dict = accounts.ToDictionary(a => a.Id, a => a.Number);
 
-        if (drawerAccount is null || banksAccount is null || liabilitiesAccount is null)
-                throw new InvalidDataException("There Are No Drawer, Banks Or Liabilities Accounts !");
+        if (accounts.Count() != basicAccounts.Count()) // All Accounts Exists
+              throw new InvalidDataException("There Are No Drawer, Banks Or Liabilities Accounts !");
 
-        Predicate<string> IsDrawerOrBank = (accountNumber) => accountNumber.StartsWith(drawerAccount.Number) || accountNumber.StartsWith(banksAccount.Number);
+        Predicate<string> IsDrawerOrBank = (accountNumber) => accountNumber.StartsWith(dict[setting.DrawersAccount.GetValueOrDefault()]) || accountNumber.StartsWith(dict[setting.BanksAccount.GetValueOrDefault()]);
 
-        if (IsDrawerOrBank(creditNumber))
+        if (creditNumber.StartsWith(dict[setting.LiabilitiesAccount.GetValueOrDefault()]))
+        {
+            journalType = JournalTypes.Due;
+        }
+        else if (debitNumber.StartsWith(dict[setting.InvestmentAccount.GetValueOrDefault()]))
+        {
+            journalType = JournalTypes.Investment;
+        }
+        else if (IsDrawerOrBank(creditNumber))
         {
             journalType = IsDrawerOrBank(debitNumber) ? JournalTypes.Forward : JournalTypes.Subtract;
         }
@@ -508,14 +586,13 @@ internal class JournalService : IJournalService
         {
             journalType = JournalTypes.Add;
         }
-        else if (creditNumber.StartsWith(liabilitiesAccount.Number))
-        {
-            journalType = JournalTypes.Due;
-        }
+       
 
         return journalType;
     }
 
+
+    
     
 }
 

@@ -183,6 +183,7 @@ public class HomeService : IHomeService
             journalsTypesSummary.GetValueOrDefault((byte)JournalTypes.Subtract),
             journalsTypesSummary.GetValueOrDefault((byte)JournalTypes.Forward),
             journalsTypesSummary.GetValueOrDefault((byte)JournalTypes.Due),
+            journalsTypesSummary.GetValueOrDefault((byte)JournalTypes.Investment),
         };
 
     }

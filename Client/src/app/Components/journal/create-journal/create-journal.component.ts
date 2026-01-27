@@ -44,7 +44,7 @@ export class CreateJournalComponent {
     private router: Router,
     private journalService: JournalService,
     private accountService: AccountService,
-    private titleService: Title
+    private titleService: Title,
   ) {
     this.titleService.setTitle('Create Journal');
     var JournalId = this.route.snapshot.params['id'];
@@ -85,6 +85,21 @@ export class CreateJournalComponent {
     }
   }
 
+  GetAdjacentJournal(isNext) {
+    const journalId = this.JournalForm.get('created').value;
+    this.journalService.GetAdjacentJournal(journalId, isNext).subscribe({
+      next: (result) => {
+        if (result.isSucceed) {
+          this.Journal.set(result.data);
+          this.intializeForm(result.data);
+          this.router.navigate(['/Journal', 'Edit', result.data.id]);
+        } else {
+          Swal.fire('Invalid Action', result.message, 'info');
+        }
+      },
+    });
+  }
+
   intializeForm(journal: Journal) {
     this.JournalForm = new FormGroup({
       id: new FormControl(journal.id),
@@ -95,7 +110,7 @@ export class CreateJournalComponent {
       costCenter: new FormControl(journal.costCenterId ?? ''),
       code: new FormControl({ disabled: true, value: journal.code }),
       created: new FormControl(
-        this.GetLocaleDateTime(new Date(journal.createdAt))
+        this.GetLocaleDateTime(new Date(journal.createdAt)),
       ),
       lastUpdate: new FormControl({
         disabled: true,
@@ -106,32 +121,8 @@ export class CreateJournalComponent {
       creditBalance: new FormControl({ disabled: true, value: 0 }),
       debitBalance: new FormControl({ disabled: true, value: 0 }),
     });
-    // this.GetCreditBalance();
-    // this.GetDebitBalance();
   }
 
-  GetCreditBalance() {}
-  GetDebitBalance() {
-    const accountId = this.JournalForm.get('debit').value;
-    this.accountService.GetAccountBalance(accountId).subscribe({
-      next: (result) => {
-        this.JournalForm.patchValue({ debitBalance: result.balance });
-        this.debitBalance = result.balance;
-        this.JournalForm.patchValue({
-          debitBalance: this.debitBalance + this.journalAmount,
-        });
-      },
-      error: (error) => {
-        Swal.fire({
-          title: 'Get Debit Balance',
-          text: error ?? 'An Error Happend',
-          icon: 'error',
-          showConfirmButton: true,
-          timer: environment.sweetAlertTimeOut,
-        });
-      },
-    });
-  }
   ChangeBalances() {
     this.journalAmount = this.JournalForm.get('amount')?.value;
     this.JournalForm.patchValue({
@@ -166,7 +157,7 @@ export class CreateJournalComponent {
             showConfirmButton: false,
             timer: environment.sweetAlertTimeOut,
           });
-          //this.router.navigate(['/Journal', 'List']);
+          this.router.navigate(['/Journal', 'Edit', result.data]);
         },
         error: (error) => {
           Swal.fire({
@@ -196,7 +187,7 @@ export class CreateJournalComponent {
               code: this.JournalForm.get('code').value + 1,
               costCenter: '',
               created: this.GetDateTimePlusOneMinute(
-                this.JournalForm.get('created').value
+                this.JournalForm.get('created').value,
               ),
             });
             // this.GetCreditBalance();

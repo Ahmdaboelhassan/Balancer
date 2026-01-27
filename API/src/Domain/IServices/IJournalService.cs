@@ -12,7 +12,9 @@ public interface IJournalService
     public Task<IEnumerable<JournalListItemDTO>> Search(string criteria);
     public Task<IEnumerable<JournalListItemDTO>> AdvancedSearch(JournalAdvancedSearchDTO DTO);
     public Task<int> GetNextCode();
-    public Task<ConfirmationResponse> Create(CreateJournalDTO model);
-    public Task<ConfirmationResponse> Edit(CreateJournalDTO model);
+    public Task<Result<GetJournalDTO>> GetNextJournal(string id);
+    public Task<Result<GetJournalDTO>> GetPrevJournal(string id);
+    public Task<Result<int>> Create(CreateJournalDTO model);
+    public Task<Result<int>> Edit(CreateJournalDTO model);
     public Task<ConfirmationResponse> Delete(int id);
 }

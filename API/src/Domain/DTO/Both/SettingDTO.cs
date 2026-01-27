@@ -27,6 +27,9 @@ namespace Domain.DTO.Both
         public int? CurrentCashAccount { get; set; }
         [Required]
         public int? LiabilitiesAccount { get; set; }
+
+        [Required]
+        public int? InvestmentAccount { get; set; }
         [Required]
         public int? BanksAccount { get; set; }
         [Required]

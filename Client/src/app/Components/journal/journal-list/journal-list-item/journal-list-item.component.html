@@ -7,33 +7,46 @@
       {{ journal.detail }}
     </h4>
     <div>
-      @if(journal.type === 1){
-      <div
-        class="amount flex items-center text-2xl lg:text-3xl overflow-hidden text-green-500"
-      >
-        <h1 class="me-2">{{ journal.amount }}</h1>
-        <i class="fa-solid fa-square-plus"></i>
-      </div>
-      } @else if(journal.type === 2){
-      <div class="amount flex items-center text-2xl lg:text-3xl text-red-400">
-        <h1 class="me-2">{{ journal.amount }}</h1>
-        <i class="fa-solid fa-square-minus"></i>
-      </div>
-
-      } @else if(journal.type === 3){
-
-      <div class="amount flex items-center text-2xl lg:text-3xl text-blue-400">
-        <h1 class="me-2">{{ journal.amount }}</h1>
-        <i class="fa-solid fa-thumbtack"></i>
-      </div>
-
+      @if (journal.type === 1) {
+        <div
+          class="amount flex items-center text-2xl lg:text-3xl overflow-hidden text-green-500"
+        >
+          <h1 class="me-2">{{ journal.amount }}</h1>
+          <i class="fa-solid fa-square-plus"></i>
+        </div>
+      } @else if (journal.type === 2) {
+        <div class="amount flex items-center text-2xl lg:text-3xl text-red-400">
+          <h1 class="me-2">{{ journal.amount }}</h1>
+          <i class="fa-solid fa-square-minus"></i>
+        </div>
+      } @else if (journal.type === 3) {
+        <div
+          class="amount flex items-center text-2xl lg:text-3xl text-blue-400"
+        >
+          <h1 class="me-2">{{ journal.amount }}</h1>
+          <i class="fa-solid fa-thumbtack"></i>
+        </div>
+      } @else if (journal.type === 3) {
+        <div
+          class="amount flex items-center text-2xl lg:text-3xl text-blue-400"
+        >
+          <h1 class="me-2">{{ journal.amount }}</h1>
+          <i class="fa-solid fa-thumbtack"></i>
+        </div>
+      } @else if (journal.type === 4) {
+        <div
+          class="amount flex items-center text-2xl lg:text-3xl text-orange-400"
+        >
+          <h1 class="me-2">{{ journal.amount }}</h1>
+          <i class="fa-solid fa-reply fa-flip-horizontal"></i>
+        </div>
       } @else {
-      <div
-        class="amount flex items-center text-2xl lg:text-3xl text-orange-400"
-      >
-        <h1 class="me-2">{{ journal.amount }}</h1>
-        <i class="fa-solid fa-reply fa-flip-horizontal"></i>
-      </div>
+        <div
+          class="amount flex items-center text-2xl lg:text-3xl text-purple-400"
+        >
+          <h1 class="me-2">{{ journal.amount }}</h1>
+          <i class="fa-solid fa-wallet"></i>
+        </div>
       }
     </div>
   </div>

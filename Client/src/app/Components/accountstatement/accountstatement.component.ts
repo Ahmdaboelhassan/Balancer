@@ -33,7 +33,7 @@ export class AccountstatementComponent {
   constructor(
     private accountService: AccountService,
     private costCenterService: CostcenterService,
-    private titleServive: Title
+    private titleServive: Title,
   ) {
     this.GetDefaultDate();
     this.accountService.GetAllAccountSelectList().subscribe({
@@ -43,23 +43,6 @@ export class AccountstatementComponent {
       .GetAllCostCenterSelectList()
       .subscribe({ next: (costCenters) => (this.costCenters = costCenters) });
     this.titleServive.setTitle('Account Statement');
-  }
-
-  GetDefaultDate() {
-    const currentDate = new Date();
-    const firstDay = new Date(
-      currentDate.getFullYear(),
-      currentDate.getMonth(),
-      2
-    );
-    const lastDay = new Date(
-      currentDate.getFullYear(),
-      currentDate.getMonth() + 1,
-      1
-    );
-
-    this.from.set(firstDay.toISOString().split('T')[0]);
-    this.to.set(lastDay.toISOString().split('T')[0]);
   }
 
   GetAccountStatement(form: NgForm) {
@@ -143,6 +126,32 @@ export class AccountstatementComponent {
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const day = date.getDate().toString().padStart(2, '0');
     return `${year}-${month}-${day}`;
+  }
+  GetDefaultDate() {
+    const currentDate = new Date();
+    const firstDay = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+      2,
+    );
+    const lastDay = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth() + 1,
+      1,
+    );
+
+    this.from.set(firstDay.toISOString().split('T')[0]);
+    this.to.set(lastDay.toISOString().split('T')[0]);
+  }
+
+  GetDefaultYear() {
+    const currentDate = new Date();
+
+    const firstDay = new Date(currentDate.getFullYear(), 0, 2); // Jan 1
+    const lastDay = new Date(currentDate.getFullYear(), 12, 1); // Dec 31
+
+    this.from.set(firstDay.toISOString().split('T')[0]);
+    this.to.set(lastDay.toISOString().split('T')[0]);
   }
 
   @HostListener('document:keydown', ['$event'])

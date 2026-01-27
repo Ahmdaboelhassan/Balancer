@@ -30,7 +30,7 @@ export class CreateAccountComponent implements OnInit {
     private accountService: AccountService,
     private titleService: Title,
     private toastr: ToastrService,
-    private router: Router
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -110,8 +110,9 @@ export class CreateAccountComponent implements OnInit {
     if (this.isEdit) {
       this.accountService.EditAccount(SaveJournal).subscribe({
         next: (result) => {
+          const id = this.accountForm.get('id').value;
           this.toastr.success(result.message);
-          this.router.navigate(['/Account', 'List']);
+          this.router.navigate(['/Account', 'Edit', id]);
         },
         error: (error) => {
           this.toastr.error(error.error.message);
