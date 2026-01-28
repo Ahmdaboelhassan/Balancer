@@ -204,13 +204,13 @@ public class HomeService : IHomeService
                 .OrderBy(j => j.CreatedAt);
 
         var expensesMonthlyGrouped = currentYearJournal.Where(j => j.Type == (byte)JournalTypes.Subtract)
-                                                       .GroupBy(j => j.CreatedAt.Month)
+                                                       .GroupBy(j => new { j.CreatedAt.Year, j.CreatedAt.Month })
                                                        .Select(j => new { j.Key, Total = j.Sum(j => j.Amount * -1) })
                                                        .ToDictionary(j => j.Key, j => j.Total);
 
 
         var revenuesMonthlyGrouped = currentYearJournal.Where(j => j.Type == (byte)JournalTypes.Add)
-                                                       .GroupBy(j => j.CreatedAt.Month)
+                                                        .GroupBy(j => new { j.CreatedAt.Year, j.CreatedAt.Month })
                                                        .Select(j => new { j.Key, Total = j.Sum(j => j.Amount) })
                                                        .ToDictionary(j => j.Key, j => j.Total);
 
@@ -223,8 +223,9 @@ public class HomeService : IHomeService
 
             revenues.Add(revenuesMonthlyGrouped.TryGetValue(k, out decimal revenueValue) ? revenueValue : 0);
 
-            string monthName = CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(k);
-            months.Add(monthName);
+            var month = new DateTime(k.Year, k.Month, 1).ToString("MMM yy", CultureInfo.CurrentCulture);
+
+            months.Add(month);
         }
 
         return (expenses, revenues, months);

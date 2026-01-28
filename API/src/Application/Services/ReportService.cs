@@ -6,6 +6,8 @@ using Domain.IServices;
 using System;
 using System.Globalization;
 using System.Linq.Expressions;
+using System.Timers;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Application.Services;
 public class ReportService : IReportService
@@ -426,12 +428,16 @@ public class ReportService : IReportService
                 break;
 
             case AccountComparerGroups.ByMonth:
-                journalGroupKey = journals.GroupBy(j => j.Journal.CreatedAt.Month)
-                    .Select(k => new AccountComparerItemDTO
-                    {
-                        Amount = k.Sum(a => a.Debit - a.Credit),
-                        Time = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(k.Key),
+                journalGroupKey = journals.GroupBy(j => new { j.Journal.CreatedAt.Year, j.Journal.CreatedAt.Month })
+                    .Select(k => {
+                        var date = new DateTime(k.Key.Year, k.Key.Month, 1);
+                        return new AccountComparerItemDTO
+                        {
+                            Amount = k.Sum(a => a.Debit - a.Credit),
+                            Time = date.ToString("MMMM yy", CultureInfo.CurrentCulture)
+                        };
                     });
+
                 break;
 
             case AccountComparerGroups.ByYear:
@@ -444,12 +450,15 @@ public class ReportService : IReportService
                 break;
 
             default:
-                journalGroupKey = journals.GroupBy(j => j.Journal.CreatedAt.Month)
-                    .Select(k => new AccountComparerItemDTO
-                    {
-                        Amount = k.Sum(a => a.Debit - a.Credit),
-                        Time = k.Key.ToString(),
-                    });
+                journalGroupKey = journals.GroupBy(j => new { j.Journal.CreatedAt.Year, j.Journal.CreatedAt.Month })
+                   .Select(k => {
+                       var date = new DateTime(k.Key.Year, k.Key.Month, 1);
+                       return new AccountComparerItemDTO
+                       {
+                           Amount = k.Sum(a => a.Debit - a.Credit),
+                           Time = date.ToString("MMMM yy", CultureInfo.CurrentCulture)
+                       };
+                   });
                 break;
         }
 
