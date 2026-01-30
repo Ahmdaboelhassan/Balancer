@@ -228,6 +228,7 @@ public class ReportService : IReportService
         var incomeStatement = journals.GroupBy(j => j.accountId)
                 .Select(d => new AccountSummaryDTO
                 {
+                    AccountId = d.First().accountId,
                     AccountName = d.First().AccountName,
                     Balance = d.Sum(d => d.balance),
                     AccountNumber = d.First().AccountNumber,
@@ -283,6 +284,7 @@ public class ReportService : IReportService
 
         var incomeStatement = journals.GroupBy(j => j.accountId)
                 .Select(d => new AccountSummaryDTO { 
+                    AccountId = d.First().accountId,
                     AccountName = d.First().AccountName, 
                     AccountNumber = d.First().AccountNumber,
                     Credit = d.Sum(d => d.Credit),
@@ -315,7 +317,17 @@ public class ReportService : IReportService
         if (!currentJournalAccounts.Any())
             return Enumerable.Empty<AccountSummaryDTO>();
 
-        var accounts = await _uow.Accounts.GetAll(d => !maxLevel.HasValue || d.Level <= maxLevel.Value);
+        
+        List<Account> accounts;
+
+        if (maxLevel.HasValue)
+            if (maxLevel.Value > 5)
+                accounts = await _uow.Accounts.GetAll(d => d.Level == (maxLevel.Value - 5));
+            else 
+                accounts = await _uow.Accounts.GetAll(d => d.Level <= maxLevel.Value);
+        else
+            accounts = await _uow.Accounts.GetAll();
+
 
         var accountsSummaries = new LinkedList<AccountSummaryDTO>();
 
@@ -365,9 +377,18 @@ public class ReportService : IReportService
         if (!currentJournalAccounts.Any())
             return Enumerable.Empty<AccountSummaryDTO>();
 
-        var childAccountNumber = await _uow.Accounts.GetAll(d => 
-            (!maxLevel.HasValue || d.Level <= maxLevel.Value) 
-            && (d.Number.StartsWith(accountNumbers[assetsAccountId]) || d.Number.StartsWith(accountNumbers[LiabilitiesAccountId])));
+        Expression<Func<Account, bool>> filter = 
+            d => (d.Number.StartsWith(accountNumbers[assetsAccountId]) || d.Number.StartsWith(accountNumbers[LiabilitiesAccountId]));
+
+        
+        if (maxLevel.HasValue)
+            if (maxLevel.Value > 5)
+                filter = d => d.Level == (maxLevel.Value - 5) && (d.Number.StartsWith(accountNumbers[assetsAccountId]) || d.Number.StartsWith(accountNumbers[LiabilitiesAccountId]));
+            else
+                filter = d => (!maxLevel.HasValue || d.Level <= maxLevel.Value) && (d.Number.StartsWith(accountNumbers[assetsAccountId]) || d.Number.StartsWith(accountNumbers[LiabilitiesAccountId]));
+
+        var childAccountNumber = await _uow.Accounts.GetAll(filter);
+          
 
         var accountsSummaries = new LinkedList<AccountSummaryDTO>();
 

@@ -8,24 +8,39 @@
       <th scope="col" class="px-8 py-3">Debit</th>
       <th scope="col" class="px-8 py-3">Credit</th>
     </tr>
-    @if(accounts.length > 0){
-    <tbody>
-      @for(account of accounts ;track $index){
-
-      <tr class="bg-white border-b hover:bg-gray-50 dark:hover:bg-gray-50">
-        <th
-          scope="row"
-          class="px-6 py-4 font-bold text-base text-gray-900 whitespace-nowrap"
-        >
-          {{ account.accountName }}
-        </th>
-        <!-- <td class="px-8 py-4 font-bold">{{ account.accountNumber }}</td> -->
-        <td class="px-8 py-4 font-bold">{{ account.balance | currency }}</td>
-        <td class="px-8 py-4 font-bold">{{ account.debit | currency }}</td>
-        <td class="px-8 py-4 font-bold">{{ account.credit | currency }}</td>
-      </tr>
-      }
-    </tbody>
+    @if (accounts.length > 0) {
+      <tbody>
+        @for (account of accounts; track $index) {
+          <tr class="bg-white border-b hover:bg-gray-50 dark:hover:bg-gray-50">
+            <th
+              scope="row"
+              class="px-6 py-4 font-bold text-base text-gray-900 whitespace-nowrap"
+            >
+              {{ account.accountName }}
+              <a
+                target="_blank"
+                [routerLink]="['/AccountStatement/Get']"
+                [queryParams]="{
+                  account: account.accountId,
+                  openingBalance: false,
+                  from: from,
+                  to: to,
+                }"
+              >
+                <i
+                  class="fa-solid fa-circle-info text-blue-700 hover:scale-125 cursor-pointer"
+                ></i>
+              </a>
+            </th>
+            <!-- <td class="px-8 py-4 font-bold">{{ account.accountNumber }}</td> -->
+            <td class="px-8 py-4 font-bold">
+              {{ account.balance | currency }}
+            </td>
+            <td class="px-8 py-4 font-bold">{{ account.debit | currency }}</td>
+            <td class="px-8 py-4 font-bold">{{ account.credit | currency }}</td>
+          </tr>
+        }
+      </tbody>
     }
   </table>
 </div>

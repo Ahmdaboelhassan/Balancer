@@ -5,97 +5,100 @@
   <div
     class="w-full lg:w-6/12 flex justify-between items-center flex-col lg:flex-row"
   >
-    @if(!hideFromDate){
-    <input
-      type="date"
-      class="lg:w-2/5 w-full print:text-xs date-form-control"
-      required
-      [(ngModel)]="from"
-    />
-    <label
-      class="text-slate-900 font-bold text-lg print:text-lg hidden lg:inline-block"
-      >To</label
-    >
+    @if (!hideFromDate) {
+      <input
+        type="date"
+        class="lg:w-2/5 w-full print:text-xs date-form-control lg:my-0 my-0.5"
+        required
+        [(ngModel)]="from"
+      />
+      <label
+        class="text-slate-900 font-bold text-lg print:text-lg hidden lg:inline-block lg:mx-2"
+        >To</label
+      >
     }
     <input
       type="date"
-      class="lg:w-2/5 w-full date-form-control print:text-xs"
+      class="lg:w-2/5 w-full date-form-control print:text-xs lg:my-0 my-0.5"
       required
       [(ngModel)]="to"
     />
-    @if(showMaxLevelFilter){
-    <select
-      [(ngModel)]="maxLevel"
-      (change)="EmitDatesValue()"
-      class="date-form-control print:text-xs lg:m-0 my-1 w-full lg:w-auto print:hidden"
-    >
-      <option value="">All Levels</option>
-      <option value="1">1st Level</option>
-      <option value="2">2nd Level</option>
-      <option value="3">3rd Level</option>
-      <option value="4">4th Level</option>
-      <option value="5">5th Level</option>
-    </select>
+    @if (showMaxLevelFilter) {
+      <select
+        [(ngModel)]="maxLevel"
+        (change)="EmitDatesValue()"
+        class="date-form-control print:text-xs lg:mx-2 lg:my-0my-1 w-full lg:w-auto print:hidden lg:my-0 my-1"
+      >
+        <option value="">All Levels</option>
+        <option value="2">2nd Level</option>
+        <option value="3">3rd Level</option>
+        <option value="4">4th Level</option>
+        <option value="5">5th Level</option>
+        <option value="1">1st Level Only</option>
+        <option value="7">2nd Level Only</option>
+        <option value="8">3rd Level Only</option>
+        <option value="9">4th Level Only</option>
+        <option value="10">5th Level Only</option>
+      </select>
     }
   </div>
 
   <div
     class="lg:flex lg:justify-end gap-2 w-full items-center lg:w-5/12 print:hidden"
   >
-    @if(!isYearRange){
-    <div
-      class="flex w-full justify-center overflow-hidden lg:w-8/12 lg:mb-0 mb-1 me-4"
-      role="group"
-    >
-      <button
-        type="button"
-        class="px-1 py-0.5 lg:py-2.5 w-1/5 text-gray-900 bg-white border border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-blue-700"
-        (click)="DecrementMonth()"
+    @if (!isYearRange) {
+      <div
+        class="flex w-full justify-center overflow-hidden lg:w-8/12 lg:mb-0 mb-1 me-4"
+        role="group"
       >
-        <i class="fa-solid fa-calendar-minus"></i>
-      </button>
-      <button
-        type="button"
-        class="px-1 py-0.5 w-1/5 text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 hover:text-blue-700"
-        (click)="GetCurrentDay()"
-      >
-        <i class="fa-solid fa-calendar-day"></i>
-      </button>
+        <button
+          type="button"
+          class="px-1 py-0.5 lg:py-2.5 w-1/5 text-gray-900 bg-white border border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-blue-700"
+          (click)="DecrementMonth()"
+        >
+          <i class="fa-solid fa-calendar-minus"></i>
+        </button>
+        <button
+          type="button"
+          class="px-1 py-0.5 w-1/5 text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 hover:text-blue-700"
+          (click)="GetCurrentDay()"
+        >
+          <i class="fa-solid fa-calendar-day"></i>
+        </button>
 
-      <button
-        type="button"
-        class="px-1 py-0.5 w-1/5 text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 hover:text-blue-700"
-        (click)="GetDefaultWeekDates()"
-      >
-        <i class="fa-solid fa-calendar-week"></i>
-      </button>
-      <button
-        type="button"
-        class="px-1 py-0.5 w-1/5 text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 hover:text-blue-700"
-        (click)="GetDefaultDate()"
-      >
-        <i class="fas fa-calendar-alt"></i>
-      </button>
-      <button
-        type="button"
-        class="px-1 py-0.5 lg:py-2.5 w-1/5 text-gray-900 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-blue-700"
-        (click)="IncrementMonth()"
-      >
-        <i class="fa-solid fa-calendar-plus"></i>
-      </button>
-    </div>
-
+        <button
+          type="button"
+          class="px-1 py-0.5 w-1/5 text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 hover:text-blue-700"
+          (click)="GetDefaultWeekDates()"
+        >
+          <i class="fa-solid fa-calendar-week"></i>
+        </button>
+        <button
+          type="button"
+          class="px-1 py-0.5 w-1/5 text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 hover:text-blue-700"
+          (click)="GetDefaultDate()"
+        >
+          <i class="fas fa-calendar-alt"></i>
+        </button>
+        <button
+          type="button"
+          class="px-1 py-0.5 lg:py-2.5 w-1/5 text-gray-900 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-blue-700"
+          (click)="IncrementMonth()"
+        >
+          <i class="fa-solid fa-calendar-plus"></i>
+        </button>
+      </div>
     }
     <div class="w-full flex gap-1">
-      @if(journalFilter){
-      <button
-        mat-button
-        (click)="openDialog()"
-        type="button"
-        class="btn-primary text-center"
-      >
-        <i class="fa-solid fa-list"></i>
-      </button>
+      @if (journalFilter) {
+        <button
+          mat-button
+          (click)="openDialog()"
+          type="button"
+          class="btn-primary text-center"
+        >
+          <i class="fa-solid fa-list"></i>
+        </button>
       }
       <button
         type="button"

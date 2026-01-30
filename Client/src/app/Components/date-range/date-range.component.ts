@@ -3,6 +3,7 @@ import {
   Component,
   EventEmitter,
   inject,
+  input,
   Input,
   OnInit,
   Output,
@@ -24,12 +25,12 @@ export class DateRangeComponent implements OnInit {
   @Input() isYearRange = false;
   @Input() hideFromDate = false;
   @Input() journalFilter = false;
+  @Input() maxLevel = '';
   readonly dialog = inject(MatDialog);
   readonly journalService = inject(JournalService);
 
   from: any;
   to: any;
-  maxLevel: any = '';
 
   ngOnInit(): void {
     this.GetDefaultDate();
