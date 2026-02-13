@@ -1,4 +1,5 @@
 ﻿using Domain.DTO.Request;
+using Domain.DTO.Response;
 using Domain.IServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -70,6 +71,17 @@ public class JournalController : ControllerBase
         return Ok(await _serviceContext.JournalService.GetPrevJournal(date));
     }
 
+    
+    [HttpPost("AdjustBudget")]
+    public async Task<IActionResult> AdjustBudget(AdjustBudgetRequest dto)
+    {
+        var result = await _serviceContext.JournalService.AdjustBudget(dto.Amount); 
+        if (result.IsSucceed)
+            return Ok (result);
+
+        return BadRequest(result);
+    }
+    
     [HttpPost("Create")]
     public async Task<IActionResult> Create(CreateJournalDTO model)
     {

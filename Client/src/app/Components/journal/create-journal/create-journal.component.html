@@ -35,7 +35,19 @@
             />
           </div>
           <div class="col-span-4 lg:col-span-2">
-            <label for="amount"> Amount </label>
+            <label for="amount">
+              <span>Amount</span>
+              <button
+                role="button"
+                type="button"
+                tabindex="-1"
+                (click)="AdjustBudget()"
+                title="Adjust Budget"
+              >
+                <i
+                  class="fa-solid fa-circle-info text-green-700 hover:scale-125 cursor-pointer transition-all ms-1"
+                ></i></button
+            ></label>
             <input
               type="number"
               id="amount"

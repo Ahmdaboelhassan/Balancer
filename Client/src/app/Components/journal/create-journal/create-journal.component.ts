@@ -240,6 +240,30 @@ export class CreateJournalComponent {
     });
   }
 
+  AdjustBudget() {
+    var amount = this.JournalForm.get('amount').value;
+
+    this.journalService.AdjustBudget(amount).subscribe({
+      next: (result) => {
+        Swal.fire({
+          title: 'Adjust Budget',
+          text: result.message,
+          icon: 'success',
+          showConfirmButton: false,
+          timer: environment.sweetAlertTimeOut,
+        });
+      },
+      error: (error) => {
+        Swal.fire({
+          title: 'Adjust Budget',
+          text: error.error.message ?? 'An Error Happend',
+          icon: 'error',
+          showConfirmButton: true,
+        });
+      },
+    });
+  }
+
   GetAccountBalance(isDebit) {
     const account = isDebit ? 'debit' : 'credit';
 

@@ -28,6 +28,7 @@ public class AccountController : ControllerBase
     {
         return Ok(await _accountService.Search(criteria));
     }
+
     [HttpGet("GetBalance/{id}")]
     public async Task<IActionResult> GetBalance(int id)
     {
@@ -53,7 +54,7 @@ public class AccountController : ControllerBase
     [HttpGet("GetSelectList")]
     public async Task<IActionResult> GetSelectList()
     {
-        return Ok(await _accountService.GetSelectList());
+        return Ok(await _accountService.GetSelectList(a => !a.IsArchive));
     }
 
     [HttpPost("Create")]

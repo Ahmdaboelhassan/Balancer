@@ -5,6 +5,7 @@ using Domain.Enums;
 using Domain.IRepository;
 using Domain.IServices;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 using System.Collections.ObjectModel;
 
 namespace Application.Services;
@@ -355,7 +356,8 @@ internal class JournalService : IJournalService
 
                 await _uow.SaveChangesAync();
 
-                var costCenter = model.CostCenterId == 0 ? null : model.CostCenterId;
+                var costCenter = await GetCostCenter(debit, model.CostCenterId);
+
                 var newJournal = new Journal
                 {
                     Code = code,
@@ -540,6 +542,38 @@ internal class JournalService : IJournalService
             }
         }
     }
+
+    public async Task<ConfirmationResponse> AdjustBudget(decimal amount)
+    {
+
+        var setting = await _uow.Settings.GetFirst();
+        if (setting is null)
+            return new ConfirmationResponse { Message = "Application Has No Settings" };
+
+        var currentCash = setting.CurrentCashAccount;
+
+        var currentCashAccount = await _uow.BudgetAccounts.Get(a => a.AccountId == currentCash);
+
+        if (currentCashAccount == null)
+            return new ConfirmationResponse { Message = "Current Cash Account Not Found" };
+
+        var currentAmount = currentCashAccount.Budget -= amount;
+
+        _uow.BudgetAccounts.Update(currentCashAccount);
+
+        var dashboard = await _uow.DashboardSettings.GetFirst();
+
+        if (dashboard == null)
+            return new ConfirmationResponse { Message = "Dashboard Settings Not Found" };
+
+        dashboard.AddOnExpensesTarget += amount;
+
+        _uow.DashboardSettings.Update(dashboard);
+        await _uow.SaveChangesAync();
+
+        return new ConfirmationResponse { Message = "Budget Adjusted Successfully", IsSucceed = true };
+    }
+
     private async Task ResetPeriodValueBeforeJournal(int periodId , decimal amount)
     {
         await _uow.Periods.ExecuteUpdateAsync(p => p.Id == periodId, e => e.SetProperty(p => p.TotalAmount, p => p.TotalAmount + -1 * amount));
@@ -590,9 +624,39 @@ internal class JournalService : IJournalService
 
         return journalType;
     }
+    public async Task<int?> GetCostCenter(Account debitAccount, int? costCenterId)
+    {
+        if (costCenterId.HasValue && costCenterId != 0)
+            return costCenterId;
+
+        var setting = await _uow.Settings.GetFirst();
+
+        if (setting is null || setting.NotBudgetCostCenter is null)
+            return null;
+
+        var outBudgetAccountIds = new int[]
+        {
+            setting.ExpensesAccount.GetValueOrDefault(),
+            setting.FixedAssetsAccount.GetValueOrDefault()
+        };
+
+        var outBudgetAccounts = await _uow.Accounts.GetAll(a => outBudgetAccountIds.Contains(a.Id));
+        var outBudgetAccountNumbers = outBudgetAccounts.Select(a => a.Number).ToList();
+
+        if (outBudgetAccounts.Count != outBudgetAccountIds.Count())
+            return null;
+
+        var budgetAccounts = await _uow.BudgetAccounts.GetAll("Account");
+        var budgetAccountNumbers = budgetAccounts.Select(ba => ba.Account.Number).ToList();
 
 
-    
-    
+        if (outBudgetAccountNumbers.Any(d => debitAccount.Number.StartsWith(d))
+            && !budgetAccountNumbers.Any(d => debitAccount.Number.StartsWith(d))){
+            return setting.NotBudgetCostCenter;
+        }
+
+        return null; 
+    }
+
 }
 
