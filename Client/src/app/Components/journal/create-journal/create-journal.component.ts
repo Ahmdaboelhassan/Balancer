@@ -266,7 +266,7 @@ export class CreateJournalComponent {
       // Step 2: Increase or Decrease?
       Swal.fire({
         title: 'Adjustment Type',
-        text: 'Do you want to increase Budget or increase Saving?',
+        text: 'Do you want to Increase Budget or Increase Saving Target?',
         icon: 'question',
         showDenyButton: true,
         showCancelButton: true,
@@ -276,7 +276,7 @@ export class CreateJournalComponent {
         if (typeResult.isConfirmed || typeResult.isDenied) {
           const request = {
             amount: amount,
-            increase: typeResult.isConfirmed, // true = increase, false = decrease
+            isBudgetIncrease: typeResult.isConfirmed, // true = increase budget , false = increase savings target
           };
 
           // Step 3: Send request

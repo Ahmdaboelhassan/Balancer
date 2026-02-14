@@ -43,10 +43,7 @@
                 tabindex="-1"
                 (click)="AdjustBudget()"
                 title="Adjust Budget"
-              >
-                <i
-                  class="fa-solid fa-circle-info text-green-700 hover:scale-125 cursor-pointer transition-all ms-1"
-                ></i></button
+              ></button
             ></label>
             <input
               type="number"
@@ -173,20 +170,20 @@
         >
           <button
             type="submit"
-            class="btn-save me-2"
+            class="btn-save lg:me-2"
             [disabled]="!JournalForm.valid"
           >
-            <i class="fa-solid fa-floppy-disk me-1"></i> Save
+            <i class="fa-solid fa-floppy-disk me-1"></i> Save Journal
           </button>
 
-          <a routerLink="/Journal/List" class="btn-primary me-2">
+          <a routerLink="/Journal/List" class="btn-primary lg:me-2">
             <i class="fa-solid fa-list me-1"></i> List
           </a>
 
           @if (isEdit) {
             <a
               (click)="DeleteJournal(Journal().id)"
-              class="btn-danger me-2"
+              class="btn-danger lg:me-2"
               role="button"
               type="button"
             >
@@ -194,20 +191,28 @@
             </a>
           }
 
-          <a [routerLink]="['/Journal', 'Create']" class="btn-add me-2">
+          <a [routerLink]="['/Journal', 'Create']" class="btn-add lg:me-2">
             <i class="fa-solid fa-plus me-1"></i> New Journal
           </a>
 
-          <a [routerLink]="['/Period', 'Create']" class="btn-add me-2">
+          <a [routerLink]="['/Period', 'Create']" class="btn-add lg:me-2">
             <i class="fa-solid fa-calendar-plus me-1"></i> New Period
           </a>
 
           <a
             [routerLink]="['/Period', 'PeriodJournals', Journal().periodId]"
-            class="btn-add me-2"
+            class="btn-add lg:me-2"
           >
             <i class="fa-solid fa-book me-1"></i> Period Journals
           </a>
+          <button
+            type="button"
+            class="btn-add lg:me-2"
+            (click)="AdjustBudget()"
+          >
+            <i class="fa-solid fa-plus-minus me-1"></i>
+            Adjust Budget
+          </button>
         </div>
       </form>
     </div>

@@ -552,29 +552,26 @@ internal class JournalService : IJournalService
         if (setting is null)
             return new ConfirmationResponse { Message = "Application Has No Settings" };
 
-        var currentCash = setting.CurrentCashAccount;
-
-        var currentCashAccount = await _uow.BudgetAccounts.Get(a => a.AccountId == currentCash);
+        var currentCashAccount = await _uow.BudgetAccounts.Get(a => a.AccountId == setting.CurrentCashAccount);
 
         if (currentCashAccount == null)
             return new ConfirmationResponse { Message = "Current Cash Account Not Found" };
 
-        var newAmount = dto.Increase ? currentCashAccount.Budget - dto.Amount : currentCashAccount.Budget + dto.Amount;
-
-        currentCashAccount.Budget = newAmount;
+        currentCashAccount.Budget += dto.IsBudgetIncrease ? (dto.Amount * -1) : dto.Amount; // When Increase Budget We Decrease Saving Target Budget  
 
         _uow.BudgetAccounts.Update(currentCashAccount);
 
-        var dashboard = await _uow.DashboardSettings.GetFirst();
+        if (dto.IsBudgetIncrease)
+        {
+            var dashboard = await _uow.DashboardSettings.GetFirst();
 
-        if (dashboard == null)
-            return new ConfirmationResponse { Message = "Dashboard Settings Not Found" };
+            if (dashboard == null)
+                return new ConfirmationResponse { Message = "Dashboard Settings Not Found" };
 
-        var newTarget = dto.Increase ? dashboard.AddOnExpensesTarget + dto.Amount : dashboard.AddOnExpensesTarget;
-
-        dashboard.AddOnExpensesTarget = newTarget;
-
-        _uow.DashboardSettings.Update(dashboard);
+            dashboard.AddOnExpensesTarget += dto.Amount;
+            _uow.DashboardSettings.Update(dashboard);
+        }
+        
         await _uow.SaveChangesAync();
 
         return new ConfirmationResponse { Message = "Budget Adjusted Successfully", IsSucceed = true };
