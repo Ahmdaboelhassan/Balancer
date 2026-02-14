@@ -241,26 +241,66 @@ export class CreateJournalComponent {
   }
 
   AdjustBudget() {
-    var amount = this.JournalForm.get('amount').value;
+    const amount = this.JournalForm.get('amount')?.value;
 
-    this.journalService.AdjustBudget(amount).subscribe({
-      next: (result) => {
-        Swal.fire({
-          title: 'Adjust Budget',
-          text: result.message,
-          icon: 'success',
-          showConfirmButton: false,
-          timer: environment.sweetAlertTimeOut,
-        });
-      },
-      error: (error) => {
-        Swal.fire({
-          title: 'Adjust Budget',
-          text: error.error.message ?? 'An Error Happend',
-          icon: 'error',
-          showConfirmButton: true,
-        });
-      },
+    if (!amount || amount <= 0) {
+      Swal.fire({
+        title: 'Invalid Amount',
+        text: 'Please enter a valid amount',
+        icon: 'warning',
+      });
+      return;
+    }
+
+    // Step 1: Are you sure?
+    Swal.fire({
+      title: 'Are you sure?',
+      text: `You are about to adjust the budget by ${amount}`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, continue',
+      cancelButtonText: 'Cancel',
+    }).then((confirmResult) => {
+      if (!confirmResult.isConfirmed) return;
+
+      // Step 2: Increase or Decrease?
+      Swal.fire({
+        title: 'Adjustment Type',
+        text: 'Do you want to increase or decrease the budget?',
+        icon: 'question',
+        showDenyButton: true,
+        showCancelButton: true,
+        confirmButtonText: 'Increase',
+        denyButtonText: 'Decrease',
+      }).then((typeResult) => {
+        if (typeResult.isConfirmed || typeResult.isDenied) {
+          const request = {
+            amount: amount,
+            increase: typeResult.isConfirmed, // true = increase, false = decrease
+          };
+
+          // Step 3: Send request
+          this.journalService.AdjustBudget(request).subscribe({
+            next: (result) => {
+              Swal.fire({
+                title: 'Adjust Budget',
+                text: result.message,
+                icon: 'success',
+                showConfirmButton: false,
+                timer: environment.sweetAlertTimeOut,
+              });
+            },
+            error: (error) => {
+              Swal.fire({
+                title: 'Adjust Budget',
+                text: error.error?.message ?? 'An Error Happened',
+                icon: 'error',
+                showConfirmButton: true,
+              });
+            },
+          });
+        }
+      });
     });
   }
 

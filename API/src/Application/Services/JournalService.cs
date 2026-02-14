@@ -543,8 +543,10 @@ internal class JournalService : IJournalService
         }
     }
 
-    public async Task<ConfirmationResponse> AdjustBudget(decimal amount)
+    public async Task<ConfirmationResponse> AdjustBudget(AdjustBudgetRequest dto)
     {
+        if (dto.Amount <= 0)
+            return new ConfirmationResponse { Message = "Amount Must Be Greater Than Zero" };
 
         var setting = await _uow.Settings.GetFirst();
         if (setting is null)
@@ -557,7 +559,9 @@ internal class JournalService : IJournalService
         if (currentCashAccount == null)
             return new ConfirmationResponse { Message = "Current Cash Account Not Found" };
 
-        var currentAmount = currentCashAccount.Budget -= amount;
+        var newAmount = dto.Increase ? currentCashAccount.Budget - dto.Amount : currentCashAccount.Budget + dto.Amount;
+
+        currentCashAccount.Budget = newAmount;
 
         _uow.BudgetAccounts.Update(currentCashAccount);
 
@@ -566,7 +570,9 @@ internal class JournalService : IJournalService
         if (dashboard == null)
             return new ConfirmationResponse { Message = "Dashboard Settings Not Found" };
 
-        dashboard.AddOnExpensesTarget += amount;
+        var newTarget = dto.Increase ? dashboard.AddOnExpensesTarget + dto.Amount : dashboard.AddOnExpensesTarget;
+
+        dashboard.AddOnExpensesTarget = newTarget;
 
         _uow.DashboardSettings.Update(dashboard);
         await _uow.SaveChangesAync();

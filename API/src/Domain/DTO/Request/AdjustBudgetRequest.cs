@@ -9,4 +9,5 @@ namespace Domain.DTO.Request;
 public class AdjustBudgetRequest
 {
     public decimal Amount { get; set; }
+    public bool Increase { get; set; }
 }

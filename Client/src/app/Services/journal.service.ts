@@ -84,8 +84,8 @@ export class JournalService {
     return this.http.get<Result<Journal>>(url);
   }
 
-  AdjustBudget(amount: number) {
+  AdjustBudget(request) {
     const url = this.url + `/AdjustBudget`;
-    return this.http.post<ConfirmationRespose>(url, { amount });
+    return this.http.post<ConfirmationRespose>(url, request);
   }
 }

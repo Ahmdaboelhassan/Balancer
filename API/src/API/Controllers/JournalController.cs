@@ -75,7 +75,7 @@ public class JournalController : ControllerBase
     [HttpPost("AdjustBudget")]
     public async Task<IActionResult> AdjustBudget(AdjustBudgetRequest dto)
     {
-        var result = await _serviceContext.JournalService.AdjustBudget(dto.Amount); 
+        var result = await _serviceContext.JournalService.AdjustBudget(dto); 
         if (result.IsSucceed)
             return Ok (result);
 
