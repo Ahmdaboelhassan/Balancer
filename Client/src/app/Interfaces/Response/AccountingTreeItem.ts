@@ -3,4 +3,5 @@ export interface AccountTreeItem {
   name: string;
   number: string;
   level: number;
+  isArchived: boolean;
 }

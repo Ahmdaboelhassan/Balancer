@@ -5,4 +5,5 @@ public class AccountingTreeItem
     public string Name { get; set; }
     public string Number { get; set; }
     public int Level { get; set; }
+    public bool IsArchived { get; set; }
 }

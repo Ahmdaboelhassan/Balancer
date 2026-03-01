@@ -18,7 +18,7 @@ export class AccountingTreeComponent implements OnInit {
   constructor(
     private accountingService: AccountService,
     private loadingService: LoadingService,
-    private titleService: Title
+    private titleService: Title,
   ) {
     this.titleService.setTitle('Accounting Tree');
   }
@@ -46,8 +46,11 @@ export class AccountingTreeComponent implements OnInit {
         accounts.forEach((el) => {
           const summary = document.createElement('summary');
           const loader = '<div class="AccountTreeloader hidden"></div>';
+          const editLink = `<a href="/#/Account/Edit/${el.id}" target="_blank" style="color:#0d6efd; cursor:pointer;" class="hover:opacity-100 opacity-0 transition-all hover:scale-110">
+              <i class="fa-solid fa-pen-to-square fa-xs"></i></a>`;
 
-          summary.innerHTML = `${loader} ${el.name} | ${el.number}`;
+          summary.innerHTML = `${loader} ${el.name} | ${el.number} ${editLink}`;
+          if (el.isArchived) summary.style.textDecoration = 'line-through';
 
           let child = document.createElement('details');
           child.className = 'my-3 cursor-pointer text-xl child font-medium';

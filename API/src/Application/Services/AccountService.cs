@@ -41,7 +41,7 @@ public class AccountService : IAccountService
     }
     public async Task<IEnumerable<AccountingTreeItem>> GetChilds(int id)
     {
-        return await _uow.Accounts.SelectAll(a => a.ParentId == id, a => new AccountingTreeItem { Name = a.Name, Number = a.Number, Id = a.Id , Level = a.Level });
+        return await _uow.Accounts.SelectAll(a => a.ParentId == id, a => new AccountingTreeItem { Name = a.Name, Number = a.Number, Id = a.Id , Level = a.Level, IsArchived = a.IsArchive });
 
     }
     public async Task<IEnumerable<GetAccountDTO>> Search(string criteria) {
