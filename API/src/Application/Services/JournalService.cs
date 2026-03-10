@@ -609,7 +609,8 @@ internal class JournalService : IJournalService
 
         if (creditNumber.StartsWith(dict[setting.LiabilitiesAccount.GetValueOrDefault()]))
         {
-            journalType = JournalTypes.Due;
+            journalType = IsDrawerOrBank(debitNumber) ? JournalTypes.Add : JournalTypes.Due;
+
         }
         else if (debitNumber.StartsWith(dict[setting.InvestmentAccount.GetValueOrDefault()]))
         {
