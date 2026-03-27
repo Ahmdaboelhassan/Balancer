@@ -6,6 +6,8 @@ import { ConfirmationRespose } from '../Interfaces/Response/ConfirmationRespose'
 import { Account } from '../Interfaces/Response/Account';
 import { AccountSelectList } from '../Interfaces/Response/AccountSelectList';
 import { AccountTreeItem } from '../Interfaces/Response/AccountingTreeItem';
+import { AccountsBalance } from '../Interfaces/Response/AccountsBalance';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -15,9 +17,16 @@ export class AccountService {
 
   constructor(private http: HttpClient) {}
 
-  GetAccountBalance(accountId) {
-    const url = this.url + `/GetBalance/${accountId}`;
-    return this.http.get<{ balance: number }>(url);
+  GetBalanceBasedOnType(accountId, from, to): Observable<AccountsBalance> {
+    const params = new URLSearchParams({
+      id: accountId,
+      from,
+      to,
+    });
+
+    const url = this.url + `/GetBalanceBasedOnType?` + params.toString();
+
+    return this.http.get<AccountsBalance>(url);
   }
   GetPrimaryAccounts() {
     const url = this.url + `/GetPrimaryAccounts`;

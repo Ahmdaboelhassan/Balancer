@@ -321,8 +321,10 @@ public class ReportService : IReportService
         List<Account> accounts;
 
         if (maxLevel.HasValue)
-            if (maxLevel.Value > 5)
-                accounts = await _uow.Accounts.GetAll(d => d.Level == (maxLevel.Value - 5));
+            if (maxLevel.Value > 10 )
+                accounts = await _uow.Accounts.GetAll(d => d.Level == (maxLevel.Value - 10));
+            else if (maxLevel.Value > 5)
+                accounts = await _uow.Accounts.GetAll(d => d.Level >= (maxLevel.Value - 5));
             else 
                 accounts = await _uow.Accounts.GetAll(d => d.Level <= maxLevel.Value);
         else
@@ -382,8 +384,10 @@ public class ReportService : IReportService
 
         
         if (maxLevel.HasValue)
-            if (maxLevel.Value > 5)
-                filter = d => d.Level == (maxLevel.Value - 5) && (d.Number.StartsWith(accountNumbers[assetsAccountId]) || d.Number.StartsWith(accountNumbers[LiabilitiesAccountId]));
+            if (maxLevel.Value > 10)
+                    filter = d => d.Level == (maxLevel.Value - 10) && (d.Number.StartsWith(accountNumbers[assetsAccountId]) || d.Number.StartsWith(accountNumbers[LiabilitiesAccountId]));
+            else if (maxLevel.Value > 5)
+                filter = d => d.Level >= (maxLevel.Value - 5) && (d.Number.StartsWith(accountNumbers[assetsAccountId]) || d.Number.StartsWith(accountNumbers[LiabilitiesAccountId]));
             else
                 filter = d => (!maxLevel.HasValue || d.Level <= maxLevel.Value) && (d.Number.StartsWith(accountNumbers[assetsAccountId]) || d.Number.StartsWith(accountNumbers[LiabilitiesAccountId]));
 

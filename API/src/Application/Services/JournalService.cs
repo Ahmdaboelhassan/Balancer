@@ -156,6 +156,12 @@ internal class JournalService : IJournalService
             case 8: // By Code DESC
                 query = query.OrderByDescending(j => j.Code);
                 break;
+            case 9: // By Period ASC
+                query = query.OrderBy(j => j.PeriodId);
+                break;
+            case 10: // By Period DESC
+                query = query.OrderByDescending(j => j.PeriodId);
+                break;
             default:
                 query = query.OrderByDescending(j => j.CreatedAt);
                 break;

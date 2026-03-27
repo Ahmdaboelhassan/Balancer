@@ -204,6 +204,7 @@
             class="btn-add lg:me-2"
           >
             <i class="fa-solid fa-book me-1"></i> Period Journals
+            {{ Journal()?.periodId > 0 ? "(" + Journal().periodId + ")" : "" }}
           </a>
           <button
             type="button"

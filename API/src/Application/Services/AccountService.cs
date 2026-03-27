@@ -32,20 +32,20 @@ public class AccountService : IAccountService
                 ParentName = a.Parent?.Name,
                 IsParent = a.IsParent,
                 IsArchive = a.IsArchive,
-               
+
             });
     }
     public async Task<IEnumerable<AccountingTreeItem>> GetPrimaryAccounts() {
 
-        return await _uow.Accounts.SelectAll(a => a.ParentId == null, a => new AccountingTreeItem { Name = a.Name, Number = a.Number, Id = a.Id , Level = a.Level });
+        return await _uow.Accounts.SelectAll(a => a.ParentId == null, a => new AccountingTreeItem { Name = a.Name, Number = a.Number, Id = a.Id, Level = a.Level });
     }
     public async Task<IEnumerable<AccountingTreeItem>> GetChilds(int id)
     {
-        return await _uow.Accounts.SelectAll(a => a.ParentId == id, a => new AccountingTreeItem { Name = a.Name, Number = a.Number, Id = a.Id , Level = a.Level, IsArchived = a.IsArchive });
+        return await _uow.Accounts.SelectAll(a => a.ParentId == id, a => new AccountingTreeItem { Name = a.Name, Number = a.Number, Id = a.Id, Level = a.Level, IsArchived = a.IsArchive });
 
     }
     public async Task<IEnumerable<GetAccountDTO>> Search(string criteria) {
-        var allAccounts = await _uow.Accounts.GetAll(a => a.Name.Contains(criteria) ,"Parent");
+        var allAccounts = await _uow.Accounts.GetAll(a => a.Name.Contains(criteria), "Parent");
         return allAccounts.Select(a =>
             new GetAccountDTO
             {
@@ -62,11 +62,11 @@ public class AccountService : IAccountService
     }
     public async Task<IEnumerable<SelectItemDTO>> GetSelectList(Expression<Func<Account, bool>>? criteria = null)
     {
-        return (await _uow.Accounts.SelectAll(criteria is null ? a => true : criteria , a => new SelectItemDTO { Id = a.Id, Name = a.Name })).OrderBy(a => a.Name); 
+        return (await _uow.Accounts.SelectAll(criteria is null ? a => true : criteria, a => new SelectItemDTO { Id = a.Id, Name = a.Name })).OrderBy(a => a.Name);
     }
     public async Task<GetAccountDTO?> GetById(int id)
     {
-        var account = await _uow.Accounts.Get(a => a.Id ==  id , "Parent");
+        var account = await _uow.Accounts.Get(a => a.Id == id, "Parent");
 
         if (account is null || id == 0)
             return new GetAccountDTO();
@@ -79,19 +79,19 @@ public class AccountService : IAccountService
             ParentId = account.ParentId,
             AccountNumber = account.Number,
             ParentNumber = account.Parent?.Number,
-            ParentName = account.Parent?.Name, 
+            ParentName = account.Parent?.Name,
             IsParent = account.IsParent,
             IsArchive = account.IsArchive,
             Accounts = await GetSelectList(a => a.Id != id)
         };
     }
     public async Task<ConfirmationResponse> Create(CreateAccountDTO DTO)
-    { 
+    {
 
         var response = await _accountNumberService.GetAccountNumberAndLevel(DTO);
 
         if (!response.IsSucceed)
-            return new ConfirmationResponse { Message = response.Message};
+            return new ConfirmationResponse { Message = response.Message };
 
         var newAccount = new Account
         {
@@ -106,7 +106,7 @@ public class AccountService : IAccountService
 
         await _uow.Accounts.AddAsync(newAccount);
         await _uow.SaveChangesAync();
-        return new ConfirmationResponse {IsSucceed = true ,Message = "Account Has Been Created Successfully" }; ;
+        return new ConfirmationResponse { IsSucceed = true, Message = "Account Has Been Created Successfully" }; ;
 
     }
     public async Task<ConfirmationResponse> Edit(CreateAccountDTO DTO)
@@ -115,7 +115,7 @@ public class AccountService : IAccountService
         if (account == null)
             return new ConfirmationResponse { IsSucceed = false, Message = "Account Not Found" };
 
-        if (account.IsParent && !account.ParentId.Equals(DTO.ParentId)) 
+        if (account.IsParent && !account.ParentId.Equals(DTO.ParentId))
             return new ConfirmationResponse { IsSucceed = false, Message = "Can Not Change Account Number Because It Has Childs" };
 
         if (DTO.ParentId == account.Id)
@@ -124,7 +124,7 @@ public class AccountService : IAccountService
         int? oldParentId = account?.ParentId;
 
         // If Change In Basic Data Only
-        if (oldParentId.Equals(DTO.ParentId))  
+        if (oldParentId.Equals(DTO.ParentId))
         {
             account.Name = DTO.Name;
             account.Description = DTO.Description;
@@ -147,14 +147,14 @@ public class AccountService : IAccountService
         account.Description = DTO.Description;
         account.Level = response.AccountLevel;
         account.Number = response.AccountNumber;
-        
+
 
         _uow.Accounts.Update(account);
         await _uow.SaveChangesAync();
 
         if (!await _uow.Accounts.Exists(a => a.ParentId == oldParentId && a.Id != account.Id))
         {
-            await _uow.Accounts.ExecuteUpdateAsync(a => a.Id == oldParentId , e => e.SetProperty(a => a.IsParent , false));
+            await _uow.Accounts.ExecuteUpdateAsync(a => a.Id == oldParentId, e => e.SetProperty(a => a.IsParent, false));
             await _uow.SaveChangesAync();
         }
 
@@ -164,13 +164,13 @@ public class AccountService : IAccountService
     {
         var account = await _uow.Accounts.Get(id);
         if (account == null)
-            return new ConfirmationResponse {Message = "Account Not Found" };
+            return new ConfirmationResponse { Message = "Account Not Found" };
 
         if (account.IsParent)
-            return new ConfirmationResponse {Message = "Can not Remove The Account Because It Has Childs" };
+            return new ConfirmationResponse { Message = "Can not Remove The Account Because It Has Childs" };
 
-        if(await _uow.JournalDetail.Exists(d => d.AccountId == id))
-            return new ConfirmationResponse {Message = "Can not Remove The Account Because There Are Transactions On It" };
+        if (await _uow.JournalDetail.Exists(d => d.AccountId == id))
+            return new ConfirmationResponse { Message = "Can not Remove The Account Because There Are Transactions On It" };
 
 
         account.IsDeleted = true;
@@ -202,6 +202,33 @@ public class AccountService : IAccountService
                    .SelectAll(d => d.Account.Number.StartsWith(account.Number), d => d.Debit - d.Credit, "Account");
 
         return journals.Sum();
+
+    }
+    public async Task<AccountBalanceDTO> GetBalanceBasedOnType(int accId, DateTime from, DateTime to)
+    {
+        var account = await _uow.Accounts.Get(accId);
+        var settigns = await _uow.Settings.GetFirst();
+        if (account is null || settigns is null)
+            return new AccountBalanceDTO ();
+
+        var RevExpNumbers = await _uow.Accounts.SelectAll(a => a.Id == settigns.RevenueAccount || a.Id == settigns.ExpensesAccount, a => a.Number);
+
+        var isRevOrExp = RevExpNumbers.Any(n => account.Number.StartsWith(n));
+        
+        var journals = await _uow.JournalDetail
+                   .SelectAll(d => d.Account.Number.StartsWith(account.Number)
+                    && (!isRevOrExp || d.Journal.CreatedAt.Date >= from && d.Journal.CreatedAt.Date <= to),
+                    d => d.Debit - d.Credit);
+
+        var amount = journals.Sum();
+        return new AccountBalanceDTO
+        {
+            AccountId = accId,
+            AccountName = account.Name,
+            Balance = amount.ToString("c"),
+            IsRevExp = isRevOrExp,
+            IsCredit = amount < 0,
+        };
 
     }
     public async Task<decimal> GetBalance(Account account)
