@@ -20,6 +20,7 @@ namespace Domain.Entities
         public int DaysCount { get; set; }
         public string? Notes { get; set; }
         public decimal TotalAmount { get; set; }
+        public decimal? PeriodBudget { get; set; }
         public bool IsDeleted { get; set; }
         public ICollection<Journal> Journals { get; set; }
     }

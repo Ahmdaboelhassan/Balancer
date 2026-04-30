@@ -6,4 +6,6 @@ export interface PeriodListItem {
   increasedBalance: boolean;
   totalAmount: number;
   maxPages: number;
+  periodBudget: number;
+  remains: number;
 }

@@ -3,5 +3,6 @@ export interface CreatePeriod {
   from: string;
   to: string;
   daysCount: number;
+  periodBudget?: number;
   notes: string;
 }

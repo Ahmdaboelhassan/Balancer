@@ -7,5 +7,7 @@ public class PeriodListItemDTO
     public string To { get; set; }
     public bool IncreasedBalance { get; set; }
     public decimal TotalAmount { get; set; }
+    public decimal? PeriodBudget { get; set; }
+    public decimal? Remains { get; set; }
     public int MaxPages { get; set; }
 }

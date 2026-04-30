@@ -4,6 +4,7 @@ export interface Period {
   createdAt: string;
   lastUpdatedAt: string;
   totalAmount: number;
+  periodBudget?: number;
   id: number;
   from: string;
   daysCount: number;

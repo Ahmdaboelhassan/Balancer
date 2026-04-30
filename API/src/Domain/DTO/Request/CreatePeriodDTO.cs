@@ -8,4 +8,5 @@ public class CreatePeriodDTO
     public DateTime To { get; set; }
     public int DaysCount { get; set; }
     public string? Notes { get; set; }
+    public decimal? PeriodBudget { get; set; }
 }

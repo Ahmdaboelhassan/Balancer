@@ -23,6 +23,8 @@ internal class PeriodService : IPeriodService
             From = sp.From.ToShortDateString(),
             To = sp.To.ToShortDateString(),
             TotalAmount = sp.TotalAmount,
+            PeriodBudget = sp.PeriodBudget,
+            Remains = sp.PeriodBudget.HasValue ? (sp.PeriodBudget > 0 ? sp.TotalAmount - sp.PeriodBudget : Math.Abs(sp.PeriodBudget.Value) - Math.Abs(sp.TotalAmount)) : null,
             IncreasedBalance = sp.TotalAmount >= 0,
 
         });
@@ -40,7 +42,8 @@ internal class PeriodService : IPeriodService
               To = sp.To.ToShortDateString(),
               TotalAmount = sp.TotalAmount,
               IncreasedBalance = sp.TotalAmount >= 0,
-
+              PeriodBudget = sp.PeriodBudget,
+              Remains = sp.PeriodBudget.HasValue ? (sp.PeriodBudget > 0 ? sp.TotalAmount - sp.PeriodBudget : Math.Abs(sp.PeriodBudget.Value) - Math.Abs(sp.TotalAmount)) : null
           }, p => p.To, page, pageSize);
     }
     public async Task<IEnumerable<PeriodListItemDTO>> GetAll(DateTime From, DateTime To)
@@ -54,6 +57,8 @@ internal class PeriodService : IPeriodService
             To = sp.To.ToShortDateString(),
             TotalAmount = sp.TotalAmount,
             IncreasedBalance = sp.TotalAmount >= 0,
+            PeriodBudget = sp.PeriodBudget,
+            Remains = sp.PeriodBudget.HasValue ? (sp.PeriodBudget > 0 ? sp.TotalAmount - sp.PeriodBudget : Math.Abs(sp.PeriodBudget.Value) - Math.Abs(sp.TotalAmount)) : null,
         });
     }
 
@@ -93,6 +98,7 @@ internal class PeriodService : IPeriodService
             Notes = period.Notes,
             TotalAmount = period.TotalAmount,
             LastUpdatedAt = period.LastUpdatedAt?.ToString("F") ?? "",
+            PeriodBudget = period.PeriodBudget,
         };
 
         return periodDto;
@@ -114,6 +120,7 @@ internal class PeriodService : IPeriodService
             Notes = lastPeriod.Notes,
             TotalAmount = lastPeriod.TotalAmount,
             LastUpdatedAt = lastPeriod.LastUpdatedAt?.ToString("F") ?? "",
+            PeriodBudget = lastPeriod.PeriodBudget,
         };
 
         return lastPeriodDto;
@@ -127,14 +134,20 @@ internal class PeriodService : IPeriodService
 
         var periodName = $"Period No. {periodNo} In Month {From.Month} In Year {From.Year}";
 
+        if (DTO.From > DTO.To)
+            return new ConfirmationResponse { IsSucceed = false, Message = "From Date Can Not Be Bigger Than To Date"};
+
+        var days = DTO.To.Subtract(DTO.From).TotalDays + 1;
+
         var newPeriod = new Period
         {
             Name = periodName,
             From = DTO.From,
             To = To,
             CreatedAt = DateTime.Now,
-            DaysCount = DTO.DaysCount,
+            DaysCount = (int)days,
             Notes = DTO.Notes,
+            PeriodBudget = DTO.PeriodBudget,
         };
         await _uow.Periods.AddAsync(newPeriod);
         await _uow.SaveChangesAync();
@@ -149,6 +162,11 @@ internal class PeriodService : IPeriodService
         if (period is null)
             return new ConfirmationResponse { IsSucceed = false, Message = "Period Is Not Exist!" };
 
+        if (DTO.From > DTO.To)
+            return new ConfirmationResponse { IsSucceed = false, Message = "From Date Can Not Be Bigger Than To Date" };
+
+        var days = DTO.To.Subtract(DTO.From).TotalDays + 1;
+
         var From = DTO.From;
         int periodNo = await GetPeriodNumber(From);
 
@@ -158,8 +176,9 @@ internal class PeriodService : IPeriodService
         period.From = DTO.From;
         period.To = DTO.To;
         period.LastUpdatedAt = DateTime.Now;
-        period.DaysCount = DTO.DaysCount;
+        period.DaysCount = (int)days;
         period.Notes = DTO.Notes;
+        period.PeriodBudget = DTO.PeriodBudget;
 
         _uow.Periods.Update(period);
         await _uow.SaveChangesAync();
@@ -190,5 +209,4 @@ internal class PeriodService : IPeriodService
         return periodsInSameMonth == 0 ? 1 : periodsInSameMonth + 1;
     }
 
-    
 }

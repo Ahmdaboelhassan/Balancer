@@ -17,7 +17,7 @@ import { NgSelectComponent } from '@ng-select/ng-select';
 
 @Component({
   selector: 'app-create-account',
-  imports: [ReactiveFormsModule, NgFor, RouterLink, NgSelectComponent],
+  imports: [ReactiveFormsModule, RouterLink, NgSelectComponent],
   templateUrl: './create-account.component.html',
   styleUrl: './create-account.component.css',
 })

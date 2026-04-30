@@ -5,29 +5,83 @@
   <h4 class="mb-2 text-xl lg:text-2xl font-bold tracking-tight text-gray-900">
     <a [routerLink]="['/Period', 'Edit', item?.id]">
       <i
-        class="fa-solid fa-clock me-2"
+        class="fa-regular fa-calendar me-2"
         [ngClass]="item?.increasedBalance ? 'text-green-500' : 'text-red-500'"
       ></i>
       {{ item?.name }}
     </a>
   </h4>
-  <h6 class="text-lg lg:text-xl font-bold tracking-tight text-gray-500">
-    {{ item?.from }} To {{ item?.to }}
+  <h6
+    class="text-lg lg:text-xl font-bold tracking-tight text-gray-500 flex items-center gap-2"
+  >
+    <i class="fa-regular fa-clock text-gray-400"></i>
+
+    <span>{{ item?.from }}</span>
+
+    <i class="fa-solid fa-arrow-right text-gray-400"></i>
+
+    <span>{{ item?.to }}</span>
   </h6>
 
-  <div class="p-1 flex justify-end">
-    <span>
-      @if (item?.increasedBalance){
-      <span class="text-green-500 text-3xl font-bold me-2"
-        >{{ item?.totalAmount }}
+  <div class="p-1 flex justify-start md:justify-end items-end">
+    @if (item?.periodBudget) {
+      <span class="flex items-center gap-2 md:text-2xl text-lg font-medium">
+        <!-- Budget -->
+        <i class="fa-solid fa-wallet text-blue-500"></i>
+        <span class="text-blue-600 me-3">
+          {{ item?.periodBudget }}
+        </span>
+
+        <!-- Total Amount -->
+        <i
+          class="fa-solid fa-coins"
+          [ngClass]="{
+            'text-green-500': item?.totalAmount >= 0,
+            'text-red-500': item?.totalAmount < 0,
+          }"
+        ></i>
+
+        <span
+          class="me-3"
+          [ngClass]="{
+            'text-green-600': item?.totalAmount >= 0,
+            'text-red-600 font-semibold': item?.totalAmount < 0,
+          }"
+        >
+          {{ item?.totalAmount }}
+        </span>
+
+        <!-- Remaining -->
+        <i
+          class="fa-solid fa-chart-line"
+          [ngClass]="{
+            'text-green-600': item?.remains >= 0,
+            'text-red-600': item?.remains < 0,
+          }"
+        ></i>
+        <span
+          [ngClass]="{
+            'text-green-600': item?.remains >= 0,
+            'text-red-600': item?.remains < 0,
+          }"
+        >
+          {{ item?.remains }}
+        </span>
       </span>
-      <i class="fa-solid fa-square-plus text-green-500 text-3xl"></i>
-      } @else{
-      <span class="text-red-500 text-3xl font-bold me-2">{{
-        item?.totalAmount
-      }}</span>
-      <i class="fa-solid fa-square-minus text-red-500 text-3xl"></i>
-      }
-    </span>
+    } @else {
+      <span class="flex items-center">
+        @if (item?.increasedBalance) {
+          <span class="text-green-500 text-3xl font-bold me-2">
+            {{ item?.totalAmount }}
+          </span>
+          <i class="fa-solid fa-square-plus text-green-500 text-3xl"></i>
+        } @else {
+          <span class="text-red-500 text-3xl font-bold me-2">
+            {{ item?.totalAmount }}
+          </span>
+          <i class="fa-solid fa-square-minus text-red-500 text-3xl"></i>
+        }
+      </span>
+    }
   </div>
 </a>

@@ -24,7 +24,7 @@ export class CreatePeriodComponent implements OnInit {
     private titleService: Title,
     private periodService: PeriodService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -81,6 +81,7 @@ export class CreatePeriodComponent implements OnInit {
         disabled: true,
       }),
       daysCount: new FormControl(this.period?.daysCount),
+      periodBudget: new FormControl(this.period?.periodBudget),
       notes: new FormControl(this.period.notes),
     });
   }
@@ -100,6 +101,7 @@ export class CreatePeriodComponent implements OnInit {
       to: formValue.to,
       daysCount: formValue.daysCount,
       notes: formValue.notes,
+      periodBudget: formValue.periodBudget,
     };
 
     if (this.isEdit) {
