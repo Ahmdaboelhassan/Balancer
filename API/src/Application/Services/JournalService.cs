@@ -223,7 +223,7 @@ internal class JournalService : IJournalService
             currentPeriodId = lastPeriod?.Id ?? 0;
         }
    
-        var period  = await _uow.Periods.Get(p => p.Id == currentPeriodId, "Journals");
+        var period  = await _uow.Periods.Get(p => p.Id == currentPeriodId, "Journals", "Journals.JournalDetails", "Journals.JournalDetails.CostCenter");
 
         if (period is null)
             return new PeriodJournals();

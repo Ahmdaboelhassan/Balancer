@@ -316,7 +316,6 @@ export class CreateJournalComponent {
     const account = isDebit ? 'debit' : 'credit';
 
     const accountId = this.JournalForm.get(account)?.value;
-    const costCenter = this.JournalForm.get('costCenter')?.value;
 
     if (!accountId) {
       Swal.fire({
@@ -341,7 +340,7 @@ export class CreateJournalComponent {
       .split('T')[0];
 
     this.accountService
-      .GetBalanceBasedOnType(accountId, from, to, costCenter)
+      .GetBalanceBasedOnType(accountId, from, to, '')
       .subscribe({
         next: (result) => {
           const msgHtml = this.GetAccountBalanceHTMLTemplate(result, from, to);

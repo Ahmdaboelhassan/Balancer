@@ -45,7 +45,7 @@ internal class PeriodService : IPeriodService
     }
     public async Task<IEnumerable<PeriodListItemDTO>> GetAll(DateTime From, DateTime To)
     {
-        var periods = await _uow.Periods.GetAll(p => p.From >= From.Date && p.From <= To.Date);  
+        var periods = await _uow.Periods.GetAll(p => (p.From >= From.Date || p.To > From.Date) && p.From <= To.Date);  
         return periods.OrderByDescending(p => p.To).Select(sp => new PeriodListItemDTO
         {
             Id = sp.Id,
