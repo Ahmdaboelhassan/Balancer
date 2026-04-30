@@ -17,11 +17,17 @@ export class AccountService {
 
   constructor(private http: HttpClient) {}
 
-  GetBalanceBasedOnType(accountId, from, to): Observable<AccountsBalance> {
+  GetBalanceBasedOnType(
+    accountId,
+    from,
+    to,
+    costCenterId,
+  ): Observable<AccountsBalance> {
     const params = new URLSearchParams({
       id: accountId,
       from,
       to,
+      costCenterId,
     });
 
     const url = this.url + `/GetBalanceBasedOnType?` + params.toString();

@@ -6,96 +6,99 @@
     <hr />
   </div>
   <div class="py-5">
-    @if(accountForm){
-    <form [formGroup]="accountForm" (ngSubmit)="Submit()">
-      <input type="hidden" formControlName="id" />
-      <div class="grid grid-cols-2 gap-4">
-        <div class="form-group col-span-2 lg:col-span-1">
-          <label for="name">Name</label>
-          <input
-            formControlName="name"
-            type="text"
-            id="name"
-            class="form-control w-full"
-            placeholder="Account"
-          />
+    @if (accountForm) {
+      <form [formGroup]="accountForm" (ngSubmit)="Submit()">
+        <input type="hidden" formControlName="id" />
+        <div class="grid grid-cols-2 gap-4">
+          <div class="form-group col-span-2 lg:col-span-1">
+            <label for="name">Name</label>
+            <input
+              formControlName="name"
+              type="text"
+              id="name"
+              class="form-control w-full"
+              placeholder="Account"
+            />
+          </div>
+          <div class="form-group col-span-2 lg:col-span-1">
+            <label for="description">Description</label>
+            <input
+              formControlName="description"
+              class="form-control w-full"
+              placeholder="Write The Purpose For This Account"
+            />
+          </div>
+          @if (isEdit) {
+            <div class="form-group col-span-2 lg:col-span-1">
+              <label for="number">Number</label>
+              <input
+                type="text"
+                id="number"
+                class="form-control w-full"
+                formControlName="number"
+              />
+            </div>
+          }
+          <div class="form-group col-span-2 lg:col-span-1">
+            <label for="parent"> Parent </label>
+
+            <ng-select
+              [items]="accounts"
+              bindLabel="name"
+              bindValue="id"
+              formControlName="parent"
+              id="parent"
+            >
+            </ng-select>
+          </div>
         </div>
-        <div class="form-group col-span-2 lg:col-span-1">
-          <label for="description">Description</label>
-          <input
-            formControlName="description"
-            class="form-control w-full"
-            placeholder="Write The Purpose For This Account"
-          />
-        </div>
-        @if (isEdit) {
-        <div class="form-group col-span-2 lg:col-span-1">
-          <label for="number">Number</label>
-          <input
-            type="text"
-            id="number"
-            class="form-control w-full"
-            formControlName="number"
-          />
-        </div>
-        }
-        <div class="form-group col-span-2 lg:col-span-1">
-          <label for="parent"> Parent </label>
-          <select
-            class="form-control w-full"
-            id="parent"
-            formControlName="parent"
+        <div class="form-group w-full mt-2">
+          <label
+            class="inline-flex items-center cursor-pointer lg:w-1/3 w-full"
           >
-            <option *ngFor="let account of accounts" [value]="account.id">
-              {{ account.name }}
-            </option>
-          </select>
+            <input
+              type="checkbox"
+              formControlName="isArchive"
+              class="sr-only peer"
+            />
+            <div
+              class="relative w-11 h-6 bg-gray-200 rounded-full peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"
+            ></div>
+            <span class="ms-3 text-sm font-medium text-gray-900"
+              >Is Archived</span
+            >
+          </label>
         </div>
-      </div>
-      <div class="form-group w-full mt-2">
-        <label class="inline-flex items-center cursor-pointer lg:w-1/3 w-full">
-          <input
-            type="checkbox"
-            formControlName="isArchive"
-            class="sr-only peer"
-          />
-          <div
-            class="relative w-11 h-6 bg-gray-200 rounded-full peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"
-          ></div>
-          <span class="ms-3 text-sm font-medium text-gray-900"
-            >Is Archived</span
+        <div
+          class="mt-5 flex text-center lg:justify-items-start lg:flex-row flex-col"
+        >
+          <button
+            type="submit"
+            class="btn-save me-2"
+            [disabled]="!accountForm.valid"
           >
-        </label>
-      </div>
-      <div
-        class="mt-5 flex text-center lg:justify-items-start lg:flex-row flex-col"
-      >
-        <button
-          type="submit"
-          class="btn-save me-2"
-          [disabled]="!accountForm.valid"
-        >
-          Save
-        </button>
-        <a routerLink="/Account/List" class="btn-primary me-2">List</a>
-        @if(isEdit){
-        <button
-          (click)="DeleteAccount()"
-          class="btn-danger me-2"
-          role="button"
-          type="button"
-        >
-          Delete
-        </button>
-        @if(account.parentId){
-        <a
-          [routerLink]="['/Account', 'Edit', account.parentId]"
-          class="btn-add me-2"
-          >Go To Parent</a
-        >
-        } }
-      </div>
-    </form>
+            Save
+          </button>
+          <a routerLink="/Account/List" class="btn-primary me-2">List</a>
+          @if (isEdit) {
+            <button
+              (click)="DeleteAccount()"
+              class="btn-danger me-2"
+              role="button"
+              type="button"
+            >
+              Delete
+            </button>
+            @if (account.parentId) {
+              <a
+                [routerLink]="['/Account', 'Edit', account.parentId]"
+                class="btn-add me-2"
+                >Go To Parent</a
+              >
+            }
+          }
+        </div>
+      </form>
     }
   </div>
 </div>

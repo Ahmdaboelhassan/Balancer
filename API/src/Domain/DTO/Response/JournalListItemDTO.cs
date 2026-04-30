@@ -9,4 +9,5 @@ public class JournalListItemDTO
     public decimal Amount { get; set; }
     public string? Notes { get; set; }
     public int periodId { get; set; }
+    public string? CostCenter { get; set; }
 }

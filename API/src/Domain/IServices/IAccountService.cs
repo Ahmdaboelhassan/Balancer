@@ -15,7 +15,7 @@ public interface IAccountService
     Task<GetAccountDTO?> GetById(int id);
     Task<decimal> GetBalance(int id);
     Task<decimal> GetBalance(Account account);
-    Task<AccountBalanceDTO> GetBalanceBasedOnType(int accId, DateTime from, DateTime to);
+    Task<AccountBalanceDTO> GetBalanceBasedOnType(int accId, DateTime from, DateTime to, int? costCenterId);
     Task<ConfirmationResponse> Create(CreateAccountDTO DTO);
     Task<ConfirmationResponse> Edit(CreateAccountDTO DTO);
     Task<ConfirmationResponse> Delete(int id);

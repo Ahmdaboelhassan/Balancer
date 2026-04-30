@@ -177,6 +177,7 @@ internal class JournalService : IJournalService
             Detail = a.Detail,
             Notes = a.Notes,
             periodId = a.PeriodId,
+            CostCenter = a.JournalDetails.First().CostCenter != null ? a.JournalDetails.First().CostCenter.Name : "" 
         }).ToListAsync();
 
     }
@@ -192,13 +193,14 @@ internal class JournalService : IJournalService
             Code = a.Code,
             CreatedAt = a.CreatedAt.ToString("f"),
             Detail = a.Detail,
-            Notes = a.Notes
+            Notes = a.Notes,
+            CostCenter = a.JournalDetails.First().CostCenter != null ? a.JournalDetails.First().CostCenter.Name : ""
         }, j => j.CreatedAt , page , pageSize);
     }
     public async Task<IEnumerable<JournalListItemDTO>> GetAll(DateTime from, DateTime to)
     {
-        return (await _uow.Journal.GetAll(a => a.CreatedAt.Date >= from.Date && a.CreatedAt.Date <= to.Date))
-            .OrderByDescending(j => j.CreatedAt).Select( a => new JournalListItemDTO
+        return (await _uow.Journal.SelectAll(a => a.CreatedAt.Date >= from.Date && a.CreatedAt.Date <= to.Date,
+           a => new JournalListItemDTO
         {
             Id = a.Id,
             Amount = a.Amount,
@@ -208,8 +210,8 @@ internal class JournalService : IJournalService
             Detail = a.Detail,
             Notes = a.Notes,
             periodId = a.PeriodId,
-            
-        });
+            CostCenter = a.JournalDetails.First().CostCenter != null ? a.JournalDetails.First().CostCenter.Name : ""
+        })).OrderByDescending(j => j.CreatedAt);
     }
     public async Task<PeriodJournals> GetPeriodJournals(int periodId)
     {
@@ -242,8 +244,9 @@ internal class JournalService : IJournalService
                 CreatedAt = j.CreatedAt.ToString("f"),
                 Detail = j.Detail,
                 Notes = j.Notes,
-                periodId = j.PeriodId
-                
+                periodId = j.PeriodId,
+                CostCenter = j.JournalDetails.First().CostCenter != null ? j.JournalDetails.First().CostCenter.Name : ""
+
             })
         };
         

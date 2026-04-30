@@ -204,7 +204,7 @@ public class AccountService : IAccountService
         return journals.Sum();
 
     }
-    public async Task<AccountBalanceDTO> GetBalanceBasedOnType(int accId, DateTime from, DateTime to)
+    public async Task<AccountBalanceDTO> GetBalanceBasedOnType(int accId, DateTime from, DateTime to, int? costCenterId)
     {
         var account = await _uow.Accounts.Get(accId);
         var settigns = await _uow.Settings.GetFirst();
@@ -217,7 +217,8 @@ public class AccountService : IAccountService
         
         var journals = await _uow.JournalDetail
                    .SelectAll(d => d.Account.Number.StartsWith(account.Number)
-                    && (!isRevOrExp || d.Journal.CreatedAt.Date >= from && d.Journal.CreatedAt.Date <= to),
+                    && (!isRevOrExp || d.Journal.CreatedAt.Date >= from && d.Journal.CreatedAt.Date <= to)
+                    && (!costCenterId.HasValue || d.CostCenterId == costCenterId),
                     d => d.Debit - d.Credit);
 
         var amount = journals.Sum();

@@ -39,6 +39,13 @@ export class CreateJournalComponent {
   debitBalance: number = 0;
   journalAmount: number = 0;
   isEdit = false;
+  iconMap: Record<number, string> = {
+    1: 'fa-solid fa-square-plus text-green-500',
+    2: 'fa-solid fa-square-minus text-red-400',
+    3: 'fa-solid fa-thumbtack text-blue-400',
+    4: 'fa-solid fa-reply fa-flip-horizontal text-orange-400',
+    5: 'fa-solid fa-wallet text-purple-400',
+  };
 
   constructor(
     private route: ActivatedRoute,
@@ -309,6 +316,7 @@ export class CreateJournalComponent {
     const account = isDebit ? 'debit' : 'credit';
 
     const accountId = this.JournalForm.get(account)?.value;
+    const costCenter = this.JournalForm.get('costCenter')?.value;
 
     if (!accountId) {
       Swal.fire({
@@ -332,26 +340,28 @@ export class CreateJournalComponent {
       .toISOString()
       .split('T')[0];
 
-    this.accountService.GetBalanceBasedOnType(accountId, from, to).subscribe({
-      next: (result) => {
-        const msgHtml = this.GetAccountBalanceHTMLTemplate(result, from, to);
-        Swal.fire({
-          title: 'Balance',
-          html: msgHtml,
-          icon: undefined,
-          showConfirmButton: true,
-        });
-      },
-      error: (error) => {
-        Swal.fire({
-          title: 'Get Balance',
-          text: error ?? 'An Error Happend',
-          icon: 'error',
-          showConfirmButton: true,
-          timer: environment.sweetAlertTimeOut,
-        });
-      },
-    });
+    this.accountService
+      .GetBalanceBasedOnType(accountId, from, to, costCenter)
+      .subscribe({
+        next: (result) => {
+          const msgHtml = this.GetAccountBalanceHTMLTemplate(result, from, to);
+          Swal.fire({
+            title: 'Balance',
+            html: msgHtml,
+            icon: undefined,
+            showConfirmButton: true,
+          });
+        },
+        error: (error) => {
+          Swal.fire({
+            title: 'Get Balance',
+            text: error ?? 'An Error Happend',
+            icon: 'error',
+            showConfirmButton: true,
+            timer: environment.sweetAlertTimeOut,
+          });
+        },
+      });
   }
 
   GetLocaleDateTime(date: Date) {
@@ -524,6 +534,13 @@ export class CreateJournalComponent {
         `;
 
     return msgHtml;
+  }
+
+  get iconClass(): string {
+    if (this.Journal()) {
+      return this.iconMap[this.Journal().type] ?? '';
+    }
+    return '';
   }
 
   @HostListener('document:keydown', ['$event'])

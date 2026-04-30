@@ -13,10 +13,11 @@ import { AccountSelectList } from '../../../Interfaces/Response/AccountSelectLis
 import { NgFor } from '@angular/common';
 import { CreateAccount } from '../../../Interfaces/Request/CreateAccount';
 import { ToastrService } from 'ngx-toastr';
+import { NgSelectComponent } from '@ng-select/ng-select';
 
 @Component({
   selector: 'app-create-account',
-  imports: [ReactiveFormsModule, NgFor, RouterLink],
+  imports: [ReactiveFormsModule, NgFor, RouterLink, NgSelectComponent],
   templateUrl: './create-account.component.html',
   styleUrl: './create-account.component.css',
 })

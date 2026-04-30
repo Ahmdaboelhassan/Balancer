@@ -36,9 +36,9 @@ public class AccountController : ControllerBase
     }
 
     [HttpGet("GetBalanceBasedOnType")]
-    public async Task<IActionResult> GetBalanceBasedOnType(int id, DateTime from, DateTime to)
+    public async Task<IActionResult> GetBalanceBasedOnType(int id, DateTime from, DateTime to, int? costCenterId)
     {
-        return Ok(await _accountService.GetBalanceBasedOnType(id, from, to));
+        return Ok(await _accountService.GetBalanceBasedOnType(id, from, to, costCenterId));
     }
 
     [HttpGet("GetAll")]
