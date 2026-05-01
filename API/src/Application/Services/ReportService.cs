@@ -271,6 +271,175 @@ public class ReportService : IReportService
         return incomeStatement;
         }
 
+    public async Task<BudgetSummaryReportDTO> GetBudgetSummary(DateTime from, DateTime to)
+    {
+        var settings = await _uow.Settings.GetFirst();
+        var dashboardSettings = await _uow.DashboardSettings.GetFirst();
+
+        if (settings is null || dashboardSettings is null ||
+            !settings.ExpensesAccount.HasValue ||
+            !settings.FixedAssetsAccount.HasValue)
+            return new BudgetSummaryReportDTO();
+
+        // PERIODS BUDGET SUMMARY
+        var periods = await _uow.Periods.GetAll(p =>
+            (p.From >= from.Date || p.To >= from.Date) &&
+            p.From <= to.Date);
+
+        var periodSummaries = periods.Select(period =>
+        {
+            var remaining = period.PeriodBudget.HasValue && period.PeriodBudget > 0 ? period.TotalAmount - period.PeriodBudget : (period.PeriodBudget.HasValue ? Math.Abs(period.PeriodBudget.Value) - Math.Abs(period.TotalAmount) : null);
+
+            return new BudgetSummaryDTO
+            {
+                Id = period.Id,
+                Name = period.Name,
+                Spent = period.TotalAmount,
+                Budget = period.PeriodBudget,
+                Remains = remaining,
+                RemainPercentage = remaining.HasValue && period.PeriodBudget.HasValue ? (remaining.Value / Math.Abs(period.PeriodBudget.Value)) * 100 : null,
+                SpentPercentage = period.PeriodBudget.HasValue && period.PeriodBudget != 0 ? (period.TotalAmount / period.PeriodBudget.Value) * 100 : null,
+            };
+        }).ToList();
+
+        var totalPeriodSpent = periodSummaries.Sum(x => x.Spent);
+        var totalPeriodRemaining = periodSummaries.Sum(x => x.Remains ?? 0);
+        var totalPeriodBudget = periodSummaries.Sum(x => x.Budget ?? 0);
+
+        periodSummaries.Add(new BudgetSummaryDTO
+        {
+            Id = 0,
+            Name = "Total",
+            Spent = totalPeriodSpent,
+            Budget = totalPeriodBudget,
+            Remains = totalPeriodRemaining,
+            RemainPercentage = totalPeriodBudget > 0 ? (totalPeriodRemaining / totalPeriodBudget) * 100 : null,
+            SpentPercentage = totalPeriodBudget > 0 ? (totalPeriodSpent / totalPeriodBudget) * 100 : null,
+        });
+
+       
+        // JOURNAL DATA
+       
+        var journals = await _uow.JournalDetail.GetAll(
+            j => j.Journal.CreatedAt.Date >= from.Date &&
+                 j.Journal.CreatedAt.Date <= to.Date,
+            "Journal",
+            "Account");
+
+        var journalTotalsByAccount = journals
+            .GroupBy(j => j.Account.Number)
+            .Select(g => new
+            {
+                AccountNumber = g.Key,
+                Total = g.Sum(x => x.Debit - x.Credit)
+            });
+
+        var budgetAccounts = await _uow.BudgetAccounts.GetAll("Account");
+
+        var expenseAccounts = (await _uow.Accounts.GetAll(a => a.Id == settings.ExpensesAccount || a.Id == settings.FixedAssetsAccount)) .Select(a => a.Number).ToList();
+
+        decimal overBudgetTotal = 0;
+
+        bool IsExpenseAccount(string accountNumber) => expenseAccounts.Any(a => accountNumber.StartsWith(a));
+
+        // BUDGET PROGRESS
+        var budgetProgress = budgetAccounts
+            .GroupJoin(
+                journalTotalsByAccount,
+                budget => budget.Account.Number,
+                journal => journal.AccountNumber,
+                (budget, journalGroup) => new { budget, journalGroup })
+            .SelectMany(
+                x => x.journalGroup.DefaultIfEmpty(),
+                (x, journal) =>
+                {
+                    var spent = journalTotalsByAccount
+                        .Where(d => d.AccountNumber.StartsWith(x.budget.Account.Number))
+                        .Sum(d => d.Total);
+
+                    if (IsExpenseAccount(x.budget.Account.Number))
+                        overBudgetTotal += Math.Max(0, spent - x.budget.Budget);
+
+                    var remains = spent < 0 ? spent - x.budget.Budget : x.budget.Budget - spent;
+                    return new BudgetSummaryDTO
+                    {
+                        Id = x.budget.AccountId,
+                        Name = x.budget.DisplayName,
+                        Budget = x.budget.Budget,
+                        Spent = spent,
+                        Remains = remains,
+                        SpentPercentage = x.budget.Budget != 0 ? Math.Round((spent / x.budget.Budget) * 100) : 0,
+                        RemainPercentage = x.budget.Budget != 0 ? Math.Round((remains / x.budget.Budget) * 100) : 0,
+                    };
+                })
+            .ToList();
+
+        var excludedAccountNumbers = budgetAccounts
+            .Where(a => IsExpenseAccount(a.Account.Number))
+            .Select(a => a.Account.Number);
+
+        var otherExpenses = journals
+            .Where(x => IsExpenseAccount(x.Account.Number) && (settings.NotBudgetCostCenter.HasValue 
+            ? x.CostCenterId == settings.NotBudgetCostCenter 
+            : !excludedAccountNumbers.Any(a => x.Account.Number.StartsWith(a))))
+            .Sum(x => x.Debit - x.Credit);
+
+        if (dashboardSettings.ApplyOverBudgetToFunds)
+            otherExpenses += overBudgetTotal;
+
+        var otherExpensesTarget =  dashboardSettings.OtherExpensesTarget + dashboardSettings.AddOnExpensesTarget;
+
+        budgetProgress = budgetProgress.OrderByDescending(x => x.Remains).ToList();
+
+        // TOTAL ACCOUNTS SUMMARY
+
+        budgetProgress.Add(new BudgetSummaryDTO
+        {
+            Id = settings.NotBudgetCostCenter ?? 0,
+            IsOtherExpenses = true,
+            Name = "Other Expenses",
+            Budget = otherExpensesTarget,
+            Spent = otherExpenses,
+            SpentPercentage = otherExpensesTarget != 0 ? Math.Round((otherExpenses / otherExpensesTarget) * 100) : 0,
+            Remains = otherExpensesTarget - otherExpenses,
+            RemainPercentage = otherExpensesTarget != 0 ? Math.Round(((otherExpensesTarget - otherExpenses) / dashboardSettings.OtherExpensesTarget) * 100) : 0,
+        });
+
+
+
+        var expensesAccounts = budgetProgress.Where(d => d.Id != settings.CurrentCashAccount).ToList();
+
+        var totalAccountsSpent = expensesAccounts.Sum(x => x.Spent);
+        var totalAccountsRemaining = expensesAccounts.Sum(x => x.Remains ?? 0);
+        var totalAccountsBudget = expensesAccounts.Sum(x => x.Budget ?? 0);
+
+        expensesAccounts.Add(new BudgetSummaryDTO
+        {
+            Id = 0,
+            Name = "Total",
+            Spent = totalAccountsSpent,
+            Budget = totalAccountsBudget,
+            Remains = totalAccountsRemaining,
+            RemainPercentage = totalAccountsBudget > 0
+                ? (totalAccountsRemaining / totalAccountsBudget) * 100
+                : null,
+            SpentPercentage = totalAccountsBudget > 0
+                ? (totalAccountsSpent / totalAccountsBudget) * 100
+                : null,
+        });
+
+
+        var savings = budgetProgress
+            .Where(d => d.Id == settings.CurrentCashAccount || d.Id == settings.CurrentAssetsAccount)
+            .ToList();
+
+        return new BudgetSummaryReportDTO
+        {
+            Periods = periodSummaries,
+            Accounts = expensesAccounts,
+            Savings = savings
+        };
+    }
     public async Task<IEnumerable<AccountSummaryDTO>> GetAccountsSummary(DateTime from, DateTime to)
     {
 

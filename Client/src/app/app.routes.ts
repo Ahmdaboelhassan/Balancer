@@ -16,6 +16,7 @@ import { AccountstatementDetialsComponent } from './Components/accountstatement/
 import { IncomeStatementComponent } from './Components/income-statement/income-statement.component';
 import { AccountingTreeComponent } from './Components/accounting-tree/accounting-tree.component';
 import { AccountsSummaryComponent } from './Components/accounts-summary/accounts-summary.component';
+import { BudgetSummaryComponent } from './Components/budget-summary/budget-summary.component';
 import { AccountsOverviewComponent } from './Components/accounts-overview/accounts-overview.component';
 import { authGuard } from './Guards/auth.guard';
 import { AccountComparerComponent } from './Components/account-comparer/account-comparer.component';
@@ -120,6 +121,11 @@ export const routes: Routes = [
     path: 'AccountsSummary',
     canActivate: [authGuard],
     loadComponent: () => AccountsSummaryComponent,
+  },
+  {
+    path: 'BudgetSummary',
+    canActivate: [authGuard],
+    loadComponent: () => BudgetSummaryComponent,
   },
   {
     path: 'AccountsOverview',

@@ -5,6 +5,10 @@ import { AccountStatement } from '../Interfaces/Response/AccountStatement';
 
 import { AccountSummary } from '../Interfaces/Response/AccountSummary';
 import { AccountComparer } from '../Interfaces/Response/AccountComparer';
+import {
+  BudgetSummaryDTO,
+  BudgetSummaryReportDTO,
+} from '../Interfaces/Response/BudgetSummaryReportDTO';
 
 @Injectable({
   providedIn: 'root',
@@ -58,6 +62,13 @@ export class ReportService {
 
     return this.http.get<AccountSummary[]>(url);
   }
+
+  GetBudgetSummary(from, to) {
+    let url = this.url + `/BudgetSummary?from=${from}&to=${to}`;
+
+    return this.http.get<BudgetSummaryReportDTO>(url);
+  }
+
   GetBalanceSheet(to, maxLevel) {
     let url = this.url + `/BalanceSheet?&to=${to}`;
 

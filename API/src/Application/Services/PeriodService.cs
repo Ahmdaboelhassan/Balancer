@@ -130,7 +130,7 @@ internal class PeriodService : IPeriodService
         var From = DTO.From;
         var To = DTO.To;
 
-        int periodNo = await GetPeriodNumber(From);
+        int periodNo = await GetPeriodNumber(From, DTO.Id);
 
         var periodName = $"Period No. {periodNo} In Month {From.Month} In Year {From.Year}";
 
@@ -168,7 +168,7 @@ internal class PeriodService : IPeriodService
         var days = DTO.To.Subtract(DTO.From).TotalDays + 1;
 
         var From = DTO.From;
-        int periodNo = await GetPeriodNumber(From);
+        int periodNo = await GetPeriodNumber(From, DTO.Id);
 
         var periodName = $"Period No. {periodNo} In Month {From.Month} In Year {From.Year}";
 
@@ -203,9 +203,9 @@ internal class PeriodService : IPeriodService
         await _uow.SaveChangesAync();
         return  new ConfirmationResponse { IsSucceed = true, Message = "Period Has Been Deleted Successfully" }; ;
     }
-    private async Task<int> GetPeriodNumber(DateTime FromDate)
+    private async Task<int> GetPeriodNumber(DateTime FromDate , int Id)
     {
-        int periodsInSameMonth = await _uow.Periods.Count(p => p.From.Month == FromDate.Month && p.From.Year == FromDate.Year);
+        int periodsInSameMonth = await _uow.Periods.Count(p => p.From.Month == FromDate.Month && p.From.Year == FromDate.Year && p.Id != Id);
         return periodsInSameMonth == 0 ? 1 : periodsInSameMonth + 1;
     }
 

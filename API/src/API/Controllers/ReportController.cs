@@ -39,6 +39,12 @@ public class ReportController : ControllerBase
         return Ok(await _serviceContext.ReportService.GetAccountsSummary(from, to));
     }
 
+    [HttpGet("BudgetSummary")]
+    public async Task<IActionResult> BudgetSummary(DateTime from, DateTime to)
+    {
+        return Ok(await _serviceContext.ReportService.GetBudgetSummary(from, to));
+    }
+
     [HttpGet("AccountsOverview")]
     public async Task<IActionResult> AccountsOverview(DateTime from, DateTime to, int? maxLevel)
     {

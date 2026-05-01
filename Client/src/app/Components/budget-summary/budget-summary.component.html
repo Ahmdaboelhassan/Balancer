@@ -1,0 +1,125 @@
+<app-date-range (dates)="GetBudgetSummary($event)"></app-date-range>
+
+<div class="bg-white mt-2 rounded-xl overflow-hidden">
+  <table class="w-full text-sm text-left rtl:text-right text-gray-500">
+    <tr class="text-xs text-white uppercase bg-slate-800">
+      <th class="px-8 py-3">Account</th>
+      <th class="px-5 py-3">Budget</th>
+      <th class="px-8 py-3">Spent</th>
+      <th class="px-8 py-3">Remains</th>
+      <th class="px-8 py-3">Spent %</th>
+      <th class="px-8 py-3">Remain %</th>
+    </tr>
+    @if (accounts.length > 0) {
+      <tbody>
+        @for (account of accounts; track $index) {
+          <tr class="bg-white border-b hover:bg-gray-50 dark:hover:bg-gray-50">
+            <th
+              scope="row"
+              class="px-6 py-4 font-bold text-base text-gray-900 whitespace-nowrap"
+            >
+              {{ account.name }}
+            </th>
+            <td class="px-8 py-4 font-bold">
+              {{ account.budget | currency }}
+            </td>
+            <td class="px-8 py-4 font-bold">
+              {{ account.spent | currency }}
+            </td>
+            <td class="px-8 py-4 font-bold">
+              {{ account.remains | currency }}
+            </td>
+            <td class="px-8 py-4 font-bold">
+              {{ account.spentPercentage || 0 | number: "1.0-2" }}%
+            </td>
+            <td class="px-8 py-4 font-bold">
+              {{ account.remainPercentage || 0 | number: "1.0-2" }}%
+            </td>
+          </tr>
+        }
+      </tbody>
+    }
+  </table>
+</div>
+
+<div class="bg-white mt-3 rounded-xl overflow-hidden">
+  <table class="w-full text-sm text-left rtl:text-right text-gray-500">
+    <tr class="text-xs text-white uppercase bg-slate-800">
+      <th class="px-8 py-3">Period</th>
+      <th class="px-5 py-3">Budget</th>
+      <th class="px-8 py-3">Spent</th>
+      <th class="px-8 py-3">Remains</th>
+      <th class="px-8 py-3">Spent %</th>
+      <th class="px-8 py-3">Remain %</th>
+    </tr>
+    @if (periods.length > 0) {
+      <tbody>
+        @for (period of periods; track $index) {
+          <tr class="bg-white border-b hover:bg-gray-50 dark:hover:bg-gray-50">
+            <th
+              scope="row"
+              class="px-6 py-4 font-bold text-base text-gray-900 whitespace-nowrap"
+            >
+              {{ period.name }}
+            </th>
+            <td class="px-8 py-4 font-bold">
+              {{ period.budget | currency }}
+            </td>
+            <td class="px-8 py-4 font-bold">{{ period.spent | currency }}</td>
+            <td class="px-8 py-4 font-bold">
+              {{ period.remains | currency }}
+            </td>
+            <td class="px-8 py-4 font-bold">
+              {{ period.spentPercentage || 0 | number: "1.0-2" }}%
+            </td>
+            <td class="px-8 py-4 font-bold">
+              {{ period.remainPercentage || 0 | number: "1.0-2" }}%
+            </td>
+          </tr>
+        }
+      </tbody>
+    }
+  </table>
+</div>
+
+<div class="bg-white mt-3 rounded-xl overflow-hidden">
+  <table class="w-full text-sm text-left rtl:text-right text-gray-500">
+    <tr class="text-xs text-white uppercase bg-slate-800">
+      <th class="px-8 py-3">Account</th>
+      <th class="px-5 py-3">Budget</th>
+      <th class="px-8 py-3">Spent</th>
+      <th class="px-8 py-3">Remains</th>
+      <th class="px-8 py-3">Spent %</th>
+      <th class="px-8 py-3">Remain %</th>
+    </tr>
+    @if (savings.length > 0) {
+      <tbody>
+        @for (account of savings; track $index) {
+          <tr class="bg-white border-b hover:bg-gray-50 dark:hover:bg-gray-50">
+            <th
+              scope="row"
+              class="px-6 py-4 font-bold text-base text-gray-900 whitespace-nowrap"
+            >
+              {{ account.name }}
+            </th>
+            <td class="px-8 py-4 font-bold">
+              {{ account.budget | currency }}
+            </td>
+            <td class="px-8 py-4 font-bold">
+              {{ account.spent | currency }}
+            </td>
+            <td class="px-8 py-4 font-bold">
+              {{ account.remains | currency }}
+            </td>
+            <td class="px-8 py-4 font-bold">
+              {{ account.spentPercentage || 0 | number: "1.0-2" }}%
+            </td>
+            <td class="px-8 py-4 font-bold">
+              {{ account.remainPercentage || 0 | number: "1.0-2" }}%
+            </td>
+          </tr>
+        }
+      </tbody>
+    }
+  </table>
+</div>
