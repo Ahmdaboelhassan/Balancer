@@ -360,7 +360,7 @@ public class ReportService : IReportService
                     if (IsExpenseAccount(x.budget.Account.Number))
                         overBudgetTotal += Math.Max(0, spent - x.budget.Budget);
 
-                    var remains = spent < 0 ? spent - x.budget.Budget : x.budget.Budget - spent;
+                    var remains = x.budget.Budget - spent;
                     return new BudgetSummaryDTO
                     {
                         Id = x.budget.AccountId,
