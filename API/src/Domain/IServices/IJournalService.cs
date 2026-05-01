@@ -6,7 +6,6 @@ public interface IJournalService
 {
     public Task<Result<GetJournalDTO>> New(int? periodId);
     public Task<Result<GetJournalDTO>> Get(int id);
-    public Task<IEnumerable<JournalListItemDTO>> GetAll(int page);
     public Task<PeriodJournals> GetPeriodJournals(int periodId);
     public Task<IEnumerable<JournalListItemDTO>> GetAll(DateTime from , DateTime to);
     public Task<IEnumerable<JournalListItemDTO>> Search(string criteria);

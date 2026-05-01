@@ -181,37 +181,27 @@ internal class JournalService : IJournalService
         }).ToListAsync();
 
     }
-    public async Task<IEnumerable<JournalListItemDTO>> GetAll(int page)
-    {
-        const int pageSize = 20;
-
-        return await _uow.Journal.SelectSome(a => true, a => new JournalListItemDTO
-        {
-            Id = a.Id,
-            Amount = a.Amount,
-            Type = a.Type,
-            Code = a.Code,
-            CreatedAt = a.CreatedAt.ToString("f"),
-            Detail = a.Detail,
-            Notes = a.Notes,
-            CostCenter = a.JournalDetails.First().CostCenter != null ? a.JournalDetails.First().CostCenter.Name : ""
-        }, j => j.CreatedAt , page , pageSize);
-    }
+   
     public async Task<IEnumerable<JournalListItemDTO>> GetAll(DateTime from, DateTime to)
     {
-        return (await _uow.Journal.SelectAll(a => a.CreatedAt.Date >= from.Date && a.CreatedAt.Date <= to.Date,
-           a => new JournalListItemDTO
-        {
-            Id = a.Id,
-            Amount = a.Amount,
-            Type = a.Type,
-            Code = a.Code,
-            CreatedAt = a.CreatedAt.ToString("f"),
-            Detail = a.Detail,
-            Notes = a.Notes,
-            periodId = a.PeriodId,
-            CostCenter = a.JournalDetails.First().CostCenter != null ? a.JournalDetails.First().CostCenter.Name : ""
-        })).OrderByDescending(j => j.CreatedAt);
+        var query = _uow.Journal
+                .AsQueryable()
+                .Where(a => a.CreatedAt.Date >= from.Date && a.CreatedAt.Date <= to.Date)
+                .OrderByDescending(a => a.CreatedAt)
+                .Select(a => new JournalListItemDTO
+                {
+                    Id = a.Id,
+                    Amount = a.Amount,
+                    Type = a.Type,
+                    Code = a.Code,
+                    CreatedAt = a.CreatedAt.ToString("f"),
+                    Detail = a.Detail,
+                    Notes = a.Notes,
+                    periodId = a.PeriodId,
+                    CostCenter = a.JournalDetails.First().CostCenter != null ? a.JournalDetails.First().CostCenter.Name : ""
+                });
+
+        return await query.ToListAsync();
     }
     public async Task<PeriodJournals> GetPeriodJournals(int periodId)
     {

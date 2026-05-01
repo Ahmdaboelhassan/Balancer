@@ -43,11 +43,7 @@ public class JournalController : ControllerBase
     {
         return Ok(await _serviceContext.JournalService.AdvancedSearch(DTO));
     }
-    [HttpGet("GetAll/{page}")]
-    public async Task<IActionResult> GetAll(int page)
-    {
-        return Ok(await _serviceContext.JournalService.GetAll(page));
-    }
+
     [HttpGet("FilterByTime")]
     public async Task<IActionResult> FilterByTime(DateTime from , DateTime to)
     {
