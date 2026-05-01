@@ -2,7 +2,7 @@
   [routerLink]="['/Period', 'PeriodJournals', item?.id]"
   class="block p-5 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100"
 >
-  <h4 class="mb-2 text-xl lg:text-2xl font-bold tracking-tight text-gray-900">
+  <h4 class="mb-2 text-lg lg:text-2xl font-bold tracking-tight text-gray-900">
     <a [routerLink]="['/Period', 'Edit', item?.id]">
       <i
         class="fa-regular fa-calendar me-2"
@@ -12,7 +12,7 @@
     </a>
   </h4>
   <h6
-    class="text-lg lg:text-xl font-bold tracking-tight text-gray-500 flex items-center gap-2"
+    class="text-md lg:text-xl font-bold tracking-tight text-gray-500 flex items-center gap-2"
   >
     <i class="fa-regular fa-clock text-gray-400"></i>
 
@@ -25,21 +25,16 @@
 
   <div class="p-1 flex justify-start md:justify-end items-end">
     @if (item?.periodBudget) {
-      <span class="flex items-center gap-2 md:text-2xl text-lg font-medium">
+      <span
+        class="flex items-center gap-3 md:text-2xl text-md font-medium flex-wrap"
+      >
         <!-- Budget -->
-        <i class="fa-solid fa-wallet text-blue-500"></i>
         <span class="text-blue-600 me-3">
+          <i class="fa-solid fa-wallet text-blue-500"></i>
           {{ item?.periodBudget }}
         </span>
 
         <!-- Total Amount -->
-        <i
-          class="fa-solid fa-coins"
-          [ngClass]="{
-            'text-green-500': item?.totalAmount >= 0,
-            'text-red-500': item?.totalAmount < 0,
-          }"
-        ></i>
 
         <span
           class="me-3"
@@ -48,23 +43,31 @@
             'text-red-600 font-semibold': item?.totalAmount < 0,
           }"
         >
+          <i
+            class="fa-solid fa-coins"
+            [ngClass]="{
+              'text-green-500': item?.totalAmount >= 0,
+              'text-red-500': item?.totalAmount < 0,
+            }"
+          ></i>
           {{ item?.totalAmount }}
         </span>
 
         <!-- Remaining -->
-        <i
-          class="fa-solid fa-chart-line"
-          [ngClass]="{
-            'text-green-600': item?.remains >= 0,
-            'text-red-600': item?.remains < 0,
-          }"
-        ></i>
+
         <span
           [ngClass]="{
             'text-green-600': item?.remains >= 0,
             'text-red-600': item?.remains < 0,
           }"
         >
+          <i
+            class="fa-solid fa-chart-line"
+            [ngClass]="{
+              'text-green-600': item?.remains >= 0,
+              'text-red-600': item?.remains < 0,
+            }"
+          ></i>
           {{ item?.remains }}
         </span>
       </span>
