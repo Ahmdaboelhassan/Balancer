@@ -109,6 +109,7 @@ export class CreateJournalComponent {
   }
 
   intializeForm(journal: Journal) {
+    debugger;
     this.JournalForm = new FormGroup({
       id: new FormControl(journal.id),
       details: new FormControl(journal.detail, Validators.required),

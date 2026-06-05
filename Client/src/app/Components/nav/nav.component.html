@@ -20,14 +20,14 @@
         routerLink="Home"
         class="bg-slate-800 font-bold text-white block py-3 px-5 mb-2 hover:bg-gray-800 rounded-xl"
         style="box-shadow: inset 0px -1px 2px #0000006e"
-        ><i class="fa-solid fa-house me-2"></i>Home</a
+        ><i class="fa-solid fa-house me-2 text-teal-500"></i>Home</a
       >
       <mat-accordion class="example-headers-align">
         <div class="mb-2">
           <mat-expansion-panel>
             <mat-expansion-panel-header>
               <mat-panel-title class="font-bold text-slate-800">
-                <i class="fa-solid fa-money-check me-2"></i>
+                <i class="fa-solid fa-book-medical me-2 text-cyan-700"></i>
                 Journals
               </mat-panel-title>
             </mat-expansion-panel-header>
@@ -67,7 +67,7 @@
           <mat-expansion-panel>
             <mat-expansion-panel-header>
               <mat-panel-title class="font-bold text-slate-800">
-                <i class="fa-solid fa-clock me-2"></i>
+                <i class="fa-solid fa-clock me-2 text-orange-700"></i>
                 Periods
               </mat-panel-title>
             </mat-expansion-panel-header>
@@ -106,7 +106,7 @@
           <mat-expansion-panel>
             <mat-expansion-panel-header>
               <mat-panel-title class="font-bold text-slate-800">
-                <i class="fa-solid fa-bookmark me-2"></i>
+                <i class="fa-solid fa-bookmark me-2 text-green-500"></i>
                 Evaluations
               </mat-panel-title>
             </mat-expansion-panel-header>
@@ -136,7 +136,7 @@
           <mat-expansion-panel>
             <mat-expansion-panel-header>
               <mat-panel-title class="font-bold text-slate-800">
-                <i class="fa-solid fa-address-book me-2"></i>
+                <i class="fa-solid fa-address-book me-2 text-stone-500"></i>
                 Accounts
               </mat-panel-title>
             </mat-expansion-panel-header>
@@ -175,7 +175,7 @@
           <mat-expansion-panel>
             <mat-expansion-panel-header>
               <mat-panel-title class="font-bold text-slate-800">
-                <i class="fa-solid fa-box me-2"></i>
+                <i class="fa-solid fa-box me-2 text-teal-700"></i>
                 Cost Centers
               </mat-panel-title>
             </mat-expansion-panel-header>
@@ -205,7 +205,7 @@
           <mat-expansion-panel>
             <mat-expansion-panel-header>
               <mat-panel-title class="font-bold text-slate-800">
-                <i class="fa-solid fa-print me-2"></i>
+                <i class="fa-solid fa-print me-2 text-violet-500"></i>
                 Reports
               </mat-panel-title>
             </mat-expansion-panel-header>
@@ -216,6 +216,7 @@
                   routerLinkActive="route-active"
                   class="p-2 inline-block hover:text-slate-950"
                 >
+                  <i class="fa-solid fa-file-lines text-violet-500 me-1"></i>
                   Account Statment</a
                 >
               </li>
@@ -225,6 +226,7 @@
                   routerLinkActive="route-active"
                   class="p-2 inline-block hover:text-slate-950"
                 >
+                  <i class="fa-solid fa-file-lines text-violet-500 me-1"></i>
                   Accounts Comparer</a
                 >
               </li>
@@ -235,6 +237,7 @@
                   routerLinkActive="route-active"
                   class="p-2 inline-block hover:text-slate-950"
                 >
+                  <i class="fa-solid fa-file-lines text-violet-500 me-1"></i>
                   Accounts Overview</a
                 >
               </li>
@@ -245,6 +248,7 @@
                   routerLinkActive="route-active"
                   class="p-2 inline-block hover:text-slate-950"
                 >
+                  <i class="fa-solid fa-file-lines text-violet-500 me-1"></i>
                   Accounts Summary</a
                 >
               </li>
@@ -254,6 +258,7 @@
                   routerLinkActive="route-active"
                   class="p-2 inline-block hover:text-slate-950"
                 >
+                  <i class="fa-solid fa-file-lines text-violet-500 me-1"></i>
                   Budget Summary</a
                 >
               </li>
@@ -263,6 +268,7 @@
                   routerLinkActive="route-active"
                   class="p-2 inline-block hover:text-slate-950"
                 >
+                  <i class="fa-solid fa-file-lines text-violet-500 me-1"></i>
                   Income Statment</a
                 >
               </li>
@@ -272,6 +278,7 @@
                   routerLinkActive="route-active"
                   class="p-2 inline-block hover:text-slate-950"
                 >
+                  <i class="fa-solid fa-file-lines text-violet-500 me-1"></i>
                   Balance Sheet</a
                 >
               </li>
@@ -291,7 +298,7 @@
           <mat-expansion-panel>
             <mat-expansion-panel-header>
               <mat-panel-title class="text-slate-800 font-bold">
-                <i class="fa-solid fa-gear me-2"></i>
+                <i class="fa-solid fa-gear me-2 text-gray-500"></i>
                 Settings
               </mat-panel-title>
             </mat-expansion-panel-header>
@@ -303,6 +310,15 @@
                   class="p-2 inline-block hover:text-slate-950"
                 >
                   General Settings</a
+                >
+              </li>
+              <li>
+                <a
+                  routerLink="/BudgetAccountSettings"
+                  routerLinkActive="route-active"
+                  class="p-2 inline-block hover:text-slate-950"
+                >
+                  Budget Settings</a
                 >
               </li>
               <li>
