@@ -11,6 +11,7 @@ public class JournalDetail
     [Required]
     public int AccountId { get; set; }
     public int? CostCenterId { get; set; }
+    public int? SecondCostCenterId { get; set; }
     public string? Notes { get; set; }
     public decimal Credit { get; set; }
     public decimal Debit { get; set; }
@@ -24,5 +25,8 @@ public class JournalDetail
 
     [ForeignKey(nameof(CostCenterId))]
     public CostCenter? CostCenter { get; set; }
+
+    [ForeignKey(nameof(SecondCostCenterId))]
+    public CostCenter? SecondCostCenter { get; set; }
 
 }

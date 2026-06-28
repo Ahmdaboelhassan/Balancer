@@ -8,4 +8,5 @@ export interface JournalListItem {
   notes: string;
   periodId: number;
   costCenter: string;
+  secondCostCenter: string;
 }

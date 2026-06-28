@@ -10,4 +10,6 @@ public class JournalListItemDTO
     public string? Notes { get; set; }
     public int periodId { get; set; }
     public string? CostCenter { get; set; }
+    public string? SecondCostCenter { get; set; }
+
 }

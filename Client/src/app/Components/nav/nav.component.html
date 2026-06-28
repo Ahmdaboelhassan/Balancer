@@ -153,6 +153,16 @@
               <li>
                 <a
                   routerLink="Account/List"
+                  [queryParams]="{ archive: true }"
+                  routerLinkActive="route-active"
+                  class="p-2 inline-block hover:text-slate-950"
+                >
+                  Archive</a
+                >
+              </li>
+              <li>
+                <a
+                  routerLink="Account/List"
                   routerLinkActive="route-active"
                   class="p-2 inline-block hover:text-slate-950"
                 >
@@ -187,6 +197,16 @@
                   class="p-2 inline-block hover:text-slate-950"
                 >
                   Create</a
+                >
+              </li>
+              <li>
+                <a
+                  routerLink="CostCenter/List"
+                  [queryParams]="{ archive: true }"
+                  routerLinkActive="route-active"
+                  class="p-2 inline-block hover:text-slate-950"
+                >
+                  Archive</a
                 >
               </li>
               <li>

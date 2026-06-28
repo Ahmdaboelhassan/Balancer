@@ -26,6 +26,9 @@
         @if (journal.costCenter) {
           / {{ journal.costCenter }}
         }
+        @if (journal.secondCostCenter) {
+          / {{ journal.secondCostCenter }}
+        }
       </span>
       <span> #{{ journal.code }}</span>
     </p>

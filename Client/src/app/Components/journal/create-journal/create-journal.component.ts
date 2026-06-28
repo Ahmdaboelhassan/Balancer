@@ -109,7 +109,6 @@ export class CreateJournalComponent {
   }
 
   intializeForm(journal: Journal) {
-    debugger;
     this.JournalForm = new FormGroup({
       id: new FormControl(journal.id),
       details: new FormControl(journal.detail, Validators.required),
@@ -117,6 +116,7 @@ export class CreateJournalComponent {
       debit: new FormControl(journal.debitAccountId, Validators.required),
       credit: new FormControl(journal.creditAccountId, Validators.required),
       costCenter: new FormControl(journal.costCenterId ?? ''),
+      secondCostCenterId: new FormControl(journal.secondCostCenterId ?? ''),
       code: new FormControl({ disabled: true, value: journal.code }),
       created: new FormControl(
         this.GetLocaleDateTime(new Date(journal.createdAt)),
@@ -124,6 +124,10 @@ export class CreateJournalComponent {
       lastUpdate: new FormControl({
         disabled: true,
         value: journal.lastUpdatedAt,
+      }),
+      actualCreatedAt: new FormControl({
+        disabled: true,
+        value: journal.actualCreatedAt,
       }),
       description: new FormControl(journal.description),
       periodId: new FormControl(journal.periodId),
@@ -154,6 +158,8 @@ export class CreateJournalComponent {
       description: form.description,
       periodId: form.periodId,
       createdAt: form.created,
+      secondCostCenterId:
+        form.secondCostCenterId == '' ? null : form.secondCostCenterId,
     };
 
     if (this.isEdit) {

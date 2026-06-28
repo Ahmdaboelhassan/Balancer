@@ -17,6 +17,7 @@ namespace Domain.Entities
 
         [Required]
         public DateTime CreatedAt { get; set; }
+        public DateTime? ActualCreatedAt { get; set; }
         public DateTime? LastUpdatedAt { get; set; }
         public bool IsDeleted { get; set; }
         public byte Type { get; set; }

@@ -26,8 +26,8 @@ public class ReportService : IReportService
                         d.Account.Number.StartsWith(account.Number)
                      && (!from.HasValue || d.Journal.CreatedAt.Date >= from.Value.Date)
                      && (!to.HasValue || d.Journal.CreatedAt.Date <= to.Value.Date)
-                     && (!costCenterId.HasValue || d.CostCenterId == costCenterId)
-                   , "CostCenter", "Account", "Journal")).OrderBy(d => d.Journal.CreatedAt);
+                     && (!costCenterId.HasValue || (d.CostCenterId == costCenterId || d.SecondCostCenterId == costCenterId))
+                   , "CostCenter", "SecondCostCenter", "Account", "Journal")).OrderBy(d => d.Journal.CreatedAt);
 
 
         var journalsLinkedList = new LinkedList<AccountStatementDetail>();
@@ -39,7 +39,7 @@ public class ReportService : IReportService
                     .GetAll(d =>
                          d.Account.Number.StartsWith(account.Number)
                        && d.Journal.CreatedAt < from.Value.Date
-                      && (!costCenterId.HasValue || d.CostCenterId == costCenterId)
+                      && (!costCenterId.HasValue || (d.CostCenterId == costCenterId || d.SecondCostCenterId == costCenterId))
                     , "Account", "Journal");
 
             if (openingJournals.Count > 0)
@@ -63,12 +63,19 @@ public class ReportService : IReportService
         {
             balance += journal.Debit - journal.Credit;
 
+            var costCenter = string.Empty;
+
+            if (journal.CostCenterId == costCenterId)
+                costCenter = journal.CostCenter?.Name ?? "";
+            else if (journal.SecondCostCenterId == costCenterId)
+                costCenter = journal.SecondCostCenter?.Name ?? "";
+         
             journalsLinkedList.AddLast(new AccountStatementDetail
             {
                 Balance = balance,
                 Credit = journal.Credit,
                 Debit = journal.Debit,
-                CostCenter = journal.CostCenter?.Name ?? "",
+                CostCenter = costCenter,
                 Detail = journal.Journal.Detail,
                 JournalId = journal.JournalId,
                 notes = journal.Journal.Notes,
@@ -115,7 +122,7 @@ public class ReportService : IReportService
 
         var banksAndSafes = (await _uow.Accounts
             .GetAll(d => d.Id == settings.BanksAccount.GetValueOrDefault() || d.Id == settings.DrawersAccount.GetValueOrDefault()))
-            .ToDictionary(d => d.Id, d => d.Number); ;
+            .ToDictionary(d => d.Id, d => d.Number);
 
         var bankNumber = banksAndSafes[settings.BanksAccount.Value];
         var drawerNumber = banksAndSafes[settings.DrawersAccount.Value];
@@ -125,7 +132,7 @@ public class ReportService : IReportService
 
         var journals = (await _uow.JournalDetail
                    .GetAll(d =>
-                     (d.CostCenterId == costCenterId && !d.Account.Number.StartsWith(bankNumber) && !d.Account.Number.StartsWith(drawerNumber))
+                     ((d.CostCenterId == costCenterId || d.SecondCostCenterId == costCenterId) && !d.Account.Number.StartsWith(bankNumber) && !d.Account.Number.StartsWith(drawerNumber))
                      && (!from.HasValue || d.Journal.CreatedAt.Date >= from.Value.Date)
                      && (!to.HasValue || d.Journal.CreatedAt.Date <= to.Value.Date)
                    , "Account", "Journal"))
@@ -137,8 +144,8 @@ public class ReportService : IReportService
         if (openingBalance && from.HasValue)
         {
             var openingJournals = await _uow.JournalDetail
-                    .GetAll(d => d.CostCenterId == costCenterId 
-                    && !d.Account.Number.StartsWith(bankNumber) 
+                    .GetAll(d => (d.CostCenterId == costCenterId || d.SecondCostCenterId == costCenterId)
+                    && !d.Account.Number.StartsWith(bankNumber)
                     && !d.Account.Number.StartsWith(drawerNumber) 
                     && d.Journal.CreatedAt < from.Value.Date, "Journal", "Account");
 

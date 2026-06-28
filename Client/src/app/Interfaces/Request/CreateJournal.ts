@@ -5,6 +5,7 @@ export interface CreateJournal {
   amount: number;
   periodId: number;
   costCenterId: number;
+  secondCostCenterId: number;
   creditAccountId: number;
   debitAccountId: number;
   createdAt: string;

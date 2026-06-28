@@ -7,6 +7,7 @@ export interface Journal {
   notes: any;
   createdAt: string;
   lastUpdatedAt: any;
+  actualCreatedAt: any;
   type: number;
   accounts: AccountSelectList[];
   costCenters: CostCenterSelectList[];
@@ -15,6 +16,7 @@ export interface Journal {
   amount: number;
   periodId: number;
   costCenterId: any;
+  secondCostCenterId: any;
   creditAccountId: number;
   debitAccountId: number;
 }

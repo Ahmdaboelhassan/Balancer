@@ -96,7 +96,11 @@ export const routes: Routes = [
       { path: '', redirectTo: 'List', pathMatch: 'full' },
       { path: 'Create', loadComponent: () => CreateCostcenterComponent },
       { path: 'Edit/:id', loadComponent: () => CreateCostcenterComponent },
-      { path: 'List', loadComponent: () => CostcenterComponent },
+      {
+        path: 'List',
+        pathMatch: 'full',
+        loadComponent: () => CostcenterComponent,
+      },
     ],
   },
   {

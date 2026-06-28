@@ -24,8 +24,8 @@
       <form [formGroup]="JournalForm" (submit)="SaveJournal()">
         <input type="hidden" formControlName="id" />
         <input type="hidden" formControlName="periodId" />
-        <div class="controls grid grid-cols-4 gap-5">
-          <div class="col-span-4 lg:col-span-2">
+        <div class="controls grid grid-cols-12 gap-5">
+          <div class="col-span-12 lg:col-span-6">
             <label for="details"> Detials </label>
             <input
               type="text"
@@ -35,7 +35,7 @@
               dir="auto"
             />
           </div>
-          <div class="col-span-4 lg:col-span-2">
+          <div class="col-span-12 lg:col-span-6">
             <label for="amount">
               <span>Amount</span>
               <button
@@ -53,7 +53,7 @@
               class="form-control w-full"
             />
           </div>
-          <div class="col-span-4 lg:col-span-2">
+          <div class="col-span-12 lg:col-span-6">
             <label for="credit">
               <span>From Account</span>
               <button
@@ -83,7 +83,7 @@
             formControlName="creditBalance"
           />
         </div> -->
-          <div class="col-span-4 lg:col-span-2">
+          <div class="col-span-12 lg:col-span-6">
             <label for="debit">
               <span>To Account </span>
               <button
@@ -105,24 +105,36 @@
             >
             </ng-select>
           </div>
-
-          <div class="col-span-4 lg:col-span-1">
-            <label for="costCenter"> Cost Center </label>
-            <select
-              id="costCenter"
-              formControlName="costCenter"
+          <div class="col-span-12 lg:col-span-4">
+            <label for="created"> Date </label>
+            <input
+              type="datetime-local"
               class="form-control w-full"
-            >
-              <option selected value="">Without Cost Center</option>
-              <option
-                *ngFor="let account of Journal().costCenters"
-                [value]="account.id"
-              >
-                {{ account.name }}
-              </option>
-            </select>
+              formControlName="created"
+            />
           </div>
-          <div class="col-span-4 lg:col-span-1">
+          <div class="col-span-12 lg:col-span-4">
+            <label for="costCenter"> Cost Center </label>
+            <ng-select
+              [items]="Journal().costCenters"
+              bindLabel="name"
+              bindValue="id"
+              formControlName="costCenter"
+            >
+            </ng-select>
+          </div>
+          <div class="col-span-12 lg:col-span-4">
+            <label for="secondCostCenterId">Second Cost Center </label>
+            <ng-select
+              [items]="Journal().costCenters"
+              bindLabel="name"
+              bindValue="id"
+              formControlName="secondCostCenterId"
+            >
+            </ng-select>
+          </div>
+
+          <div class="col-span-12 lg:col-span-4">
             <label for="detail"> Code </label>
             <input
               type="number"
@@ -131,21 +143,18 @@
             />
           </div>
 
-          <div
-            class="col-span-4"
-            [ngClass]="
-              Journal().lastUpdatedAt ? 'lg:col-span-1' : 'lg:col-span-2'
-            "
-          >
-            <label for="created"> Date </label>
-            <input
-              type="datetime-local"
-              class="form-control w-full"
-              formControlName="created"
-            />
-          </div>
+          @if (Journal().actualCreatedAt) {
+            <div class="col-span-12 lg:col-span-4">
+              <label for="detail">Created Date </label>
+              <input
+                type="text"
+                class="form-control w-full"
+                formControlName="actualCreatedAt"
+              />
+            </div>
+          }
           @if (Journal().lastUpdatedAt) {
-            <div class="col-span-4 lg:col-span-1">
+            <div class="col-span-12 lg:col-span-4">
               <label for="detail"> Last Update </label>
               <input
                 type="text"
@@ -154,7 +163,7 @@
               />
             </div>
           }
-          <div class="col-span-4">
+          <div class="col-span-12">
             <label for="descroption"> Description </label>
             <textarea
               class="form-control w-full resize-none"

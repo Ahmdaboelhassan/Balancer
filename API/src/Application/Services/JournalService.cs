@@ -72,6 +72,7 @@ internal class JournalService : IJournalService
             {
                 Id = journal.Id,
                 CostCenterId = journal.JournalDetails.FirstOrDefault()?.CostCenterId,
+                SecondCostCenterId = journal.JournalDetails.FirstOrDefault()?.SecondCostCenterId,
                 DebitAccountId = journal.JournalDetails.First(d => d.Debit > 0).AccountId,
                 CreditAccountId = journal.JournalDetails.First(d => d.Credit > 0).AccountId,
                 CreatedAt = journal.CreatedAt,
@@ -80,6 +81,7 @@ internal class JournalService : IJournalService
                 Code = journal.Code,
                 Notes = journal.Notes,
                 LastUpdatedAt = journal.LastUpdatedAt?.ToString("g"),
+                ActualCreatedAt = journal.ActualCreatedAt?.ToString("g"),
                 PeriodId = journal.PeriodId,
                 Detail = journal.Detail,
                 Description = journal.Description,
@@ -177,7 +179,8 @@ internal class JournalService : IJournalService
             Detail = a.Detail,
             Notes = a.Notes,
             periodId = a.PeriodId,
-            CostCenter = a.JournalDetails.First().CostCenter != null ? a.JournalDetails.First().CostCenter.Name : "" 
+            CostCenter = a.JournalDetails.First().CostCenter != null ? a.JournalDetails.First().CostCenter.Name : "",
+            SecondCostCenter = a.JournalDetails.First().SecondCostCenter != null ? a.JournalDetails.First().SecondCostCenter.Name : ""
         }).ToListAsync();
 
     }
@@ -198,7 +201,8 @@ internal class JournalService : IJournalService
                     Detail = a.Detail,
                     Notes = a.Notes,
                     periodId = a.PeriodId,
-                    CostCenter = a.JournalDetails.First().CostCenter != null ? a.JournalDetails.First().CostCenter.Name : ""
+                    CostCenter = a.JournalDetails.First().CostCenter != null ? a.JournalDetails.First().CostCenter.Name : "",
+                    SecondCostCenter = a.JournalDetails.First().SecondCostCenter != null ? a.JournalDetails.First().SecondCostCenter.Name : ""
                 });
 
         return await query.ToListAsync();
@@ -235,7 +239,8 @@ internal class JournalService : IJournalService
                 Detail = j.Detail,
                 Notes = j.Notes,
                 periodId = j.PeriodId,
-                CostCenter = j.JournalDetails.First().CostCenter != null ? j.JournalDetails.First().CostCenter.Name : ""
+                CostCenter = j.JournalDetails.First().CostCenter != null ? j.JournalDetails.First().CostCenter.Name : "",
+                SecondCostCenter = j.JournalDetails.First().SecondCostCenter != null ? j.JournalDetails.First().SecondCostCenter.Name : ""
 
             })
         };
@@ -264,9 +269,11 @@ internal class JournalService : IJournalService
             {
                 Id = journal.Id,
                 CostCenterId = journal.JournalDetails.FirstOrDefault()?.CostCenterId,
+                SecondCostCenterId = journal.JournalDetails.FirstOrDefault()?.SecondCostCenterId,
                 DebitAccountId = journal.JournalDetails.First(d => d.Debit > 0).AccountId,
                 CreditAccountId = journal.JournalDetails.First(d => d.Credit > 0).AccountId,
                 CreatedAt = journal.CreatedAt,
+                ActualCreatedAt = journal.ActualCreatedAt?.ToString("g"),
                 Amount = Math.Abs(journal.Amount),
                 Type = journal.Type,
                 Code = journal.Code,
@@ -294,6 +301,7 @@ internal class JournalService : IJournalService
             {
                 Id = journal.Id,
                 CostCenterId = journal.JournalDetails.FirstOrDefault()?.CostCenterId,
+                SecondCostCenterId = journal.JournalDetails.FirstOrDefault()?.SecondCostCenterId,
                 DebitAccountId = journal.JournalDetails.First(d => d.Debit > 0).AccountId,
                 CreditAccountId = journal.JournalDetails.First(d => d.Credit > 0).AccountId,
                 CreatedAt = journal.CreatedAt,
@@ -301,6 +309,7 @@ internal class JournalService : IJournalService
                 Type = journal.Type,
                 Code = journal.Code,
                 Notes = journal.Notes,
+                ActualCreatedAt = journal.ActualCreatedAt?.ToString("g"),
                 LastUpdatedAt = journal.LastUpdatedAt?.ToString("g"),
                 PeriodId = journal.PeriodId,
                 Detail = journal.Detail,
@@ -336,9 +345,23 @@ internal class JournalService : IJournalService
                 if (model.CreatedAt.Date > period.To.Date)
                 {
                     var difference = model.CreatedAt.Date.Subtract(period.To.Date).TotalDays;
-                    return new Result<int> { Message = $"Period Has Been Expired From {difference} Days Ago" };
+                    var date = period.To.ToString("dd/MM/yyyy");
+                    return new Result<int> { Message = $"Period Has Been Expired From {difference} Days Ago From Day {date}" };
                 }
-                
+
+                if (model.CreatedAt.Date < period.From.Date)
+                {
+                    var difference = period.From.Date.Subtract(model.CreatedAt.Date).TotalDays;
+                    var date = period.From.ToString("dd/MM/yyyy");
+                    return new Result<int> { Message = $"Cannot Be Created Because It is {difference} Day(s) Before The Start Of The Selected Period From Day {date}" };
+                }
+
+                if (!model.CostCenterId.HasValue && model.SecondCostCenterId.HasValue)
+                    return new Result<int> { Message = "Please Select First Cost Center First" };
+
+                if (model.CostCenterId.HasValue && model.SecondCostCenterId.HasValue && model.CostCenterId == model.SecondCostCenterId)
+                    return new Result<int> { Message = "Cost Centers Can't be the same" };
+
                 var code = await GetNextCode();
 
                 var notes = $"{credit.Name} : {debit.Name}";
@@ -357,6 +380,9 @@ internal class JournalService : IJournalService
 
                 var costCenter = await GetCostCenter(debit, model.CostCenterId);
 
+                var egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time");
+                var egyptTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptTimeZone);
+
                 var newJournal = new Journal
                 {
                     Code = code,
@@ -367,7 +393,8 @@ internal class JournalService : IJournalService
                     Amount = journalAmount,
                     Type = (byte)journalType,
                     Description = model.Description,
-                    LastUpdatedAt = DateTime.Now
+                    LastUpdatedAt = egyptTime,
+                    ActualCreatedAt = egyptTime,
                 };
 
                 newJournal.JournalDetails = new Collection<JournalDetail>
@@ -376,6 +403,7 @@ internal class JournalService : IJournalService
                     {
                         AccountId = model.DebitAccountId,
                         CostCenterId = costCenter,
+                        SecondCostCenterId = model.SecondCostCenterId > 0 ? model.SecondCostCenterId : null,
                         Credit = 0,
                         Debit = model.Amount,
                         JournalId = newJournal.Id,
@@ -385,6 +413,7 @@ internal class JournalService : IJournalService
                     {
                         AccountId = model.CreditAccountId,
                         CostCenterId = costCenter,
+                        SecondCostCenterId = model.SecondCostCenterId > 0 ? model.SecondCostCenterId : null,
                         Credit = model.Amount,
                         Debit = 0,
                         JournalId = newJournal.Id,
@@ -440,8 +469,22 @@ internal class JournalService : IJournalService
                 if (model.CreatedAt.Date > period.To.Date)
                 {
                     var difference = model.CreatedAt.Date.Subtract(period.To.Date).TotalDays;
-                    return new Result<int> { Message = $"Created Date Is Greater Than Period End Date With {difference} Days" };
+                    var date = period.To.ToString("dd/MM/yyyy");
+                    return new Result<int> { Message = $"Period Has Been Expired From {difference} Days Ago From Day {date}" };
                 }
+
+                if (model.CreatedAt.Date < period.From.Date)
+                {
+                    var difference = period.From.Date.Subtract(model.CreatedAt.Date).TotalDays;
+                    var date = period.From.ToString("dd/MM/yyyy");
+                    return new Result<int> { Message = $"Cannot Be Created Because It is {difference} Day(s) Before The Start Of The Selected Period From Day {date}" };
+                }
+
+                if (!model.CostCenterId.HasValue && model.SecondCostCenterId.HasValue)
+                    return new Result<int> { Message = "Please Select First Cost Center First" };
+
+                if (model.CostCenterId.HasValue && model.SecondCostCenterId.HasValue && model.CostCenterId == model.SecondCostCenterId)
+                    return new Result<int> { Message = "Cost Centers Can't be the same" };
 
                 var notes = $"{credit.Name} : {debit.Name} (U)";
 
@@ -456,12 +499,15 @@ internal class JournalService : IJournalService
                 period.LastUpdatedAt = DateTime.Now;
 
 
+                var egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time");
+                var egyptTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptTimeZone);
+
                 journal.Notes = notes;
                 journal.PeriodId = model.PeriodId;
                 journal.Detail = model.Detail;
                 journal.Amount = journalAmount;
                 journal.Type = (byte)journalType;
-                journal.LastUpdatedAt = DateTime.Now;
+                journal.LastUpdatedAt = egyptTime;
                 journal.Description = model.Description;
                 journal.CreatedAt = model.CreatedAt;
 
@@ -471,6 +517,7 @@ internal class JournalService : IJournalService
 
                 // Add New Details 
                 var costCenter = model.CostCenterId == 0 ? null : model.CostCenterId;
+                var secondCostCenter = model.SecondCostCenterId == 0 ? null : model.SecondCostCenterId;
 
                 journal.JournalDetails = new Collection<JournalDetail>
                 {
@@ -478,6 +525,7 @@ internal class JournalService : IJournalService
                     {
                         AccountId = model.DebitAccountId,
                         CostCenterId = costCenter,
+                        SecondCostCenterId = secondCostCenter,
                         Credit = 0,
                         Debit = model.Amount,
                         JournalId = journal.Id,
@@ -487,6 +535,7 @@ internal class JournalService : IJournalService
                     {
                         AccountId = model.CreditAccountId,
                         CostCenterId = costCenter,
+                        SecondCostCenterId = secondCostCenter,
                         Credit = model.Amount,
                         Debit = 0,
                         JournalId = journal.Id,
