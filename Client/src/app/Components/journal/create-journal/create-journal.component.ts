@@ -200,7 +200,8 @@ export class CreateJournalComponent {
               details: '',
               description: '',
               code: this.JournalForm.get('code').value + 1,
-              costCenter: '',
+              costCenter: null,
+              secondCostCenterId: null,
               created: this.GetDateTimePlusOneMinute(
                 this.JournalForm.get('created').value,
               ),
