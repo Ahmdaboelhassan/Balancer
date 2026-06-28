@@ -115,8 +115,8 @@ export class CreateJournalComponent {
       amount: new FormControl(journal.amount, Validators.min(0.1)),
       debit: new FormControl(journal.debitAccountId, Validators.required),
       credit: new FormControl(journal.creditAccountId, Validators.required),
-      costCenter: new FormControl(journal.costCenterId ?? ''),
-      secondCostCenterId: new FormControl(journal.secondCostCenterId ?? ''),
+      costCenter: new FormControl(journal.costCenterId),
+      secondCostCenterId: new FormControl(journal.secondCostCenterId),
       code: new FormControl({ disabled: true, value: journal.code }),
       created: new FormControl(
         this.GetLocaleDateTime(new Date(journal.createdAt)),
