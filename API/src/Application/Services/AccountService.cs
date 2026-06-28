@@ -17,9 +17,9 @@ public class AccountService : IAccountService
         _uow = uow;
         _accountNumberService = accountNumberService;
     }
-    public async Task<IEnumerable<GetAccountDTO>> GetAll()
+    public async Task<IEnumerable<GetAccountDTO>> GetAll(bool archive = false)
     {
-        return (await _uow.Accounts.GetAll("Parent"))
+        return (await _uow.Accounts.GetAll(x => x.IsArchive == archive ,"Parent"))
             .OrderBy(a => a.Level).Select(a =>
             new GetAccountDTO
             {

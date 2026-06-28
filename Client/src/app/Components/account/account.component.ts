@@ -3,6 +3,7 @@ import { AccountsListComponent } from './accounts-list/accounts-list.component';
 import { AccountService } from '../../Services/account.service';
 import { Account } from '../../Interfaces/Response/Account';
 import { SearchComponent } from '../search/search.component';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-account',
@@ -15,12 +16,17 @@ export class AccountComponent implements OnInit {
 
   accounts: Account[] = [];
   private accountService = inject(AccountService);
+  private route = inject(ActivatedRoute);
 
   ngOnInit(): void {
-    this.accountService.GetAllAccount().subscribe({
-      next: (accounts) => {
-        this.accounts = accounts;
-      },
+    this.route.queryParamMap.subscribe((params) => {
+      const archive = params.get('archive') === 'true';
+
+      this.accountService.GetAllAccount(archive).subscribe({
+        next: (accounts) => {
+          this.accounts = accounts;
+        },
+      });
     });
   }
 

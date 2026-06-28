@@ -42,9 +42,9 @@ public class AccountController : ControllerBase
     }
 
     [HttpGet("GetAll")]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll(bool archive = false)
     {
-        return Ok(await _accountService.GetAll());
+        return Ok(await _accountService.GetAll(archive));
     }
     [HttpGet("GetPrimaryAccounts")]
     public async Task<IActionResult> GetPrimaryAccounts()

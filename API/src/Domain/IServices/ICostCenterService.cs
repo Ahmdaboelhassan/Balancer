@@ -6,7 +6,7 @@ namespace Domain.IServices;
 public interface ICostCenterService
 {
     Task<GetCostCenter> Get(int id);
-    Task<IEnumerable<GetCostCenter>> GetAll();
+    Task<IEnumerable<GetCostCenter>> GetAll(bool archive = false);
     Task<IEnumerable<SelectItemDTO>> GetAllSelectList();
     Task<ConfirmationResponse> Create(CreateCostCenter model);
     Task<ConfirmationResponse> Edit(CreateCostCenter model);

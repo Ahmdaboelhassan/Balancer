@@ -7,7 +7,7 @@ using System.Linq.Expressions;
 namespace Domain.IServices;
 public interface IAccountService
 {
-    Task<IEnumerable<GetAccountDTO>> GetAll();
+    Task<IEnumerable<GetAccountDTO>> GetAll(bool archive = false);
     Task<IEnumerable<AccountingTreeItem>> GetChilds(int id);
     Task<IEnumerable<AccountingTreeItem>> GetPrimaryAccounts();
     Task<IEnumerable<GetAccountDTO>> Search(string criteria);

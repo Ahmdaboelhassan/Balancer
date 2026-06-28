@@ -17,9 +17,9 @@ public class CostCenterController : ControllerBase
     }
 
     [HttpGet("GetAll")]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll(bool archive = false)
     {
-        return Ok(await _serviceContext.CostCenterService.GetAll());
+        return Ok(await _serviceContext.CostCenterService.GetAll(archive));
     }
 
     [HttpGet("GetAllSelectList")]

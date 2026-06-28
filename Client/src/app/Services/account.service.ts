@@ -52,8 +52,8 @@ export class AccountService {
     const url = this.url + `/Search?criteria=${key}`;
     return this.http.get<Account[]>(url);
   }
-  GetAllAccount() {
-    const url = this.url + `/GetAll`;
+  GetAllAccount(archive = false) {
+    const url = this.url + `/GetAll?archive=` + archive;
     return this.http.get<Account[]>(url);
   }
   GetAllAccountSelectList() {

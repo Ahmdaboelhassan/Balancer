@@ -19,8 +19,8 @@ export class CostcenterService {
     return this.http.get<CostCenter>(url);
   }
 
-  GetAllCostCenter() {
-    const url = this.url + `/GetAll`;
+  GetAllCostCenter(archive = false) {
+    const url = this.url + `/GetAll?archive=` + archive;
     return this.http.get<CostCenter[]>(url);
   }
   GetAllCostCenterSelectList() {

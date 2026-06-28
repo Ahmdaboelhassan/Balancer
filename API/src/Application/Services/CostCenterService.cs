@@ -14,9 +14,9 @@ public class CostCenterService : ICostCenterService
         _uow = uow;
     }
 
-    public async Task<IEnumerable<GetCostCenter>> GetAll()
+    public async Task<IEnumerable<GetCostCenter>> GetAll(bool archive = false)
     {
-        return await _uow.CostCenter.SelectAll(a => true, a => new GetCostCenter
+        return await _uow.CostCenter.SelectAll(a => a.IsArchived == archive, a => new GetCostCenter
         {
             Id = a.Id,
             CreatedAt = a.CreatedAt.ToShortDateString(),

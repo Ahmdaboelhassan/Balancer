@@ -150,7 +150,7 @@ public class HomeService : IHomeService
         var otherExpenses = currentMonthJournals
             .Where(x => IsAccountNumberInAccountSet(x.Account.Number) 
             && (settings.NotBudgetCostCenter.HasValue 
-            ? x.CostCenterId == settings.NotBudgetCostCenter 
+            ? (x.CostCenterId == settings.NotBudgetCostCenter || x.SecondCostCenterId == settings.NotBudgetCostCenter)
             : !excludedAccounts.Any(a => x.Account.Number.StartsWith(a))))
             .Sum(x => x.Debit - x.Credit);
 

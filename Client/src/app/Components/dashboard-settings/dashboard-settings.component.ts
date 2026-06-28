@@ -12,10 +12,16 @@ import { DashboardSettingsDTO } from '../../Interfaces/Both/DashboardSettingsDTO
 import { ToastrService } from 'ngx-toastr';
 import { RouterLink } from '@angular/router';
 import { NgSelectComponent } from '@ng-select/ng-select';
+import { AccountBudgetSettingsComponent } from './account-budget-settings/account-budget-settings.component';
 
 @Component({
   selector: 'app-dashboard-settings',
-  imports: [ReactiveFormsModule, RouterLink, NgSelectComponent],
+  imports: [
+    ReactiveFormsModule,
+    RouterLink,
+    NgSelectComponent,
+    AccountBudgetSettingsComponent,
+  ],
   templateUrl: './dashboard-settings.component.html',
   styleUrl: './dashboard-settings.component.css',
 })
@@ -27,7 +33,7 @@ export class DashboardSettingsComponent implements OnInit {
     private fb: FormBuilder,
     private accountService: AccountService,
     private settingsService: SettingsService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
   ) {}
 
   ngOnInit() {
