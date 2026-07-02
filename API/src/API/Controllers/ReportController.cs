@@ -52,9 +52,9 @@ public class ReportController : ControllerBase
     }
 
     [HttpGet("AccountComparer")]
-    public async Task<IActionResult> AccountComparer(DateTime? from, DateTime? to, int account, int? costCenter, int groupType)
+    public async Task<IActionResult> AccountComparer(DateTime? from, DateTime? to, int account, int? costCenter, int groupType, bool openingBalance)
     {
-        return Ok(await _serviceContext.ReportService.GetAccountComparer(from, to ,account , costCenter , (AccountComparerGroups)groupType));
+        return Ok(await _serviceContext.ReportService.GetAccountComparer(from, to ,account , costCenter , (AccountComparerGroups)groupType, openingBalance));
     }
     [HttpGet("BalanceSheet")]
     public async Task<IActionResult> GetBalanceSheet(DateTime to, int? maxLevel)

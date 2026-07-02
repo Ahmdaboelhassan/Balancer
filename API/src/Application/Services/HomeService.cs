@@ -106,7 +106,7 @@ public class HomeService : IHomeService
         GetBudgetProgressAsync(DashboardSettings dashboard, Settings settings, HashSet<string> accountSet, DateTime current)
     {
         var currentMonthJournals = (await _unitOfWork.JournalDetail
-                   .GetAll(j => (j.Journal.CreatedAt.Month == current.Month && j.Journal.CreatedAt.Year == current.Year), "Journal", "Account"));
+                   .GetAll(j => (j.Journal.CreatedAt.Month == current.Month && j.Journal.CreatedAt.Year == current.Year), "Journal", "Account", "CostCenters"));
 
 
         var groupedJournals = currentMonthJournals 

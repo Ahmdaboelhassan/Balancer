@@ -18,6 +18,7 @@ import { NgSelectComponent } from '@ng-select/ng-select';
 export class AccountComparerComponent {
   from = signal('');
   to = signal('');
+  openingBalance = false;
   accounts: AccountSelectList[];
   costCenters: CostCenterSelectList[];
 
@@ -25,7 +26,7 @@ export class AccountComparerComponent {
     private router: Router,
     private accountService: AccountService,
     private costCenterService: CostcenterService,
-    private titleServive: Title
+    private titleServive: Title,
   ) {
     this.GetDefaultDate();
     this.accountService
@@ -56,6 +57,7 @@ export class AccountComparerComponent {
       groupType: formValue.groupType,
       from: formValue.from,
       to: formValue.to,
+      openingBalance: formValue.openingBalance,
     };
 
     if (formValue.costCenter) {

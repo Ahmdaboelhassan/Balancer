@@ -22,7 +22,7 @@ export class AccountComparerDetailsComponent {
   constructor(
     private reportService: ReportService,
     private route: ActivatedRoute,
-    private toestr: ToastrService
+    private toestr: ToastrService,
   ) {}
 
   ngOnInit(): void {
@@ -31,17 +31,24 @@ export class AccountComparerDetailsComponent {
     const account = this.route.snapshot.queryParams['account'];
     const costcenter = this.route.snapshot.queryParams['costCenter'] || '';
     const groupType = this.route.snapshot.queryParams['groupType'];
+    const openingBalance = this.route.snapshot.queryParams['openingBalance'];
 
     if (!account) {
       this.toestr.error('Please Select Account');
     }
 
     this.reportService
-      .GetAccountComparer(from, to, account, costcenter, groupType)
+      .GetAccountComparer(
+        from,
+        to,
+        account,
+        costcenter,
+        groupType,
+        openingBalance,
+      )
       .subscribe({
         next: (accountComparer) => {
           this.accountComparer = accountComparer;
-          console.log(accountComparer);
           this.InitChart(accountComparer);
         },
       });
@@ -68,7 +75,7 @@ export class AccountComparerDetailsComponent {
   SwitchChartType() {
     this.chartType.update((x) => (x == 'bar' ? 'line' : 'bar'));
     this.chartTypeIcon.update((x) =>
-      x == 'fa-chart-line' ? 'fa-chart-column' : 'fa-chart-line'
+      x == 'fa-chart-line' ? 'fa-chart-column' : 'fa-chart-line',
     );
   }
 }

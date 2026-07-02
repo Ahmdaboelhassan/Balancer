@@ -618,71 +618,96 @@ public class ReportService : IReportService
         return accountsSummaries.OrderBy(s => s.AccountNumber);
     }
 
-    public async Task<AccountComparerDTO> GetAccountComparer(DateTime? from, DateTime? to, int accountId, int? costCenterId, AccountComparerGroups groupType)
+    public async Task<AccountComparerDTO> GetAccountComparer(DateTime? from, DateTime? to, int accountId, int? costCenterId, AccountComparerGroups groupType, bool openingBalance)
     {
         // Get Accounts 
         var account = await _uow.Accounts.Get(accountId);
-        if (account is null)
+        if (account is null || !from.HasValue || !to.HasValue)
             return new AccountComparerDTO();
 
-        
-
-        var journals = (await _uow.JournalDetail
-        .GetAll(d =>
-             d.Account.Number.StartsWith(account.Number)
-            && (!from.HasValue || d.Journal.CreatedAt.Date >= from.Value.Date)
-            && (!to.HasValue || d.Journal.CreatedAt.Date <= to.Value.Date)
-            && (!costCenterId.HasValue || d.CostCenters.Any(d => d.CostCenterId == costCenterId))
-            , "CostCenter", "Account", "Journal")).OrderBy(j => j.Journal.CreatedAt);
+        var query = _uow.JournalDetail.AsQueryable()
+            .Where(d =>
+                d.Account.Number.StartsWith(account.Number)
+                && (d.Journal.CreatedAt.Date >= from.Value.Date)
+                && d.Journal.CreatedAt.Date <= to.Value.Date
+                && (!costCenterId.HasValue || d.CostCenters.Any(cc => cc.CostCenterId == costCenterId)));
 
 
+       
+    
 
         IEnumerable<AccountComparerItemDTO> journalGroupKey = Enumerable.Empty<AccountComparerItemDTO>();
-
+        
         switch (groupType)
         {
             case AccountComparerGroups.ByDay:
-                journalGroupKey = journals.GroupBy(j => j.Journal.CreatedAt.Date)
-                    .Select(k => new AccountComparerItemDTO
+                journalGroupKey = await query
+                    .GroupBy(j => j.Journal.CreatedAt.Date)
+                    .OrderBy(g => g.Key)
+                    .Select(g => new AccountComparerItemDTO
                     {
-                        Amount = k.Sum(a => a.Debit - a.Credit),
-                        Time = k.Key.ToShortDateString()
-                    });
+                        Amount = g.Sum(x => x.Debit - x.Credit),
+                        Time = g.Key.ToShortDateString()
+                    })
+                    .ToListAsync();
+
                 break;
 
             case AccountComparerGroups.ByMonth:
-                journalGroupKey = journals.GroupBy(j => new { j.Journal.CreatedAt.Year, j.Journal.CreatedAt.Month })
-                    .Select(k => {
-                        var date = new DateTime(k.Key.Year, k.Key.Month, 1);
-                        return new AccountComparerItemDTO
-                        {
-                            Amount = k.Sum(a => a.Debit - a.Credit),
-                            Time = date.ToString("MMMM yy", CultureInfo.CurrentCulture)
-                        };
-                    });
+                journalGroupKey = (await query
+                    .GroupBy(j => new { j.Journal.CreatedAt.Year, j.Journal.CreatedAt.Month })
+                    .OrderBy(g => g.Key.Year)
+                    .ThenBy(g => g.Key.Month)
+                    .Select(g => new
+                    {
+                        g.Key.Year,
+                        g.Key.Month,
+                        Amount = g.Sum(x => x.Debit - x.Credit)
+                    })
+                    .ToListAsync())
+                    .Select(x => new AccountComparerItemDTO
+                    {
+                        Amount = x.Amount,
+                        Time = new DateTime(x.Year, x.Month, 1).ToString("MMMM yy", CultureInfo.CurrentCulture)
+                    })
+                    .ToList();
 
                 break;
 
             case AccountComparerGroups.ByYear:
-                journalGroupKey = journals.GroupBy(j => j.Journal.CreatedAt.Year)
-                    .Select(k => new AccountComparerItemDTO
+                journalGroupKey = await query
+                    .GroupBy(j => j.Journal.CreatedAt.Year)
+                    .OrderBy(g => g.Key)
+                    .Select(g => new AccountComparerItemDTO
                     {
-                        Amount = k.Sum(a => a.Debit - a.Credit),
-                        Time = k.Key.ToString(),
-                    });
+                        Amount = g.Sum(x => x.Debit - x.Credit),
+                        Time = g.Key.ToString()
+                    })
+                    .ToListAsync();
+
                 break;
 
             default:
-                journalGroupKey = journals.GroupBy(j => new { j.Journal.CreatedAt.Year, j.Journal.CreatedAt.Month })
-                   .Select(k => {
-                       var date = new DateTime(k.Key.Year, k.Key.Month, 1);
-                       return new AccountComparerItemDTO
-                       {
-                           Amount = k.Sum(a => a.Debit - a.Credit),
-                           Time = date.ToString("MMMM yy", CultureInfo.CurrentCulture)
-                       };
-                   });
+                journalGroupKey = Enumerable.Empty<AccountComparerItemDTO>();
                 break;
+        }
+
+
+        // Add Running Balance 
+        if (openingBalance)
+        {
+            var runningBalance = await _uow.JournalDetail.AsQueryable()
+                  .Where(d =>
+                      d.Account.Number.StartsWith(account.Number)
+                      && d.Journal.CreatedAt.Date < from.Value.Date
+                      && (!costCenterId.HasValue || d.CostCenters.Any(cc => cc.CostCenterId == costCenterId)))
+                  .SumAsync(x => x.Debit - x.Credit);
+
+            foreach (var item in journalGroupKey)
+            {
+                runningBalance += item.Amount;
+                item.Amount = runningBalance;
+            }
         }
 
         return new AccountComparerDTO()

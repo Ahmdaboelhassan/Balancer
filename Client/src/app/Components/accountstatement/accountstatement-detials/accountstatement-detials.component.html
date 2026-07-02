@@ -46,10 +46,11 @@
             <td class="py-4 px-3 font-bold">{{ item.balance | currency }}</td>
             <td class="py-4 px-3">
               @if (item.costCenters?.length > 0) {
-                <div class="flex flex-wrap gap-1">
+                <div class="flex flex-wrap gap-1 justify-center">
                   @for (costCenter of item.costCenters; track costCenter) {
                     <span
-                      class="inline-flex items-center rounded-full bg-slate-300 px-2.5 py-0.5 text-xs font-medium text-slate-700"
+                      [title]="costCenter.trim()"
+                      class="inline-flex items-center text-center min-w-[70px] max-w-[150px] text-nowrap overflow-hidden text-ellipsis rounded-full bg-slate-300 px-2.5 py-0.5 text-xs font-medium text-slate-700"
                     >
                       {{ costCenter.trim() }}
                     </span>

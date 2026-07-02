@@ -41,10 +41,10 @@ export class ReportService {
     return this.http.get<AccountStatement>(url);
   }
 
-  GetAccountComparer(from, to, account, costcenter, groupType) {
+  GetAccountComparer(from, to, account, costcenter, groupType, openingBalance) {
     let url =
       this.url +
-      `/AccountComparer?from=${from}&to=${to}&account=${account}&groupType=${groupType}`;
+      `/AccountComparer?from=${from}&to=${to}&account=${account}&groupType=${groupType}&openingBalance=${openingBalance}`;
 
     if (costcenter) {
       url += `&costcenter=${costcenter}`;
