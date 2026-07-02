@@ -392,7 +392,6 @@ internal class JournalService : IJournalService
                     Amount = journalAmount,
                     Type = (byte)journalType,
                     Description = model.Description,
-                    LastUpdatedAt = egyptTime,
                     ActualCreatedAt = egyptTime,
                 };
 

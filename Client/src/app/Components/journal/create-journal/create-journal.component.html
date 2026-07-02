@@ -22,23 +22,25 @@
   @if (Journal() && JournalForm) {
     <div class="flex flex-wrap gap-3 py-4">
       <div
-        class="flex items-center rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700"
+        class="flex items-center rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-xs md:text-sm text-slate-700"
       >
         <i class="fa-solid fa-hashtag me-2 text-slate-500"></i>
 
         <span class="ms-1">{{ JournalForm.get("code")?.value }}</span>
       </div>
-      @if (isEdit) {
+      @if (Journal().actualCreatedAt) {
         <div
-          class="flex items-center rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700"
+          class="flex items-center rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-xs md:text-sm text-slate-700"
         >
           <i class="fa-solid fa-calendar-plus me-2 text-slate-500"></i>
           <span class="ms-1">{{
             JournalForm.get("actualCreatedAt")?.value
           }}</span>
         </div>
+      }
+      @if (Journal().lastUpdatedAt) {
         <div
-          class="flex items-center rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700"
+          class="flex items-center rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-xs md:text-sm text-slate-700"
         >
           <i class="fa-solid fa-clock-rotate-left me-2 text-slate-500"></i>
           <span class="ms-1">{{ JournalForm.get("lastUpdate")?.value }}</span>
