@@ -3,12 +3,9 @@ using Domain.Entities;
 using Domain.Enums;
 using Domain.IRepository;
 using Domain.IServices;
-using System;
+using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 using System.Linq.Expressions;
-using System.Timers;
-using static Azure.Core.HttpHeader;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Application.Services;
 public class ReportService : IReportService
@@ -22,69 +19,75 @@ public class ReportService : IReportService
         if (account == null)
             return GetEmptyAccountStatement();
 
-        var journalsDetails = (await _uow.JournalDetail
-                   .GetAll(d =>
+        var journals = await _uow.JournalDetail
+                   .SelectAllOrderBy(d =>
                         d.Account.Number.StartsWith(account.Number)
                      && (!from.HasValue || d.Journal.CreatedAt.Date >= from.Value.Date)
                      && (!to.HasValue || d.Journal.CreatedAt.Date <= to.Value.Date)
-                     && (!costCenterId.HasValue || d.CostCenters.Any(d => d.CostCenterId == costCenterId))
-                   ,"CostCenters", "CostCenters.CostCenter", "Account", "Journal")).OrderBy(d => d.Journal.CreatedAt);
+                     && (!costCenterId.HasValue || d.CostCenters.Any(d => d.CostCenterId == costCenterId)),
+                     j => new
+                     {
+                         Journal = j.Journal,
+                         JournalDetail = j,
+                         CreditAccount = j.Journal.JournalDetails.Where(d => d.Credit > 0).Select(d => d.Account.Name).FirstOrDefault(),
+                         DebitAccount = j.Journal.JournalDetails.Where(d => d.Debit > 0).Select(d => d.Account.Name).FirstOrDefault(),
+                         CostCenters = j.CostCenters.Select(d => d.CostCenter.Name)
+                     }, d => d.Journal.CreatedAt
+                   );
 
-        var detailsGroupByJournal = journalsDetails.GroupBy(d => d.JournalId)
-            .Select(g => new
-            {
-                JournalId = g.Key,
-                DebitAccount = g.First(d => d.Debit > 0).Account.Name,
-                CreditAccount = g.First(d => d.Credit > 0).Account.Name,
-            }).ToDictionary(d => d.JournalId, d => new {d.DebitAccount, d.CreditAccount});
 
-
-        var journalsLinkedList = new LinkedList<AccountStatementDetail>();
+        var journalsLinkedList = new List<AccountStatementDetail>(journals.Count());
 
         decimal balance = 0;
+
         if (openingBalance && from.HasValue)
         {
-            var openingJournals = await _uow.JournalDetail
-                    .GetAll(d =>
-                         d.Account.Number.StartsWith(account.Number)
-                       && d.Journal.CreatedAt < from.Value.Date
-                      && (!costCenterId.HasValue || d.CostCenters.Any(d => d.CostCenterId == costCenterId))
-                    , "Account", "Journal");
+            var openingJournal = await _uow.JournalDetail.AsQueryable()
+                .Where(d =>
+                    d.Account.Number.StartsWith(account.Number)
+                    && d.Journal.CreatedAt < from.Value.Date
+                    && (!costCenterId.HasValue ||
+                        d.CostCenters.Any(cc => cc.CostCenterId == costCenterId)))
+                .GroupBy(_ => 1)
+                .Select(g => new
+                {
+                    Debit = g.Sum(x => x.Debit),
+                    Credit = g.Sum(x => x.Credit),
+                    Balance = g.Sum(x => x.Debit - x.Credit),
+                    Date = g.Min(x => x.Journal.CreatedAt)
+                })
+                .FirstOrDefaultAsync();
 
-
-
-            if (openingJournals.Count > 0)
+            if (openingJournal != null)
             {
-                balance = openingJournals.Sum(j => j.Debit - j.Credit);
+                balance += openingJournal.Balance;
 
-                journalsLinkedList.AddFirst(new AccountStatementDetail
+                journalsLinkedList.Add(new AccountStatementDetail
                 {
                     Balance = balance,
-                    Credit = openingJournals.Sum(j => j.Credit),
-                    Debit = openingJournals.Sum(j => j.Debit),
+                    Credit = openingJournal.Credit,
+                    Debit = openingJournal.Debit,
                     Detail = "Opening Balance",
                     notes = "Opening Balance",
                     Description = "Opening Balance",
-                    Date = openingJournals.First().Journal.CreatedAt.ToShortDateString(),
+                    Date = openingJournal.Date.ToShortDateString(),
                 });
             }
         }
 
-        foreach (var journal in journalsDetails)
+        foreach (var journal in journals)
         {
-            balance += journal.Debit - journal.Credit;
+            balance += journal.JournalDetail.Debit - journal.JournalDetail.Credit;
 
-            var currentJournalDetails = detailsGroupByJournal[journal.JournalId];
-
-            journalsLinkedList.AddLast(new AccountStatementDetail
+            journalsLinkedList.Add(new AccountStatementDetail
             {
                 Balance = balance,
-                Credit = journal.Credit,
-                Debit = journal.Debit,
-                CostCenter = string.Join(", ", journal.CostCenters.Where(cc => cc.CostCenter != null).Select(cc => cc.CostCenter.Name)),
+                Credit = journal.JournalDetail.Credit,
+                Debit = journal.JournalDetail.Debit,
+                CostCenter = string.Join(", ", journal.CostCenters),
                 Detail = journal.Journal.Detail,
-                JournalId = journal.JournalId,
-                notes = $"{currentJournalDetails.CreditAccount} : {currentJournalDetails.DebitAccount}",
+                JournalId = journal.Journal.Id,
+                notes = $"{journal.CreditAccount} -> {journal.DebitAccount}",
                 PeriodId = journal.Journal.PeriodId,
                 Description = journal.Journal.Description,
                 Date = journal.Journal.CreatedAt.ToShortDateString(),
@@ -93,7 +96,7 @@ public class ReportService : IReportService
 
         if (journalsLinkedList.Count > 0)
         {
-            journalsLinkedList.AddLast(new AccountStatementDetail
+            journalsLinkedList.Add(new AccountStatementDetail
             {
                 Balance = balance,
                 Credit = journalsLinkedList.Sum(j => j.Credit),
@@ -136,79 +139,85 @@ public class ReportService : IReportService
         if (string.IsNullOrEmpty(bankNumber) || string.IsNullOrEmpty(drawerNumber))
             return GetEmptyAccountStatement();
 
-        var journalsDetails = (await _uow.JournalDetail
-                   .GetAll(d =>
+        var journals = await _uow.JournalDetail
+                   .SelectAllOrderBy(d =>
                      (d.CostCenters.Any(cc => cc.CostCenterId == costCenterId) && !d.Account.Number.StartsWith(bankNumber) && !d.Account.Number.StartsWith(drawerNumber))
                      && (!from.HasValue || d.Journal.CreatedAt.Date >= from.Value.Date)
-                     && (!to.HasValue || d.Journal.CreatedAt.Date <= to.Value.Date)
-                   , "CostCenters", "CostCenters.CostCenter", "Account", "Journal"))
-                   .OrderBy(d => d.Journal.CreatedAt);
+                     && (!to.HasValue || d.Journal.CreatedAt.Date <= to.Value.Date),
+                        j => new
+                        {
+                            Journal = j.Journal,
+                            JournalDetail = j,
+                            CreditAccount = j.Journal.JournalDetails.Where(d => d.Credit > 0).Select(d => d.Account.Name).FirstOrDefault(),
+                            DebitAccount = j.Journal.JournalDetails.Where(d => d.Debit > 0).Select(d => d.Account.Name).FirstOrDefault(),
+                            CostCenters = j.CostCenters.Select(d => d.CostCenter.Name)
+                        },
+                        d => d.Journal.CreatedAt
+                   );
 
-
-        var detailsGroupByJournal = journalsDetails.GroupBy(d => d.JournalId)
-            .Select(g => new
-            {
-                JournalId = g.Key,
-                DebitAccount = g.First(d => d.Debit > 0).Account.Name,
-                CreditAccount = g.First(d => d.Credit > 0).Account.Name,
-            }).ToDictionary(d => d.JournalId, d => new { d.DebitAccount, d.CreditAccount });
-
-
-        var journalsLinkedList = new LinkedList<AccountStatementDetail>();
+        var journalsList = new List<AccountStatementDetail>(journals.Count());
 
         decimal balance = 0;
         if (openingBalance && from.HasValue)
         {
-            var openingJournals = await _uow.JournalDetail
-                    .GetAll(d => (d.CostCenters.Any(cc => cc.CostCenterId == costCenterId))
+            var openingJournals = await _uow.JournalDetail.AsQueryable()
+                .Where(d => d.CostCenters.Any(cc => cc.CostCenterId == costCenterId)
                     && !d.Account.Number.StartsWith(bankNumber)
-                    && !d.Account.Number.StartsWith(drawerNumber) 
-                    && d.Journal.CreatedAt < from.Value.Date, "Journal", "Account");
+                    && !d.Account.Number.StartsWith(drawerNumber)
+                    && d.Journal.CreatedAt < from.Value.Date)
+                .GroupBy(_ => 1)
+                .Select(g => new
+                {
+                    Debit = g.Sum(x => x.Debit),
+                    Credit = g.Sum(x => x.Credit),
+                    Balance = g.Sum(x => x.Debit - x.Credit),
+                    Date = g.Min(x => x.Journal.CreatedAt)
+                })
+                .FirstOrDefaultAsync();
 
-            if (openingJournals.Count > 0)
+            if (openingJournals != null)
             {
-                balance = openingJournals.Sum(j => j.Debit - j.Credit);
+                balance += openingJournals.Balance;
 
-                journalsLinkedList.AddFirst(new AccountStatementDetail
+                journalsList.Add(new AccountStatementDetail
                 {
                     Balance = balance,
-                    Credit = openingJournals.Sum(j => j.Credit),
-                    Debit = openingJournals.Sum(j => j.Debit),
+                    Credit = openingJournals.Credit,
+                    Debit = openingJournals.Debit,
                     Detail = "Opening Balance",
                     notes = "Opening Balance",
-                    Date = openingJournals.First().Journal.CreatedAt.ToShortDateString(),
+                    Date = openingJournals.Date.ToShortDateString(),
                     CostCenter = costCenter.Name
                 });
             }
         }
 
-        foreach (var journal in journalsDetails)
+        foreach (var journal in journals)
         {
-            balance += journal.Debit - journal.Credit;
+            balance += journal.JournalDetail.Debit - journal.JournalDetail.Credit;
 
-            var currentJournalDetails = detailsGroupByJournal[journal.JournalId];
-
-            journalsLinkedList.AddLast(new AccountStatementDetail
+            journalsList.Add(new AccountStatementDetail
             {
                 Balance = balance,
-                Credit = journal.Credit,
-                Debit = journal.Debit,
-                CostCenter = string.Join(", ", journal.CostCenters.Where(cc => cc.CostCenter != null).Select(cc => cc.CostCenter.Name)),
+                Credit = journal.JournalDetail.Credit,
+                Debit = journal.JournalDetail.Debit,
+                CostCenter = string.Join(", ", journal.CostCenters),
                 Detail = journal.Journal.Detail,
-                JournalId = journal.JournalId,
-                notes = $"{currentJournalDetails.CreditAccount} : {currentJournalDetails.DebitAccount}",
+                JournalId = journal.Journal.Id,
+                notes = $"{journal.CreditAccount} -> {journal.DebitAccount}",
                 PeriodId = journal.Journal.PeriodId,
+                Description = journal.Journal.Description,
                 Date = journal.Journal.CreatedAt.ToShortDateString(),
             });
         }
 
-        if (journalsLinkedList.Count > 0)
+        if (journalsList.Count > 0)
         {
-            journalsLinkedList.AddLast(new AccountStatementDetail
+            journalsList.Add(new AccountStatementDetail
             {
                 Balance = balance,
-                Credit = journalsLinkedList.Sum(j => j.Credit),
-                Debit = journalsLinkedList.Sum(j => j.Debit),
+                Credit = journalsList.Sum(j => j.Credit),
+                Debit = journalsList.Sum(j => j.Debit),
                 CostCenter = "",
                 Detail = "Total",
                 JournalId = 0,
@@ -217,10 +226,11 @@ public class ReportService : IReportService
                 Date = "",
             });
         }
+
         return new AccountStatement()
         {
             AccountType = "",
-            Details = journalsLinkedList,
+            Details = journalsList,
             AccountName = costCenter.Name + " (Cost Center)",
             From = from?.ToString("d") ?? "",
             To = to?.ToString("d") ?? "",
@@ -245,8 +255,7 @@ public class ReportService : IReportService
         var journals = await _uow.JournalDetail
             .SelectAll(d => d.Journal.CreatedAt.Date >= from && d.Journal.CreatedAt.Date <= to
                && (d.Account.Number.StartsWith(expensesAccount.Number) || d.Account.Number.StartsWith(RevenuesAccount.Number))
-            , d => new { accountId = d.AccountId, AccountNumber = d.Account.Number, AccountName = d.Account.Name, balance = d.Debit - d.Credit , d.Credit , d.Debit}
-            , "Account", "Journal");
+            , d => new { accountId = d.AccountId, AccountNumber = d.Account.Number, AccountName = d.Account.Name, balance = d.Debit - d.Credit , d.Credit , d.Debit});
 
 
 
@@ -405,7 +414,7 @@ public class ReportService : IReportService
 
         var otherExpenses = journals
             .Where(x => IsExpenseAccount(x.Account.Number) && (settings.NotBudgetCostCenter.HasValue 
-            ? x.CostCenterId == settings.NotBudgetCostCenter 
+            ? x.CostCenters.Any(x => x.CostCenterId == settings.NotBudgetCostCenter) 
             : !excludedAccountNumbers.Any(a => x.Account.Number.StartsWith(a))))
             .Sum(x => x.Debit - x.Credit);
 
@@ -470,8 +479,7 @@ public class ReportService : IReportService
 
         var journals = await _uow.JournalDetail
             .SelectAll(d => d.Journal.CreatedAt.Date >= from && d.Journal.CreatedAt.Date <= to
-            , d => new { accountId = d.AccountId, AccountNumber = d.Account.Number, AccountName = d.Account.Name, balance = d.Debit - d.Credit, d.Credit, d.Debit }
-            , "Account", "Journal");
+            , d => new { accountId = d.AccountId, AccountNumber = d.Account.Number, AccountName = d.Account.Name, balance = d.Debit - d.Credit, d.Credit, d.Debit });
 
         if (journals.Count() == 0)
             return Enumerable.Empty<AccountSummaryDTO>();
@@ -503,8 +511,7 @@ public class ReportService : IReportService
     {
         var currentJournalAccounts = (await _uow.JournalDetail
             .SelectAll(d => d.Journal.CreatedAt.Date >= from && d.Journal.CreatedAt.Date <= to
-            , d => new { accountId = d.AccountId, AccountNumber = d.Account.Number, AccountName = d.Account.Name, balance = d.Debit - d.Credit, d.Credit, d.Debit }
-            , "Account", "Journal"))
+            , d => new { accountId = d.AccountId, AccountNumber = d.Account.Number, AccountName = d.Account.Name, balance = d.Debit - d.Credit, d.Credit, d.Debit }))
             .GroupBy(x => x.AccountNumber)
             .Select(j => new {AccountNumber = j.Key , Debit = j.Sum(a => a.Debit) , Credit = j.Sum(a => a.Credit)});
 
@@ -567,8 +574,7 @@ public class ReportService : IReportService
         var currentJournalAccounts = (await _uow.JournalDetail
             .SelectAll(d => d.Journal.CreatedAt.Date <= to
             && (d.Account.Number.StartsWith(accountNumbers[assetsAccountId]) || d.Account.Number.StartsWith(accountNumbers[LiabilitiesAccountId]))
-            , d => new { accountId = d.AccountId, AccountNumber = d.Account.Number, AccountName = d.Account.Name, balance = d.Debit - d.Credit, d.Credit, d.Debit }
-            , "Account", "Journal"));
+            , d => new { accountId = d.AccountId, AccountNumber = d.Account.Number, AccountName = d.Account.Name, balance = d.Debit - d.Credit, d.Credit, d.Debit }));
 
         if (!currentJournalAccounts.Any())
             return Enumerable.Empty<AccountSummaryDTO>();
@@ -628,7 +634,7 @@ public class ReportService : IReportService
              d.Account.Number.StartsWith(account.Number)
             && (!from.HasValue || d.Journal.CreatedAt.Date >= from.Value.Date)
             && (!to.HasValue || d.Journal.CreatedAt.Date <= to.Value.Date)
-            && (!costCenterId.HasValue || d.CostCenterId == costCenterId)
+            && (!costCenterId.HasValue || d.CostCenters.Any(d => d.CostCenterId == costCenterId))
             , "CostCenter", "Account", "Journal")).OrderBy(j => j.Journal.CreatedAt);
 
 

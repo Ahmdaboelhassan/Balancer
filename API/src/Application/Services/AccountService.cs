@@ -198,8 +198,7 @@ public class AccountService : IAccountService
         if (account == null)
             return 0;
 
-        var journals = await _uow.JournalDetail
-                   .SelectAll(d => d.Account.Number.StartsWith(account.Number), d => d.Debit - d.Credit, "Account");
+        var journals = await _uow.JournalDetail.SelectAll(d => d.Account.Number.StartsWith(account.Number), d => d.Debit - d.Credit);
 
         return journals.Sum();
 
@@ -218,7 +217,7 @@ public class AccountService : IAccountService
         var journals = await _uow.JournalDetail
                    .SelectAll(d => d.Account.Number.StartsWith(account.Number)
                     && (!isRevOrExp || d.Journal.CreatedAt.Date >= from && d.Journal.CreatedAt.Date <= to)
-                    && (!costCenterId.HasValue || d.CostCenterId == costCenterId),
+                    && (!costCenterId.HasValue || d.CostCenters.Any(d => d.CostCenterId == costCenterId)),
                     d => d.Debit - d.Credit);
 
         var amount = journals.Sum();
@@ -236,6 +235,6 @@ public class AccountService : IAccountService
     {
         if (account is null) return 0;
 
-        return (await _uow.JournalDetail.SelectAll(d => d.Account.Number.StartsWith(account.Number), d => d.Debit - d.Credit, "Account")).Sum();
+        return (await _uow.JournalDetail.SelectAll(d => d.Account.Number.StartsWith(account.Number), d => d.Debit - d.Credit)).Sum();
     }
 }

@@ -11,7 +11,6 @@ namespace Domain.Entities
         public int Code { get; set; }
         [Required]
         public string Detail { get; set; }
-        public string? Notes { get; set; }
         public string? Description { get; set; }
 
         [Required]
@@ -26,7 +25,7 @@ namespace Domain.Entities
         public int PeriodId { get; set; }
   
         [ForeignKey(nameof(PeriodId))]
-        public Period Period { get; set; }
-        public ICollection<JournalDetail> JournalDetails { get; set; }
+        public Period? Period { get; set; }
+        public ICollection<JournalDetail> JournalDetails { get; set; } = new List<JournalDetail>();
     }
 }

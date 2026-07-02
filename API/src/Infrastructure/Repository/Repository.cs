@@ -75,21 +75,41 @@ public class Repository<T> : IRepository<T> where T : class
 
         return query.ToListAsync();
     }
-    public async Task<IEnumerable<O>> SelectAll<O>(Expression<Func<T, bool>> criteria, Expression<Func<T, O>> columns, params string[]? includes)
+    public Task<List<O>> SelectAll<O>(Expression<Func<T, bool>> criteria, Expression<Func<T, O>> columns)
     {
         var query = _set
             .Where(criteria)
-            .AsNoTracking();
-
-        foreach (var item in includes)
-        {
-            query = query.Include(item);
-        }
-
-        return await query
+            .AsNoTracking()
             .Select(columns)
             .ToListAsync();
+
+        return query;
     }
+
+    public Task<List<O>> SelectAllOrderBy<O, k>(Expression<Func<T, bool>> criteria, Expression<Func<T, O>> columns, Expression<Func<T, k>> orderBy)
+    {
+        var query = _set
+            .AsNoTracking()
+            .Where(criteria)
+            .OrderBy(orderBy)
+            .Select(columns)
+            .ToListAsync();
+
+        return query;
+    }
+
+    public Task<List<O>> SelectAllOrderByDesc<O, K>(Expression<Func<T, bool>> criteria, Expression<Func<T, O>> columns, Expression<Func<T, K>> orderBy)
+    {
+        var query = _set
+            .AsNoTracking()
+            .Where(criteria)
+            .OrderByDescending(orderBy)
+            .Select(columns)
+            .ToListAsync();
+
+        return query;
+    }
+
     public async Task<IEnumerable<O>> SelectSome<O, K>(Expression<Func<T, bool>> criteria, Expression<Func<T, O>> columns, Expression<Func<T, K>> orderBy, int pageNum, int pageSize, params string[]? includes)
     {
         var query = _set

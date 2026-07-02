@@ -10,8 +10,6 @@ public class JournalDetail
     public int JournalId { get; set; }
     [Required]
     public int AccountId { get; set; }
-    public int? CostCenterId { get; set; }
-    public int? SecondCostCenterId { get; set; }
     public decimal Credit { get; set; }
     public decimal Debit { get; set; }
     public bool IsDeleted { get; set; }
@@ -21,12 +19,6 @@ public class JournalDetail
 
     [ForeignKey(nameof(JournalId))]
     public Journal Journal { get; set; }
-
-    [ForeignKey(nameof(CostCenterId))]
-    public CostCenter? CostCenter { get; set; }
-
-    [ForeignKey(nameof(SecondCostCenterId))]
-    public CostCenter? SecondCostCenter { get; set; }
 
     public ICollection<JournalDetailCostCenter> CostCenters { get; set; } = new List<JournalDetailCostCenter>();
 

@@ -11,6 +11,6 @@ public class JournalDetailCostCenter
     public int CostCenterId { get; set; }
     public bool IsDeleted { get; set; }
 
-    public JournalDetail? JournalDetail { get; set; }
-    public CostCenter? CostCenter { get; set; }
+    public JournalDetail JournalDetail { get; set; }
+    public CostCenter CostCenter { get; set; }
 }

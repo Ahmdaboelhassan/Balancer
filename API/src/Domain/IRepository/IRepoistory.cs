@@ -14,7 +14,9 @@ public interface IRepository<T>
     Task<T?> GetLastOrderBy<Key>(Expression<Func<T, Key>> orderBy, params string[] includes);
     Task<List<T>> GetAll(params string[]? includes);
     Task<List<T>> GetAll(Expression<Func<T, bool>> criteria, params string[]? includes);
-    Task<IEnumerable<O>> SelectAll<O>(Expression<Func<T, bool>> criteria, Expression<Func<T, O>> columns, params string[]? includes);
+    Task<List<O>> SelectAll<O>(Expression<Func<T, bool>> criteria, Expression<Func<T, O>> columns);
+    Task<List<O>> SelectAllOrderBy<O, k>(Expression<Func<T, bool>> criteria, Expression<Func<T, O>> columns, Expression<Func<T, k>> orderBy);
+    Task<List<O>> SelectAllOrderByDesc<O, K>(Expression<Func<T, bool>> criteria, Expression<Func<T, O>> columns, Expression<Func<T, K>> orderBy);
     Task<IEnumerable<O>> SelectSome<O,K>(Expression<Func<T, bool>> criteria, Expression<Func<T, O>> columns , Expression<Func<T, K>> orderBy, int pageNum, int pageSize, params string[]? includes);
     Task<IEnumerable<O>> TakeLastOrderBy<O, K>(int takeCount, Expression<Func<T, O>> columns, Expression<Func<T, K>> orderBy);
     IQueryable<T> AsQueryable();

@@ -47,23 +47,25 @@ internal class JournalService : IJournalService
     }
     public async Task<Result<GetJournalDTO>> Get(int id)
     {
-        var journal = await _uow.Journal.Get(j => j.Id == id , "JournalDetails", "JournalDetails.Account", "JournalDetails.CostCenters");
+  
+        var journal = (await _uow.Journal.SelectAll(j => j.Id == id,
+            j => new
+            {
+                Journal = j,
+                DebitAccount =  j.JournalDetails.First(d => d.Debit > 0)!.Account,
+                CreditAccount = j.JournalDetails.First(d => d.Credit > 0)!.Account,
+                CostCentersIds = j.JournalDetails.First().CostCenters.Where(c => c.CostCenter != null).Select(cc => cc.CostCenterId).ToList(),
+                HasArchiveAccount = j.JournalDetails.FirstOrDefault(x => x.Account.IsArchive) != null,
+                HasArchiveCostCenter = j.JournalDetails.FirstOrDefault(x => x.CostCenters.Any(cc => cc.CostCenter.IsArchived == true)) != null,
+            })).FirstOrDefault();
+
         if (journal is null)
-        {
-            var lastPeriod = await _uow.Periods.GetLastOrderBy(p => p.To);
-            int periodId = lastPeriod?.Id ?? 0;
+            return await New(null);
 
-            return await New(periodId);
-        }
-
-        var archiveAccount = journal.JournalDetails.FirstOrDefault(x => x.Account.IsArchive);
-
-        if (archiveAccount != null)
+        if (journal.HasArchiveAccount)
             return new Result<GetJournalDTO> { Message = "Can't Load This Journal Because It Contains Archived Account", IsSucceed = false };
 
-        var archiveCostCenter = journal.JournalDetails.FirstOrDefault(x => x.CostCenter != null && x.CostCenter.IsArchived);
-
-        if (archiveCostCenter != null)
+        if (journal.HasArchiveCostCenter)
             return new Result<GetJournalDTO> { Message = "Can't Load This Journal Because It Contains Archived Cost Center", IsSucceed = false };
 
         return new Result<GetJournalDTO>
@@ -71,20 +73,20 @@ internal class JournalService : IJournalService
             IsSucceed = true,
             Data = new GetJournalDTO()
             {
-                Id = journal.Id,
-                CostCentersIds = journal.JournalDetails.First().CostCenters.Any() ? journal.JournalDetails.First().CostCenters.Select(cc => cc.CostCenterId).ToList() : new List<int>(),
-                DebitAccountId = journal.JournalDetails.First(d => d.Debit > 0).AccountId,
-                CreditAccountId = journal.JournalDetails.First(d => d.Credit > 0).AccountId,
-                CreatedAt = journal.CreatedAt,
-                Amount = Math.Abs(journal.Amount),
-                Type = journal.Type,
-                Code = journal.Code,
-                Notes = $"{journal.JournalDetails.First(d => d.Credit > 0).Account.Name} : {journal.JournalDetails.First(d => d.Debit > 0).Account.Name}",
-                LastUpdatedAt = journal.LastUpdatedAt?.ToString("g"),
-                ActualCreatedAt = journal.ActualCreatedAt?.ToString("g"),
-                PeriodId = journal.PeriodId,
-                Detail = journal.Detail,
-                Description = journal.Description,
+                Id = journal.Journal.Id,
+                CostCentersIds = journal.CostCentersIds,
+                DebitAccountId = journal.DebitAccount?.Id ?? 0,
+                CreditAccountId = journal.CreditAccount?.Id ?? 0,
+                CreatedAt = journal.Journal.CreatedAt,
+                Amount = Math.Abs(journal.Journal.Amount),
+                Type = journal.Journal.Type,
+                Code = journal.Journal.Code,
+                Notes = $"{journal.CreditAccount?.Name ?? ""} -> {journal.DebitAccount?.Name ?? ""}",
+                LastUpdatedAt = journal.Journal.LastUpdatedAt?.ToString("g"),
+                ActualCreatedAt = journal.Journal.ActualCreatedAt?.ToString("g"),
+                PeriodId = journal.Journal.PeriodId,
+                Detail = journal.Journal.Detail,
+                Description = journal.Journal.Description,
                 CostCenters = await _costCenterService.GetAllSelectList(),
                 Accounts = await _accountService.GetSelectList(a => !a.IsParent && !a.IsArchive),
             }
@@ -94,17 +96,19 @@ internal class JournalService : IJournalService
     public async Task<IEnumerable<JournalListItemDTO>> Search(string criteria)
     {
         return (await _uow.Journal.GetAll(a => a.Detail.Contains(criteria) || a.Code.ToString().Contains(criteria) || (a.Description != null && a.Description.Contains(criteria))))
-            .OrderByDescending(j => j.CreatedAt).Select(a =>  new JournalListItemDTO
-        {
-            Id = a.Id,
-            Amount = a.Amount,
-            Type = a.Type,
-            Code = a.Code,
-            CreatedAt = a.CreatedAt.ToString("f"),
-            Detail = a.Detail,
-            Notes = a.Notes,
-            periodId = a.PeriodId,
-        });
+            .OrderByDescending(j => j.CreatedAt)
+            .Select(a =>  new JournalListItemDTO
+            {
+                Id = a.Id,
+                Amount = a.Amount,
+                Type = a.Type,
+                Code = a.Code,
+                CreatedAt = a.CreatedAt.ToString("f"),
+                Detail = a.Detail,
+                periodId = a.PeriodId,
+                Notes = $"{a.JournalDetails.First(d => d.Credit > 0).Account.Name} -> {a.JournalDetails.First(d => d.Debit > 0).Account.Name}",
+                CostCenters = a.JournalDetails.First().CostCenters.Select(cc => cc.CostCenter.Name).ToList(),
+            });
     }
     public async Task<IEnumerable<JournalListItemDTO>> AdvancedSearch(JournalAdvancedSearchDTO DTO)
     {
@@ -177,9 +181,9 @@ internal class JournalService : IJournalService
             Code = a.Code,
             CreatedAt = a.CreatedAt.ToString("f"),
             Detail = a.Detail,
-            Notes = $"{a.JournalDetails.First(d => d.Credit > 0).Account.Name} : {a.JournalDetails.First(d => d.Debit > 0).Account.Name}",
             periodId = a.PeriodId,
-            CostCenters = a.JournalDetails.First().CostCenters.Where(c => c.CostCenter != null).Select(cc => cc.CostCenter.Name).ToList(),
+            Notes = $"{a.JournalDetails.First(d => d.Credit > 0).Account.Name} -> {a.JournalDetails.First(d => d.Debit > 0).Account.Name}",
+            CostCenters = a.JournalDetails.First().CostCenters.Select(cc => cc.CostCenter.Name).ToList(),
       }).ToListAsync();
 
     }
@@ -198,9 +202,9 @@ internal class JournalService : IJournalService
                     Code = a.Code,
                     CreatedAt = a.CreatedAt.ToString("f"),
                     Detail = a.Detail,
-                    Notes = $"{a.JournalDetails.First(d => d.Credit > 0).Account.Name} : {a.JournalDetails.First(d => d.Debit > 0).Account.Name}",
                     periodId = a.PeriodId,
-                    CostCenters = a.JournalDetails.First().CostCenters.Where(c => c.CostCenter != null).Select(cc => cc.CostCenter.Name).ToList(),
+                    Notes = $"{a.JournalDetails.First(d => d.Credit > 0).Account.Name} -> {a.JournalDetails.First(d => d.Debit > 0).Account.Name}",
+                    CostCenters = a.JournalDetails.First().CostCenters.Select(cc => cc.CostCenter.Name).ToList(),
                 });
 
         return await query.ToListAsync();
@@ -233,7 +237,7 @@ internal class JournalService : IJournalService
                     Detail = j.Detail,
                     Notes = $"{j.JournalDetails.First(d => d.Credit > 0).Account.Name} : {j.JournalDetails.First(d => d.Debit > 0).Account.Name}",
                     periodId = j.PeriodId,
-                    CostCenters = j.JournalDetails.First().CostCenters.Where(c => c.CostCenter != null).Select(cc => cc.CostCenter.Name).ToList(),
+                    CostCenters = j.JournalDetails.First().CostCenters.Select(cc => cc.CostCenter.Name).ToList(),
                 })
                }
             );
@@ -278,7 +282,7 @@ internal class JournalService : IJournalService
                 PeriodId = journal.PeriodId,
                 Detail = journal.Detail,
                 Description = journal.Description,
-                CostCentersIds = journal.JournalDetails.First().CostCenters.Where(c => c.CostCenter != null).Select(cc => cc.CostCenterId).ToList(),
+                CostCentersIds = journal.JournalDetails.First().CostCenters.Select(cc => cc.CostCenterId).ToList(),
                 CostCenters = await _costCenterService.GetAllSelectList(),
                 Accounts = await _accountService.GetSelectList(a => !a.IsParent && !a.IsArchive),
             }
@@ -309,7 +313,7 @@ internal class JournalService : IJournalService
                 PeriodId = journal.PeriodId,
                 Detail = journal.Detail,
                 Description = journal.Description,
-                CostCentersIds = journal.JournalDetails.First().CostCenters.Where(c => c.CostCenter != null).Select(cc => cc.CostCenterId).ToList(),
+                CostCentersIds = journal.JournalDetails.First().CostCenters.Select(cc => cc.CostCenterId).ToList(),
                 CostCenters = await _costCenterService.GetAllSelectList(),
                 Accounts = await _accountService.GetSelectList(a => !a.IsParent && !a.IsArchive),
             }
@@ -560,6 +564,8 @@ internal class JournalService : IJournalService
                 await _uow.JournalDetailCostCenters.ExecuteUpdateAsync(d => journalDetailIds.Contains(d.JournalDetailId), e => e.SetProperty(d => d.IsDeleted, true));
 
                 await _uow.JournalDetail.ExecuteUpdateAsync(d => d.JournalId == journal.Id, e => e.SetProperty(d => d.IsDeleted, true));
+
+                _uow.Journal.Update(journal);
 
                 await _uow.SaveChangesAync();
 
