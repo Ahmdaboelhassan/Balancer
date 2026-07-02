@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Domain.DTO.Response;
+using System.ComponentModel.DataAnnotations;
 
 namespace Domain.DTO.Request;
 public class CreateJournalDTO
@@ -10,8 +11,7 @@ public class CreateJournalDTO
     public decimal Amount { get; set; }
     public int PeriodId { get; set; }
     public DateTime CreatedAt { get; set; } 
-    public int? CostCenterId { get; set; }
-    public int? SecondCostCenterId { get; set; }
+    public List<int> CostCentersIds { get; set; } = new List<int>();
 
     [Required]
     public int CreditAccountId { get; set; }

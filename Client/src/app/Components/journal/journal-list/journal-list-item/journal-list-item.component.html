@@ -23,11 +23,8 @@
       <span class="mb-2">
         <i class="fa-solid fa-paperclip"></i>
         {{ journal.notes }}
-        @if (journal.costCenter) {
-          / {{ journal.costCenter }}
-        }
-        @if (journal.secondCostCenter) {
-          / {{ journal.secondCostCenter }}
+        @if (journal.costCenters?.length) {
+           [ {{ journal.costCenters.join(', ') }} ]
         }
       </span>
       <span> #{{ journal.code }}</span>

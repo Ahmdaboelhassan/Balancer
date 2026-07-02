@@ -2,7 +2,7 @@
 
 namespace Domain.IRepository
 {
-   public interface IBudgetAccountRepo : IRepository<BudgetAccount>
+   public interface IJournalDetailCostCentersRepo : IRepository<JournalDetailCostCenter>
     {
     }
 }

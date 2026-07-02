@@ -25,7 +25,7 @@
         <input type="hidden" formControlName="id" />
         <input type="hidden" formControlName="periodId" />
         <div class="controls grid grid-cols-12 gap-5">
-          <div class="col-span-12 lg:col-span-6">
+          <div class="col-span-12 lg:col-span-4">
             <label for="details"> Detials </label>
             <input
               type="text"
@@ -35,7 +35,7 @@
               dir="auto"
             />
           </div>
-          <div class="col-span-12 lg:col-span-6">
+          <div class="col-span-12 lg:col-span-4">
             <label for="amount">
               <span>Amount</span>
               <button
@@ -53,7 +53,17 @@
               class="form-control w-full"
             />
           </div>
-          <div class="col-span-12 lg:col-span-6">
+           <div
+            class="col-span-12 lg:col-span-4"
+          >
+            <label for="created"> Date </label>
+            <input
+              type="datetime-local"
+              class="form-control w-full"
+              formControlName="created"
+            />
+          </div>
+          <div class="col-span-12 lg:col-span-4">
             <label for="credit">
               <span>From Account</span>
               <button
@@ -83,7 +93,7 @@
             formControlName="creditBalance"
           />
         </div> -->
-          <div class="col-span-12 lg:col-span-6">
+          <div class="col-span-12 lg:col-span-4">
             <label for="debit">
               <span>To Account </span>
               <button
@@ -105,49 +115,24 @@
             >
             </ng-select>
           </div>
+         
           <div
-            class="col-span-12"
-            [ngClass]="isEdit ? 'lg:col-span-4' : 'lg:col-span-6'"
+            class="col-span-12 lg:col-span-4"
           >
-            <label for="created"> Date </label>
-            <input
-              type="datetime-local"
-              class="form-control w-full"
-              formControlName="created"
-            />
-          </div>
-          <div
-            class="col-span-12"
-            [ngClass]="isEdit ? 'lg:col-span-4' : 'lg:col-span-6'"
-          >
-            <label for="costCenter"> Cost Center </label>
+            <label for="costCentersIds"> Cost Centers </label>
             <ng-select
               [items]="Journal().costCenters"
               bindLabel="name"
               bindValue="id"
-              formControlName="costCenter"
-              placeholder="Without Cost Center"
-            >
-            </ng-select>
-          </div>
-          <div
-            class="col-span-12"
-            [ngClass]="isEdit ? 'lg:col-span-4' : 'lg:col-span-6'"
-          >
-            <label for="secondCostCenterId">Second Cost Center </label>
-            <ng-select
-              [items]="Journal().costCenters"
-              bindLabel="name"
-              bindValue="id"
-              formControlName="secondCostCenterId"
+              [multiple]="true"
+              formControlName="costCentersIds"
               placeholder="Without Cost Center"
             >
             </ng-select>
           </div>
 
           <div
-            class="col-span-12"
-            [ngClass]="isEdit ? 'lg:col-span-4' : 'lg:col-span-6'"
+            class="col-span-12 lg:col-span-4"
           >
             <label for="detail"> Code </label>
             <input

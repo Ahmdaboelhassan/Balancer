@@ -15,8 +15,7 @@ export interface Journal {
   description: any;
   amount: number;
   periodId: number;
-  costCenterId: any;
-  secondCostCenterId: any;
+  costCentersIds: number[];
   creditAccountId: number;
   debitAccountId: number;
 }

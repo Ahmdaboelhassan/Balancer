@@ -14,6 +14,7 @@ public interface IUnitOfWork
     IDashboardSettingsRepo DashboardSettings { get; }
     IBudgetAccountRepo BudgetAccounts { get; }
     IRefreshTokenRepo RefreshTokens { get; }
+    IJournalDetailCostCentersRepo JournalDetailCostCenters { get; }
     Task SaveChangesAync();
     IDbTransaction StartTransaction();
     IEvaluationRepo Evaluations { get; }

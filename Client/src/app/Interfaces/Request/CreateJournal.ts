@@ -4,8 +4,9 @@ export interface CreateJournal {
   description: string;
   amount: number;
   periodId: number;
-  costCenterId: number;
-  secondCostCenterId: number;
+  // costCenterId: number;
+  // secondCostCenterId: number;
+  costCentersIds: number[];
   creditAccountId: number;
   debitAccountId: number;
   createdAt: string;

@@ -11,6 +11,7 @@ namespace Infrastructure.Data
         public DbSet<Journal> Journals { get; set; }
         public DbSet<JournalDetail> JournalDetails { get; set; }
         public DbSet<CostCenter> CostCenters { get; set; }
+        public DbSet<JournalDetailCostCenter> JournalDetailCostCenters { get; set; }
         public DbSet<Settings> Settings { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<DashboardSettings> DashboardSettings { get; set; }
@@ -28,6 +29,7 @@ namespace Infrastructure.Data
             modelBuilder.Entity<CostCenter>().HasQueryFilter(p => !p.IsDeleted);
             modelBuilder.Entity<Evaluation>().HasQueryFilter(p => !p.IsDeleted);
             modelBuilder.Entity<EvaluationDetail>().HasQueryFilter(p => !p.IsDeleted);
+            modelBuilder.Entity<JournalDetailCostCenter>().HasQueryFilter(p => !p.IsDeleted);
 
             modelBuilder.Entity<JournalDetail>()
             .HasOne(d => d.Journal)

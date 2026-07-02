@@ -9,34 +9,23 @@ namespace Infrastructure.Repository;
 public class UnitOfWork : IUnitOfWork
 {
     private readonly AppDbContext _context;
-    public IPeriodRepo Periods { get;}
-    public IAccountRepo Accounts { get;}
-    public IJournalRepo Journal { get;}
-    public IJournalDetailRepo JournalDetail { get;}
-    public ICostCenterRepo CostCenter { get;}
-    public ISettingsRepo Settings { get;}
-    public IUserRepo Users { get;}
-    public IBudgetAccountRepo BudgetAccounts { get;}
-    public IDashboardSettingsRepo DashboardSettings { get;}
-    public IRefreshTokenRepo RefreshTokens { get;}
-    public IEvaluationRepo Evaluations { get;}
-    public IEvaluationDetailRepo EvaluationDetails { get;}
+    public IPeriodRepo Periods { get => new PeriodRepo(_context); }
+    public IAccountRepo Accounts { get => new AccountRepo(_context); }
+    public IJournalRepo Journal { get => new JournalRepo(_context); }
+    public IJournalDetailRepo JournalDetail { get => new JournalDetailRepo(_context); }
+    public ICostCenterRepo CostCenter { get => new CostCenterRepo(_context); }
+    public ISettingsRepo Settings { get => new SettingsRepo(_context); }
+    public IUserRepo Users { get => new UserRepo(_context); }
+    public IBudgetAccountRepo BudgetAccounts { get => new BudgetAccountRepo(_context); }
+    public IDashboardSettingsRepo DashboardSettings { get => new DashboardSettingsRepo(_context); }
+    public IRefreshTokenRepo RefreshTokens { get => new RefreshTokenRepo(_context); }
+    public IEvaluationRepo Evaluations { get => new EvaluationRepo(_context); }
+    public IEvaluationDetailRepo EvaluationDetails { get => new EvaluationDetailRepo(_context); }
+    public IJournalDetailCostCentersRepo JournalDetailCostCenters { get => new JournalDetailCostCentersRepo(_context); }
 
     public UnitOfWork(AppDbContext context)
     {
-        _context = context;
-        Periods = new PeriodRepo(context);
-        Accounts = new AccountRepo(context);
-        Journal = new JournalRepo(context);
-        JournalDetail = new JournalDetailRepo(context);
-        CostCenter = new CostCenterRepo(context);
-        Settings = new SettingsRepo(context);
-        Users = new UserRepo(context);
-        BudgetAccounts = new BudgetAccountRepo(context);
-        DashboardSettings = new DashboardSettingsRepo(context);
-        RefreshTokens = new RefreshTokenRepo(context);
-        Evaluations = new EvaluationRepo(context);
-        EvaluationDetails = new EvaluationDetailRepo(context);
+       _context = context;
     }
    
 

@@ -18,7 +18,6 @@ import { AccountBudgetSettingsComponent } from './account-budget-settings/accoun
   selector: 'app-dashboard-settings',
   imports: [
     ReactiveFormsModule,
-    RouterLink,
     NgSelectComponent,
     AccountBudgetSettingsComponent,
   ],

@@ -27,6 +27,9 @@ internal class JournalRepo : Repository<Journal>, IJournalRepo
         var nextJournal = await _context.Journals
             .Where(j => j.CreatedAt > d)
             .Include(j => j.JournalDetails)
+                .ThenInclude(jd => jd.Account)
+            .Include(j => j.JournalDetails)
+                .ThenInclude(jd => jd.CostCenters)
             .OrderBy(j => j.CreatedAt)
             .ThenBy(j => j.Id)
             .FirstOrDefaultAsync();
@@ -41,7 +44,10 @@ internal class JournalRepo : Repository<Journal>, IJournalRepo
 
         var prevJournal = await _context.Journals
             .Where(j => j.CreatedAt < d)
+             .Include(j => j.JournalDetails)
+                .ThenInclude(jd => jd.Account)
             .Include(j => j.JournalDetails)
+                .ThenInclude(jd => jd.CostCenters)
             .OrderByDescending(j => j.CreatedAt)
             .ThenByDescending(j => j.Id)
             .FirstOrDefaultAsync();

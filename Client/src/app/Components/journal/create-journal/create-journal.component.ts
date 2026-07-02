@@ -12,7 +12,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { Journal } from '../../../Interfaces/Response/Journal';
-import { NgClass, NgFor } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { AccountService } from '../../../Services/account.service';
 import { CreateJournal } from '../../../Interfaces/Request/CreateJournal';
 import { NgSelectComponent } from '@ng-select/ng-select';
@@ -24,7 +24,6 @@ import { AccountsBalance } from '../../../Interfaces/Response/AccountsBalance';
   imports: [
     RouterLink,
     ReactiveFormsModule,
-    NgFor,
     NgClass,
     NgSelectComponent,
     BidiModule,
@@ -115,8 +114,7 @@ export class CreateJournalComponent {
       amount: new FormControl(journal.amount, Validators.min(0.1)),
       debit: new FormControl(journal.debitAccountId, Validators.required),
       credit: new FormControl(journal.creditAccountId, Validators.required),
-      costCenter: new FormControl(journal.costCenterId),
-      secondCostCenterId: new FormControl(journal.secondCostCenterId),
+      costCentersIds: new FormControl(journal.costCentersIds ?? []),
       code: new FormControl({ disabled: true, value: journal.code }),
       created: new FormControl(
         this.GetLocaleDateTime(new Date(journal.createdAt)),
@@ -152,14 +150,14 @@ export class CreateJournalComponent {
       id: form.id,
       amount: form.amount,
       detail: form.details,
-      costCenterId: form.costCenter == '' ? null : form.costCenter,
+      costCentersIds: Array.isArray(form.costCentersIds)
+        ? form.costCentersIds
+        : [],
       creditAccountId: form.credit,
       debitAccountId: form.debit,
       description: form.description,
       periodId: form.periodId,
       createdAt: form.created,
-      secondCostCenterId:
-        form.secondCostCenterId == '' ? null : form.secondCostCenterId,
     };
 
     if (this.isEdit) {
@@ -200,8 +198,7 @@ export class CreateJournalComponent {
               details: '',
               description: '',
               code: this.JournalForm.get('code').value + 1,
-              costCenter: null,
-              secondCostCenterId: null,
+              costCentersIds: [],
               created: this.GetDateTimePlusOneMinute(
                 this.JournalForm.get('created').value,
               ),

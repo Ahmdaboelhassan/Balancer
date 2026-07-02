@@ -4,6 +4,7 @@ using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260702000350_addnewCostCenters")]
+    partial class addnewCostCenters
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -262,6 +265,7 @@ namespace API.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Notes")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("PeriodId")
@@ -303,6 +307,9 @@ namespace API.Migrations
                     b.Property<int>("JournalId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int?>("SecondCostCenterId")
                         .HasColumnType("int");
 
@@ -330,9 +337,6 @@ namespace API.Migrations
                     b.Property<int>("CostCenterId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<int>("JournalDetailId")
                         .HasColumnType("int");
 
@@ -342,7 +346,7 @@ namespace API.Migrations
 
                     b.HasIndex("JournalDetailId");
 
-                    b.ToTable("JournalDetailCostCenters");
+                    b.ToTable("JournalDetailCostCenter");
                 });
 
             modelBuilder.Entity("Domain.Entities.Period", b =>
@@ -604,7 +608,7 @@ namespace API.Migrations
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.JournalDetail", "JournalDetail")
-                        .WithMany("CostCenters")
+                        .WithMany("JournalDetailCostCenters")
                         .HasForeignKey("JournalDetailId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -642,7 +646,7 @@ namespace API.Migrations
 
             modelBuilder.Entity("Domain.Entities.JournalDetail", b =>
                 {
-                    b.Navigation("CostCenters");
+                    b.Navigation("JournalDetailCostCenters");
                 });
 
             modelBuilder.Entity("Domain.Entities.Period", b =>

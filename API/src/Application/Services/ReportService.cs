@@ -7,6 +7,7 @@ using System;
 using System.Globalization;
 using System.Linq.Expressions;
 using System.Timers;
+using static Azure.Core.HttpHeader;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Application.Services;
@@ -21,13 +22,21 @@ public class ReportService : IReportService
         if (account == null)
             return GetEmptyAccountStatement();
 
-        var journals = (await _uow.JournalDetail
+        var journalsDetails = (await _uow.JournalDetail
                    .GetAll(d =>
                         d.Account.Number.StartsWith(account.Number)
                      && (!from.HasValue || d.Journal.CreatedAt.Date >= from.Value.Date)
                      && (!to.HasValue || d.Journal.CreatedAt.Date <= to.Value.Date)
-                     && (!costCenterId.HasValue || (d.CostCenterId == costCenterId || d.SecondCostCenterId == costCenterId))
-                   , "CostCenter", "SecondCostCenter", "Account", "Journal")).OrderBy(d => d.Journal.CreatedAt);
+                     && (!costCenterId.HasValue || d.CostCenters.Any(d => d.CostCenterId == costCenterId))
+                   ,"CostCenters", "CostCenters.CostCenter", "Account", "Journal")).OrderBy(d => d.Journal.CreatedAt);
+
+        var detailsGroupByJournal = journalsDetails.GroupBy(d => d.JournalId)
+            .Select(g => new
+            {
+                JournalId = g.Key,
+                DebitAccount = g.First(d => d.Debit > 0).Account.Name,
+                CreditAccount = g.First(d => d.Credit > 0).Account.Name,
+            }).ToDictionary(d => d.JournalId, d => new {d.DebitAccount, d.CreditAccount});
 
 
         var journalsLinkedList = new LinkedList<AccountStatementDetail>();
@@ -39,8 +48,10 @@ public class ReportService : IReportService
                     .GetAll(d =>
                          d.Account.Number.StartsWith(account.Number)
                        && d.Journal.CreatedAt < from.Value.Date
-                      && (!costCenterId.HasValue || (d.CostCenterId == costCenterId || d.SecondCostCenterId == costCenterId))
+                      && (!costCenterId.HasValue || d.CostCenters.Any(d => d.CostCenterId == costCenterId))
                     , "Account", "Journal");
+
+
 
             if (openingJournals.Count > 0)
             {
@@ -59,26 +70,21 @@ public class ReportService : IReportService
             }
         }
 
-        foreach (var journal in journals)
+        foreach (var journal in journalsDetails)
         {
             balance += journal.Debit - journal.Credit;
 
-            var costCenter = string.Empty;
+            var currentJournalDetails = detailsGroupByJournal[journal.JournalId];
 
-            if (journal.CostCenterId == costCenterId)
-                costCenter = journal.CostCenter?.Name ?? "";
-            else if (journal.SecondCostCenterId == costCenterId)
-                costCenter = journal.SecondCostCenter?.Name ?? "";
-         
             journalsLinkedList.AddLast(new AccountStatementDetail
             {
                 Balance = balance,
                 Credit = journal.Credit,
                 Debit = journal.Debit,
-                CostCenter = costCenter,
+                CostCenter = string.Join(", ", journal.CostCenters.Where(cc => cc.CostCenter != null).Select(cc => cc.CostCenter.Name)),
                 Detail = journal.Journal.Detail,
                 JournalId = journal.JournalId,
-                notes = journal.Journal.Notes,
+                notes = $"{currentJournalDetails.CreditAccount} : {currentJournalDetails.DebitAccount}",
                 PeriodId = journal.Journal.PeriodId,
                 Description = journal.Journal.Description,
                 Date = journal.Journal.CreatedAt.ToShortDateString(),
@@ -130,13 +136,23 @@ public class ReportService : IReportService
         if (string.IsNullOrEmpty(bankNumber) || string.IsNullOrEmpty(drawerNumber))
             return GetEmptyAccountStatement();
 
-        var journals = (await _uow.JournalDetail
+        var journalsDetails = (await _uow.JournalDetail
                    .GetAll(d =>
-                     ((d.CostCenterId == costCenterId || d.SecondCostCenterId == costCenterId) && !d.Account.Number.StartsWith(bankNumber) && !d.Account.Number.StartsWith(drawerNumber))
+                     (d.CostCenters.Any(cc => cc.CostCenterId == costCenterId) && !d.Account.Number.StartsWith(bankNumber) && !d.Account.Number.StartsWith(drawerNumber))
                      && (!from.HasValue || d.Journal.CreatedAt.Date >= from.Value.Date)
                      && (!to.HasValue || d.Journal.CreatedAt.Date <= to.Value.Date)
-                   , "Account", "Journal"))
+                   , "CostCenters", "CostCenters.CostCenter", "Account", "Journal"))
                    .OrderBy(d => d.Journal.CreatedAt);
+
+
+        var detailsGroupByJournal = journalsDetails.GroupBy(d => d.JournalId)
+            .Select(g => new
+            {
+                JournalId = g.Key,
+                DebitAccount = g.First(d => d.Debit > 0).Account.Name,
+                CreditAccount = g.First(d => d.Credit > 0).Account.Name,
+            }).ToDictionary(d => d.JournalId, d => new { d.DebitAccount, d.CreditAccount });
+
 
         var journalsLinkedList = new LinkedList<AccountStatementDetail>();
 
@@ -144,7 +160,7 @@ public class ReportService : IReportService
         if (openingBalance && from.HasValue)
         {
             var openingJournals = await _uow.JournalDetail
-                    .GetAll(d => (d.CostCenterId == costCenterId || d.SecondCostCenterId == costCenterId)
+                    .GetAll(d => (d.CostCenters.Any(cc => cc.CostCenterId == costCenterId))
                     && !d.Account.Number.StartsWith(bankNumber)
                     && !d.Account.Number.StartsWith(drawerNumber) 
                     && d.Journal.CreatedAt < from.Value.Date, "Journal", "Account");
@@ -166,19 +182,21 @@ public class ReportService : IReportService
             }
         }
 
-        foreach (var journal in journals)
+        foreach (var journal in journalsDetails)
         {
             balance += journal.Debit - journal.Credit;
+
+            var currentJournalDetails = detailsGroupByJournal[journal.JournalId];
 
             journalsLinkedList.AddLast(new AccountStatementDetail
             {
                 Balance = balance,
                 Credit = journal.Credit,
                 Debit = journal.Debit,
-                CostCenter = costCenter.Name,
+                CostCenter = string.Join(", ", journal.CostCenters.Where(cc => cc.CostCenter != null).Select(cc => cc.CostCenter.Name)),
                 Detail = journal.Journal.Detail,
                 JournalId = journal.JournalId,
-                notes = journal.Journal.Notes,
+                notes = $"{currentJournalDetails.CreditAccount} : {currentJournalDetails.DebitAccount}",
                 PeriodId = journal.Journal.PeriodId,
                 Date = journal.Journal.CreatedAt.ToShortDateString(),
             });

@@ -11,4 +11,7 @@ public class CostCenter
     public DateTime CreatedAt { get; set; }
     public bool IsDeleted { get; set; }
     public bool IsArchived { get; set; }
+
+    public ICollection<JournalDetailCostCenter> JournalDetailCostCenters { get; set; }
+
 }
