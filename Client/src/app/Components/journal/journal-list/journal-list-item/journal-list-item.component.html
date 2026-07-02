@@ -23,13 +23,10 @@
       <span class="mb-2">
         <i class="fa-solid fa-paperclip"></i>
         {{ journal.notes }}
-        @if (journal.costCenters?.length) {
-           [ {{ journal.costCenters.join(', ') }} ]
-        }
       </span>
       <span> #{{ journal.code }}</span>
     </p>
-    <p class="overflow-hidden text-nowrap text-ellipsis">
+    <p class="overflow-hidden text-nowrap text-ellipsis lg:mt-0 mt-2">
       <span>
         <i class="fa-regular fa-clock"></i>
         {{ journal.createdAt }}
@@ -37,4 +34,15 @@
       <span> | P-{{ journal.periodId }}</span>
     </p>
   </div>
+  @if (journal.costCenters?.length) {
+    <div class="mt-2 flex flex-wrap gap-1">
+      @for (costCenter of journal.costCenters; track costCenter) {
+        <span
+          class="inline-flex items-center rounded-xl bg-slate-300 px-2.5 py-0.5 text-xs font-medium text-slate-700"
+        >
+          {{ costCenter }}
+        </span>
+      }
+    </div>
+  }
 </a>

@@ -1,8 +1,7 @@
 <div class="grid grid-cols-1 gap-3">
   @for (journal of journals; track $index) {
-  <div class="col-span-1">
-    <app-journal-list-item [journal]="journal"></app-journal-list-item>
-  </div>
+    <div class="col-span-1">
+      <app-journal-list-item [journal]="journal"></app-journal-list-item>
+    </div>
   }
-  <div></div>
 </div>

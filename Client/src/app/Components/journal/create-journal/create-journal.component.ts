@@ -17,6 +17,8 @@ import { AccountService } from '../../../Services/account.service';
 import { CreateJournal } from '../../../Interfaces/Request/CreateJournal';
 import { NgSelectComponent } from '@ng-select/ng-select';
 import { BidiModule } from '@angular/cdk/bidi';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
 import { environment } from '../../../../environments/environment';
 import { AccountsBalance } from '../../../Interfaces/Response/AccountsBalance';
 
@@ -27,6 +29,8 @@ import { AccountsBalance } from '../../../Interfaces/Response/AccountsBalance';
     NgClass,
     NgSelectComponent,
     BidiModule,
+    MatFormFieldModule,
+    MatSelectModule,
   ],
   templateUrl: './create-journal.component.html',
   styleUrl: './create-journal.component.css',

@@ -84,7 +84,7 @@ public class ReportService : IReportService
                 Balance = balance,
                 Credit = journal.JournalDetail.Credit,
                 Debit = journal.JournalDetail.Debit,
-                CostCenter = string.Join(", ", journal.CostCenters),
+                CostCenters = journal.CostCenters,
                 Detail = journal.Journal.Detail,
                 JournalId = journal.Journal.Id,
                 notes = $"{journal.CreditAccount} -> {journal.DebitAccount}",
@@ -101,7 +101,6 @@ public class ReportService : IReportService
                 Balance = balance,
                 Credit = journalsLinkedList.Sum(j => j.Credit),
                 Debit = journalsLinkedList.Sum(j => j.Debit),
-                CostCenter = "",
                 Detail = "Total",
                 JournalId = 0,
                 notes = "Total",
@@ -187,7 +186,7 @@ public class ReportService : IReportService
                     Detail = "Opening Balance",
                     notes = "Opening Balance",
                     Date = openingJournals.Date.ToShortDateString(),
-                    CostCenter = costCenter.Name
+                    CostCenters = [costCenter.Name]
                 });
             }
         }
@@ -201,7 +200,7 @@ public class ReportService : IReportService
                 Balance = balance,
                 Credit = journal.JournalDetail.Credit,
                 Debit = journal.JournalDetail.Debit,
-                CostCenter = string.Join(", ", journal.CostCenters),
+                CostCenters = journal.CostCenters,
                 Detail = journal.Journal.Detail,
                 JournalId = journal.Journal.Id,
                 notes = $"{journal.CreditAccount} -> {journal.DebitAccount}",
@@ -218,7 +217,6 @@ public class ReportService : IReportService
                 Balance = balance,
                 Credit = journalsList.Sum(j => j.Credit),
                 Debit = journalsList.Sum(j => j.Debit),
-                CostCenter = "",
                 Detail = "Total",
                 JournalId = 0,
                 notes = "Total",

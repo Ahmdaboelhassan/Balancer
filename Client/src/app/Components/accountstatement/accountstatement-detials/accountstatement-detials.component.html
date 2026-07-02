@@ -1,10 +1,10 @@
-@if(accountStatement){
-<div
-  class="rounded-lg mb-2 px-6 py-2 flex md:flex-row flex-col justify-between md:items-center items-start text-sm text font-medium bg-white text-slate-900"
->
-  <h4>{{ accountStatement.accountName }}</h4>
-  <h4>{{ accountStatement.from }} - {{ accountStatement.to }}</h4>
-</div>
+@if (accountStatement) {
+  <div
+    class="rounded-lg mb-2 px-6 py-2 flex md:flex-row flex-col justify-between md:items-center items-start text-sm text font-medium bg-white text-slate-900"
+  >
+    <h4>{{ accountStatement.accountName }}</h4>
+    <h4>{{ accountStatement.from }} - {{ accountStatement.to }}</h4>
+  </div>
 }
 <div
   class="relative bg-white shadow-sm rounded-xl overflow-auto min-h-[calc(100vh-10rem)]"
@@ -22,53 +22,65 @@
         Source
       </th>
     </tr>
-    @if(accountStatement){
-    <tbody>
-      @for(item of accountStatement.details ;track $index){
+    @if (accountStatement) {
+      <tbody>
+        @for (item of accountStatement.details; track $index) {
+          <tr class="bg-white border-b hover:bg-gray-50">
+            <th
+              scope="row"
+              class="py-4 px-5 font-bold text-base text-gray-900 whitespace-nowrap"
+            >
+              {{ item.detail }}
 
-      <tr class="bg-white border-b hover:bg-gray-50">
-        <th
-          scope="row"
-          class="py-4 px-5 font-bold text-base text-gray-900 whitespace-nowrap"
-        >
-          {{ item.detail }}
-
-          @if(item.description){
-          <i
-            [title]="item.description"
-            (click)="ShowDescription(item.description)"
-            class="fa-solid fa-circle-info text-blue-700 hover:scale-125 cursor-pointer ms-2 transition-transform"
-          ></i>
-          }
-        </th>
-        <td class="py-4 px-3">{{ item.date }}</td>
-        <td class="py-4 px-3 font-bold">{{ item.debit | currency }}</td>
-        <td class="py-4 px-3 font-bold">{{ item.credit | currency }}</td>
-        <td class="py-4 px-3 font-bold">{{ item.balance | currency }}</td>
-        <td class="py-4 px-3">{{ item.costCenter }}</td>
-        <td
-          [title]="item.notes"
-          class="py-4 px-3 whitespace-nowrap overflow-hidden text-ellipsis"
-        >
-          @if (item.notes.length > 50) {
-          {{ item.notes | slice : 0 : 50 }}.. } @else {
-          {{ item.notes }}
-          }
-        </td>
-        <td class="py-4 px-3 text-center lg:text-right print:hidden">
-          @if(item.journalId > 0 && item.periodId > 0){
-          <a
-            [routerLink]="['/Journal/Edit/', item.journalId]"
-            class="font-medium text-blue-600 hover:underline me-2 hover:me-3 transition-all"
-          >
-            <i class="fa-solid fa-folder-open cursor-pointer"></i>
-            Open</a
-          >
-          }
-        </td>
-      </tr>
-      }
-    </tbody>
+              @if (item.description) {
+                <i
+                  [title]="item.description"
+                  (click)="ShowDescription(item.description)"
+                  class="fa-solid fa-circle-info text-blue-700 hover:scale-125 cursor-pointer ms-2 transition-transform"
+                ></i>
+              }
+            </th>
+            <td class="py-4 px-3">{{ item.date }}</td>
+            <td class="py-4 px-3 font-bold">{{ item.debit | currency }}</td>
+            <td class="py-4 px-3 font-bold">{{ item.credit | currency }}</td>
+            <td class="py-4 px-3 font-bold">{{ item.balance | currency }}</td>
+            <td class="py-4 px-3">
+              @if (item.costCenters?.length > 0) {
+                <div class="flex flex-wrap gap-1">
+                  @for (costCenter of item.costCenters; track costCenter) {
+                    <span
+                      class="inline-flex items-center rounded-full bg-slate-300 px-2.5 py-0.5 text-xs font-medium text-slate-700"
+                    >
+                      {{ costCenter.trim() }}
+                    </span>
+                  }
+                </div>
+              }
+            </td>
+            <td
+              [title]="item.notes"
+              class="py-4 px-3 whitespace-nowrap overflow-hidden text-ellipsis"
+            >
+              @if (item.notes.length > 50) {
+                {{ item.notes | slice: 0 : 50 }}..
+              } @else {
+                {{ item.notes }}
+              }
+            </td>
+            <td class="py-4 px-3 text-center lg:text-right print:hidden">
+              @if (item.journalId > 0 && item.periodId > 0) {
+                <a
+                  [routerLink]="['/Journal/Edit/', item.journalId]"
+                  class="font-medium text-blue-600 hover:underline me-2 hover:me-3 transition-all"
+                >
+                  <i class="fa-solid fa-folder-open cursor-pointer"></i>
+                  Open</a
+                >
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
     }
   </table>
 </div>
@@ -81,8 +93,8 @@
       : 'text-green-700'
   "
 >
-  @if(accountStatement){
-  <span class="me-4">{{ accountStatement.amount }}</span>
-  <span>{{ accountStatement.accountType }}</span>
+  @if (accountStatement) {
+    <span class="me-4">{{ accountStatement.amount }}</span>
+    <span>{{ accountStatement.accountType }}</span>
   }
 </div>

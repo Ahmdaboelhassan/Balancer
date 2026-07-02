@@ -6,7 +6,7 @@ public class AccountStatementDetail
    public decimal Debit { get; set; }
    public decimal Credit { get; set; }
    public decimal Balance { get; set; }
-   public string CostCenter { get; set; }
+   public IEnumerable<string?> CostCenters { get; set; } = new List<string?>();
    public int JournalId { get; set; }
    public int PeriodId { get; set; }
    public string? Date { get; set; }
