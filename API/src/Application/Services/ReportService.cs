@@ -356,7 +356,8 @@ public class ReportService : IReportService
             j => j.Journal.CreatedAt.Date >= from.Date &&
                  j.Journal.CreatedAt.Date <= to.Date,
             "Journal",
-            "Account");
+            "Account",
+            "CostCenters");
 
         var journalTotalsByAccount = journals
             .GroupBy(j => j.Account.Number)
