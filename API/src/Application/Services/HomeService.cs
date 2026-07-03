@@ -3,7 +3,10 @@ using Domain.Entities;
 using Domain.Enums;
 using Domain.IRepository;
 using Domain.IServices;
+using Domain.Static;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using System.Collections;
 using System.Globalization;
 using System.Text;
@@ -12,23 +15,25 @@ namespace Application.Services;
 
 public class HomeService : IHomeService
 {
-    private readonly IUnitOfWork _unitOfWork;
     private readonly IAccountService _accountService;
+    private readonly IServiceScopeFactory _scope;
 
-    public HomeService(IUnitOfWork unitOfWork, IAccountService accountService)
+    public HomeService(IAccountService accountService, IServiceScopeFactory scope)
     {
-        _unitOfWork = unitOfWork;
         _accountService = accountService;
+        _scope = scope;
     }
 
     public async Task<GetHomeDTO> GetHome()
     {
         // Statistics
-        var dashboard = await _unitOfWork.DashboardSettings.GetFirst();
-        var settings = await _unitOfWork.Settings.GetFirst();
+        await using var scope = _scope.CreateAsyncScope();
+        var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+
+        var dashboard = await unitOfWork.DashboardSettings.GetFirst();
+        var settings = await unitOfWork.Settings.GetFirst();
         if (dashboard == null || settings == null)
             return GetEmptyHome();
-
 
         var accountIds = new[]
         {
@@ -40,63 +45,57 @@ public class HomeService : IHomeService
             settings.FixedAssetsAccount.GetValueOrDefault(),
         };
 
-        var accounts = (await _unitOfWork.Accounts.GetAll(x => accountIds.Contains(x.Id))).ToDictionary(a => a.Id, a => a);
+        var accounts = (await unitOfWork.Accounts.GetAll(x => accountIds.Contains(x.Id))).ToDictionary(a => a.Id, a => a);
 
         if (accounts.Count() < 4)
             return GetEmptyHome();
 
-        var accountsList = new[]
+        var timeZone = TimeZoneInfo.FindSystemTimeZoneById(MagicStrings.TimeZone);
+        var current = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZone);
+
+        var otherExpensesAccounts = new HashSet<string>(
+        [
+            accounts[accountIds[4]].Number,
+            accounts[accountIds[5]].Number
+        ]);
+
+        var accountsBalancesTasks = new[]
         {
-          accounts[accountIds[0]],
-          accounts[accountIds[1]],
-          accounts[accountIds[2]],
-          accounts[accountIds[3]],
+            GetDashboardAccountBalance(accounts[accountIds[0]]),
+            GetDashboardAccountBalance(accounts[accountIds[1]]),
+            GetDashboardAccountBalance(accounts[accountIds[2]]),
+            GetDashboardAccountBalance(accounts[accountIds[3]]),
         };
 
-        var balances = new List<AccountBalanceDTO>();
+        var balances = await Task.WhenAll(accountsBalancesTasks);
 
-        foreach (var acc in accountsList)
-        {
-            balances.Add(new AccountBalanceDTO
-            {
-                AccountName = acc.Name,
-                Balance = (await _accountService.GetBalance(acc)).ToString("c")
-            });
-        }
-
-        var current = DateTime.Now.Date;
 
         // Line Chart
-        var lastPeriods = await GetLastPeriodsBalancesAsync(4);
+        var lastPeriodsTask = GetLastPeriodsBalancesAsync(4);
 
         // Pie Chart
-        var journalsTypesSummary = await GetJournalsTypesSummary(current);
+        var journalsTypesSummaryTask = GetJournalsTypesSummary(current);
 
         // Bar Chart
-        var lastMonthsJournals = await GetLast12MonthJournalAsync(current);
+        var lastMonthsJournalsTask = GetLast12MonthJournalAsync(current);
 
         // Progress Bar 
-        var accountsSet = new HashSet<string>(new string[] 
-        { 
-          accounts[accountIds[4]].Number, 
-          accounts[accountIds[5]].Number 
-        });
+        var GetBudgetProgressTask = GetBudgetProgressAsync(dashboard, settings, otherExpensesAccounts, current);
 
-        (IEnumerable <BudgetAccountDTO> budgetProgress,decimal otherExpenses, decimal availableFunds) =
-            await GetBudgetProgressAsync(dashboard,settings,accountsSet , current);
+        await Task.WhenAll(lastPeriodsTask, journalsTypesSummaryTask, lastMonthsJournalsTask, GetBudgetProgressTask);
 
         return new GetHomeDTO
         {
             AccountsSummary = balances,
-            LastPeriods = lastPeriods,
-            Expenses = lastMonthsJournals.expenses,
-            Revenues = lastMonthsJournals.revenues,
-            MonthsNames = lastMonthsJournals.months,
-            JournalsTypesSummary = journalsTypesSummary,
-            AvailableFunds = availableFunds,
-            OtherExpenses = otherExpenses,
+            LastPeriods = lastPeriodsTask.Result,
+            Expenses = lastMonthsJournalsTask.Result.expenses,
+            Revenues = lastMonthsJournalsTask.Result.revenues,
+            MonthsNames = lastMonthsJournalsTask.Result.months,
+            JournalsTypesSummary = journalsTypesSummaryTask.Result,
+            AvailableFunds = GetBudgetProgressTask.Result.availableFunds,
+            OtherExpenses = GetBudgetProgressTask.Result.otherExpenses,
             OtherExpensesTarget = dashboard.OtherExpensesTarget + dashboard.AddOnExpensesTarget,
-            BudgetProgress = budgetProgress,
+            BudgetProgress = GetBudgetProgressTask.Result.budgetProgress,
             DayRate = settings.DefaultDayRate,
             PeriodDays = settings.DefaultPeriodDays.GetValueOrDefault(),
         };
@@ -105,7 +104,11 @@ public class HomeService : IHomeService
     private async Task<(IEnumerable<BudgetAccountDTO> budgetProgress, decimal otherExpenses, decimal availableFunds)> 
         GetBudgetProgressAsync(DashboardSettings dashboard, Settings settings, HashSet<string> accountSet, DateTime current)
     {
-        var currentMonthJournals = (await _unitOfWork.JournalDetail
+        await using var scope = _scope.CreateAsyncScope();
+
+        var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+
+        var currentMonthJournals = (await unitOfWork.JournalDetail
                    .GetAll(j => (j.Journal.CreatedAt.Month == current.Month && j.Journal.CreatedAt.Year == current.Year), "Journal", "Account", "CostCenters"));
 
 
@@ -113,7 +116,7 @@ public class HomeService : IHomeService
                    .GroupBy(j => j.Account.Number)
                    .Select(j => new { AccountNumber = j.Key, Total = j.Sum(j => j.Debit - j.Credit) });
 
-        var budgetAccounts = await _unitOfWork.BudgetAccounts.GetAll("Account");
+        var budgetAccounts = await unitOfWork.BudgetAccounts.GetAll("Account");
 
         decimal overBudget = 0;
 
@@ -164,15 +167,23 @@ public class HomeService : IHomeService
     }
     private async Task<IEnumerable<decimal>> GetLastPeriodsBalancesAsync(int count)
     {
-        return (await _unitOfWork.Periods.
+        await using var scope = _scope.CreateAsyncScope();
+
+        var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+
+        return (await unitOfWork.Periods.
                 TakeLastOrderBy(count, p => new { p.From, p.TotalAmount }, p => p.From.Date))
                 .OrderBy(p => p.From).Select(p => p.TotalAmount);
     }
     private async Task<IEnumerable<decimal>> GetJournalsTypesSummary(DateTime current)
     {
-        // Pie Chart
+        await using var scope = _scope.CreateAsyncScope();
 
-        var journalsTypesSummary = (await _unitOfWork.Journal
+        var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+
+
+        // Pie Chart
+        var journalsTypesSummary = (await unitOfWork.Journal
                .GetAll(j => j.CreatedAt.Date.Month == current.Month && j.CreatedAt.Date.Year == current.Year))
                .GroupBy(j => j.Type)
                .Select(j => new { j.Key, total = j.Sum(j => Math.Abs(j.Amount)) })
@@ -189,6 +200,10 @@ public class HomeService : IHomeService
     }
     private async Task<(List<decimal> expenses, List<decimal> revenues, List<string> months)> GetLast12MonthJournalAsync(DateTime current)
     {
+        await using var scope = _scope.CreateAsyncScope();
+
+        var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+
         // Bar Chart 
         var last11Month = current.AddMonths(-11).Date;
         var firstDayInLast11Month = new DateTime(last11Month.Year, last11Month.Month, 1);
@@ -199,7 +214,7 @@ public class HomeService : IHomeService
         List<decimal> revenues = new List<decimal>();
         List<string> months = new List<string>();
 
-        var currentYearJournal = (await _unitOfWork.Journal
+        var currentYearJournal = (await unitOfWork.Journal
                 .GetAll(j => j.CreatedAt.Date >= firstDayInLast11Month.Date && j.CreatedAt.Date <= lastDayOfCurrentMonth.Date && (j.Type == (byte)JournalTypes.Subtract || j.Type == (byte)JournalTypes.Add)))
                 .OrderBy(j => j.CreatedAt);
 
@@ -230,6 +245,21 @@ public class HomeService : IHomeService
 
         return (expenses, revenues, months);
     }
+    private async Task<AccountBalanceDTO> GetDashboardAccountBalance(Account account)
+    {
+        await using var scope = _scope.CreateAsyncScope();
+
+        var accountService = scope.ServiceProvider.GetRequiredService<IAccountService>();
+
+        var balance = await accountService.GetBalance(account.Id);
+
+        return new AccountBalanceDTO
+        {
+            AccountName = account.Name,
+            Balance = balance.ToString("C")
+        };
+    }
+
     private GetHomeDTO GetEmptyHome()
     {
         return new GetHomeDTO

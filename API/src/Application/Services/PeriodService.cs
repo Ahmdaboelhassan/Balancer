@@ -1,8 +1,9 @@
 ﻿using Domain.DTO.Request;
 using Domain.DTO.Response;
+using Domain.Entities;
 using Domain.IRepository;
 using Domain.IServices;
-using Domain.Entities;
+using Domain.Static;
 
 namespace Application.Services;
 internal class PeriodService : IPeriodService
@@ -72,11 +73,14 @@ internal class PeriodService : IPeriodService
         var DTO = new GetPeriodDTO();
         var lastPeriod = await _uow.Periods.GetLastOrderBy(p => p.Id);
 
+        var timeZone = TimeZoneInfo.FindSystemTimeZoneById(MagicStrings.TimeZone);
+        var time = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZone);
+
         var Settings = await _uow.Settings.GetFirst();
         DTO.DaysCount = Settings?.DefaultPeriodDays ?? 7;
-        DTO.From = lastPeriod != null ? lastPeriod.To.AddDays(1) : DateTime.Now;
+        DTO.From = lastPeriod != null ? lastPeriod.To.AddDays(1) : time;
         DTO.To = DTO.From.AddDays(DTO.DaysCount - 1);
-        DTO.Notes = $"New Period In {DateTime.Now.ToShortTimeString()}";
+        DTO.Notes = $"New Period In {time.ToShortTimeString()}";
         return DTO;
     }
     public async Task<GetPeriodDTO> GetById(int id)
@@ -138,13 +142,15 @@ internal class PeriodService : IPeriodService
             return new ConfirmationResponse { IsSucceed = false, Message = "From Date Can Not Be Bigger Than To Date"};
 
         var days = DTO.To.Subtract(DTO.From).TotalDays + 1;
+        var timeZone = TimeZoneInfo.FindSystemTimeZoneById(MagicStrings.TimeZone);
+        var time = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZone);
 
         var newPeriod = new Period
         {
             Name = periodName,
             From = DTO.From,
             To = To,
-            CreatedAt = DateTime.Now,
+            CreatedAt = time,
             DaysCount = (int)days,
             Notes = DTO.Notes,
             PeriodBudget = DTO.PeriodBudget,
@@ -172,10 +178,13 @@ internal class PeriodService : IPeriodService
 
         var periodName = $"Period No. {periodNo} In Month {From.Month} In Year {From.Year}";
 
+        var timeZone = TimeZoneInfo.FindSystemTimeZoneById(MagicStrings.TimeZone);
+        var time = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZone);
+
         period.Name = periodName;
         period.From = DTO.From;
         period.To = DTO.To;
-        period.LastUpdatedAt = DateTime.Now;
+        period.LastUpdatedAt = time;
         period.DaysCount = (int)days;
         period.Notes = DTO.Notes;
         period.PeriodBudget = DTO.PeriodBudget;

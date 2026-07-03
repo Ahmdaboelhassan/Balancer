@@ -5,92 +5,101 @@
     </h1>
     <hr />
   </div>
+  @if (evaluationForm) {
+    <div class="flex flex-wrap gap-3 py-4">
+      @if (evaluationForm.get("createdAt")?.value) {
+        <div
+          class="flex items-center rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-xs md:text-sm text-slate-700"
+        >
+          <i class="fa-solid fa-calendar-plus me-2 text-slate-500"></i>
+          <span class="ms-1">{{ evaluationForm.get("createdAt")?.value }}</span>
+        </div>
+      }
+      @if (evaluationForm.get("lastUpdatedAt")?.value) {
+        <div
+          class="flex items-center rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-xs md:text-sm text-slate-700"
+        >
+          <i class="fa-solid fa-clock-rotate-left me-2 text-slate-500"></i>
+          <span class="ms-1">{{
+            evaluationForm.get("lastUpdatedAt")?.value
+          }}</span>
+        </div>
+      }
+    </div>
+  }
   <div class="py-5">
-    <div class="grid grid-cols-2 gap-7">
-      @if(evaluationForm){
-      <form
-        [formGroup]="evaluationForm"
-        class="grid grid-cols-2 gap-3 col-span-2 lg:col-span-1"
-      >
-        <input type="hidden" formControlName="id" />
-        <div class="form-group col-span-2 lg:col-span-1">
-          <label for="From">From</label>
-          <input
-            formControlName="from"
-            type="date"
-            class="form-control w-full"
-          />
-          <span></span>
-        </div>
-        <div class="form-group col-span-2 lg:col-span-1">
-          <label for="To">To</label>
-          <input formControlName="to" type="date" class="form-control w-full" />
-          <span></span>
-        </div>
-        <div class="form-group col-span-2 lg:col-span-1">
-          <label for="Name">Name</label>
-          <input
-            formControlName="name"
-            type="text"
-            class="form-control w-full"
-          />
-          <span></span>
-        </div>
-        <div class="form-group col-span-2 lg:col-span-1">
-          <label>Income</label>
-          <input
-            formControlName="income"
-            (change)="calculateProfit()"
-            type="number"
-            class="form-control w-full"
-          />
-        </div>
-        <div class="form-group col-span-2 lg:col-span-1">
-          <label>Profit</label>
-          <input
-            formControlName="profit"
-            (change)="calculateProfitPercentage()"
-            type="number"
-            class="form-control w-full"
-          />
-        </div>
-        <div class="form-group col-span-2 lg:col-span-1">
-          <label>Profit Percentage %</label>
-          <input
-            formControlName="profitPercentage"
-            type="number"
-            readonly
-            class="form-control w-full"
-          />
-        </div>
-        @if(isEdit){
-        <div class="form-group col-span-2 lg:col-span-1">
-          <label>Created At</label>
-          <input
-            formControlName="createdAt"
-            type="input"
-            class="form-control w-full"
-          />
-        </div>
-        <div class="form-group col-span-2 lg:col-span-1">
-          <label>Last Updated At</label>
-          <input
-            formControlName="lastUpdatedAt"
-            type="input"
-            class="form-control w-full"
-          />
-        </div>
-        }
-        <div class="form-group col-span-2">
-          <label>Notes</label>
-          <textarea
-            formControlName="note"
-            type="date"
-            class="form-control w-full"
-            dir="auto"
-          ></textarea>
-        </div>
-      </form>
+    <div class="grid grid-cols-2 gap-7 items-start">
+      @if (evaluationForm) {
+        <form
+          [formGroup]="evaluationForm"
+          class="grid grid-cols-2 gap-3 col-span-2 lg:col-span-1"
+        >
+          <input type="hidden" formControlName="id" />
+          <div class="form-group col-span-2 lg:col-span-1">
+            <label for="From">From</label>
+            <input
+              formControlName="from"
+              type="date"
+              class="form-control w-full"
+            />
+            <span></span>
+          </div>
+          <div class="form-group col-span-2 lg:col-span-1">
+            <label for="To">To</label>
+            <input
+              formControlName="to"
+              type="date"
+              class="form-control w-full"
+            />
+            <span></span>
+          </div>
+          <div class="form-group col-span-2 lg:col-span-1">
+            <label for="Name">Name</label>
+            <input
+              formControlName="name"
+              type="text"
+              class="form-control w-full"
+            />
+            <span></span>
+          </div>
+          <div class="form-group col-span-2 lg:col-span-1">
+            <label>Income</label>
+            <input
+              formControlName="income"
+              (change)="calculateProfit()"
+              type="number"
+              class="form-control w-full"
+            />
+          </div>
+          <div class="form-group col-span-2 lg:col-span-1">
+            <label>Profit</label>
+            <input
+              formControlName="profit"
+              (change)="calculateProfitPercentage()"
+              type="number"
+              class="form-control w-full"
+            />
+          </div>
+          <div class="form-group col-span-2 lg:col-span-1">
+            <label>Profit Percentage %</label>
+            <input
+              formControlName="profitPercentage"
+              type="number"
+              readonly
+              class="form-control w-full"
+            />
+          </div>
+          <div class="form-group col-span-2">
+            <label>Notes</label>
+            <textarea
+              formControlName="note"
+              type="date"
+              class="form-control w-full"
+              dir="auto"
+              rows="5"
+            ></textarea>
+          </div>
+        </form>
       }
 
       <div class="col-span-2 lg:col-span-1">
@@ -119,16 +128,15 @@
       Calculate
     </button>
     <a routerLink="/Evaluation/List" class="btn-primary me-2">List</a>
-    @if(isEdit){
-    <button
-      role="button"
-      type="button"
-      (click)="Delete()"
-      class="btn-danger me-2"
-    >
-      Delete
-    </button>
-
+    @if (isEdit) {
+      <button
+        role="button"
+        type="button"
+        (click)="Delete()"
+        class="btn-danger me-2"
+      >
+        Delete
+      </button>
     }
   </div>
 </div>

@@ -4,6 +4,7 @@ using Domain.Entities;
 using Domain.Enums;
 using Domain.IRepository;
 using Domain.IServices;
+using Domain.Static;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 using System.Collections.ObjectModel;
@@ -366,7 +367,10 @@ internal class JournalService : IJournalService
                     await _uow.Periods.ExecuteUpdateAsync(p => p.Id == period.Id, e => e.SetProperty(p => p.TotalAmount, p => p.TotalAmount + journalAmount));
                 }
 
-                period.LastUpdatedAt = DateTime.Now;
+                var timeZone = TimeZoneInfo.FindSystemTimeZoneById(MagicStrings.TimeZone);
+                var time = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZone);
+
+                period.LastUpdatedAt = time;
 
                 await _uow.SaveChangesAync();
 
@@ -380,8 +384,7 @@ internal class JournalService : IJournalService
 
 
 
-                var egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time");
-                var egyptTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptTimeZone);
+          
 
                 var newJournal = new Journal
                 {
@@ -392,7 +395,7 @@ internal class JournalService : IJournalService
                     Amount = journalAmount,
                     Type = (byte)journalType,
                     Description = model.Description,
-                    ActualCreatedAt = egyptTime,
+                    ActualCreatedAt = time,
                 };
 
                 newJournal.JournalDetails = new Collection<JournalDetail>
@@ -486,7 +489,7 @@ internal class JournalService : IJournalService
                 period.LastUpdatedAt = DateTime.Now;
 
 
-                var egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time");
+                var egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById(MagicStrings.TimeZone);
                 var egyptTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptTimeZone);
 
                 journal.PeriodId = model.PeriodId;

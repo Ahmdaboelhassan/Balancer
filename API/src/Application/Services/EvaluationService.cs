@@ -2,6 +2,7 @@
 using Domain.DTO.Response;
 using Domain.Entities;
 using Domain.IRepository;
+using Domain.Static;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using System;
 
@@ -78,7 +79,7 @@ namespace Application.Services
                 To = eva.To.ToShortDateString(),
                 Income = eva.Income,
                 Name = eva.Name,
-                LastUpdatedAt = eva.LastUpdatedAt.ToString("g"),
+                LastUpdatedAt = eva.LastUpdatedAt?.ToString("g"),
                 CreatedAt = eva.CreatedAt.ToString("g"),
                 Note = eva.Note,
                 Profit = eva.Profit,
@@ -150,6 +151,7 @@ namespace Application.Services
                     From = from.ToShortDateString(),
                     To = to.ToShortDateString(),
                     Income = DTO.Income,
+                    CreatedAt = DTO.CreatedAt,
                     Name = DTO.Name,
                     LastUpdatedAt = DateTime.Now.ToString("g"),
                     Note = DTO.Note,
@@ -183,13 +185,15 @@ namespace Application.Services
             if (DTO.Income <= 0)
                 return new ConfirmationResponse { IsSucceed = false, Message = "Income Should Be Grater Than Zero" };
 
+            var timeZone = TimeZoneInfo.FindSystemTimeZoneById(MagicStrings.TimeZone);
+            var time = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZone);
+
             var newEvaluation = new Evaluation
             {
                 Name = DTO.Name,
                 From = from,
                 To = to,
-                CreatedAt = DateTime.Now,
-                LastUpdatedAt = DateTime.Now,
+                CreatedAt = time,
                 Income = DTO.Income,
                 Profit = DTO.Profit,
                 Note = DTO.Note,
@@ -236,10 +240,13 @@ namespace Application.Services
             if (DTO.Income <= 0)
                 return new ConfirmationResponse { IsSucceed = false, Message = "Income Should Be Grater Than Zero" };
 
+            var timeZone = TimeZoneInfo.FindSystemTimeZoneById(MagicStrings.TimeZone);
+            var time = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZone);
+
             evaluation.Name = DTO.Name;
             evaluation.From = from;
             evaluation.To = to;
-            evaluation.LastUpdatedAt = DateTime.Now;
+            evaluation.LastUpdatedAt = time;
             evaluation.Income = DTO.Income;
             evaluation.Profit = DTO.Profit;
             evaluation.Note = DTO.Note;

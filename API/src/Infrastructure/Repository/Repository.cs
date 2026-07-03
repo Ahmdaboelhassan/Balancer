@@ -144,14 +144,22 @@ public class Repository<T> : IRepository<T> where T : class
 
         return await _set.AnyAsync(criteria);
     }
+
+    public Task<decimal> Sum(Expression<Func<T, bool>> criteria, Expression<Func<T, decimal>> selector)
+    {
+        return _set.Where(criteria).SumAsync(selector);
+    }
+
+    public Task<int> Sum( Expression<Func<T, bool>> criteria, Expression<Func<T, int>> selector)
+    {
+        return _set.Where(criteria).SumAsync(selector);
+    }
+
     public Task<int> Count(Expression<Func<T, bool>> criteria)
     {
         return _set.CountAsync(criteria);
     }
-    public Task<decimal> Sum(Expression<Func<T, decimal>> criteria)
-    {
-        return _set.SumAsync(criteria);
-    }
+
     // Commands
     public async Task AddAsync(T element)
     {

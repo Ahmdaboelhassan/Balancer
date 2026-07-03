@@ -22,7 +22,8 @@ public interface IRepository<T>
     IQueryable<T> AsQueryable();
     Task<bool> Exists(Expression<Func<T, bool>>? criteria = null);
     Task<int> Count(Expression<Func<T, bool>> criteria);
-    Task<decimal> Sum(Expression<Func<T, decimal>> criteria);
+    Task<int> Sum(Expression<Func<T, bool>> criteria, Expression<Func<T, int>> selector);
+    Task<decimal> Sum(Expression<Func<T, bool>> criteria, Expression<Func<T, decimal>> selector);
 
     // Command
     void Add(T element);

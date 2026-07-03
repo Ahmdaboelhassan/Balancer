@@ -15,7 +15,7 @@ namespace Domain.Entities
         public decimal Income { get; set; }
         public int userId { get; set; }
         public string? Note { get; set; }
-        public DateTime LastUpdatedAt { get; set; }
+        public DateTime? LastUpdatedAt { get; set; }
         public DateTime CreatedAt { get; set; }
         public ICollection<EvaluationDetail> EvaluationDetails { get; set; }
 

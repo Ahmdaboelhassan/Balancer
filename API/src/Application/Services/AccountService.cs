@@ -195,32 +195,33 @@ public class AccountService : IAccountService
     public async Task<decimal> GetBalance(int accId)
     {
         var account = await _uow.Accounts.Get(accId);
-        if (account == null)
-            return 0;
+        if (account == null) return 0;
 
-        var journals = await _uow.JournalDetail.SelectAll(d => d.Account.Number.StartsWith(account.Number), d => d.Debit - d.Credit);
+        var balance = await _uow
+            .JournalDetail
+            .Sum(d => d.Account.Number.StartsWith(account.Number)
+            , d => d.Debit - d.Credit);
 
-        return journals.Sum();
-
+        return balance;
     }
+
     public async Task<AccountBalanceDTO> GetBalanceBasedOnType(int accId, DateTime from, DateTime to, int? costCenterId)
     {
         var account = await _uow.Accounts.Get(accId);
-        var settigns = await _uow.Settings.GetFirst();
-        if (account is null || settigns is null)
+        var settings = await _uow.Settings.GetFirst();
+        if (account is null || settings is null)
             return new AccountBalanceDTO ();
 
-        var RevExpNumbers = await _uow.Accounts.SelectAll(a => a.Id == settigns.RevenueAccount || a.Id == settigns.ExpensesAccount, a => a.Number);
+        var RevExpNumbers = await _uow.Accounts.SelectAll(a => a.Id == settings.RevenueAccount || a.Id == settings.ExpensesAccount, a => a.Number);
 
         var isRevOrExp = RevExpNumbers.Any(n => account.Number.StartsWith(n));
         
-        var journals = await _uow.JournalDetail
-                   .SelectAll(d => d.Account.Number.StartsWith(account.Number)
+        var amount = await _uow.JournalDetail
+                   .Sum(d => d.Account.Number.StartsWith(account.Number)
                     && (!isRevOrExp || d.Journal.CreatedAt.Date >= from && d.Journal.CreatedAt.Date <= to)
                     && (!costCenterId.HasValue || d.CostCenters.Any(d => d.CostCenterId == costCenterId)),
                     d => d.Debit - d.Credit);
 
-        var amount = journals.Sum();
         return new AccountBalanceDTO
         {
             AccountId = accId,
@@ -235,6 +236,7 @@ public class AccountService : IAccountService
     {
         if (account is null) return 0;
 
-        return (await _uow.JournalDetail.SelectAll(d => d.Account.Number.StartsWith(account.Number), d => d.Debit - d.Credit)).Sum();
+        return await _uow.JournalDetail
+            .Sum(d => d.Account.Number.StartsWith(account.Number), d => d.Debit - d.Credit);
     }
 }

@@ -40,7 +40,7 @@ export class CreateEvaluationComponent implements OnInit {
     private titleService: Title,
     private route: ActivatedRoute,
     private router: Router,
-    private fb: FormBuilder
+    private fb: FormBuilder,
   ) {}
 
   ngOnInit(): void {
@@ -88,8 +88,8 @@ export class CreateEvaluationComponent implements OnInit {
       profitPercentage: [evaluation.profitPercentage],
       income: [evaluation.income, [Validators.required, Validators.min(1)]],
       note: [evaluation.note],
-      lastUpdatedAt: [{ value: evaluation.lastUpdatedAt, disabled: true }],
-      createdAt: [{ value: evaluation.createdAt, disabled: true }],
+      lastUpdatedAt: [evaluation.lastUpdatedAt],
+      createdAt: [evaluation.createdAt],
     });
   }
 
@@ -118,7 +118,7 @@ export class CreateEvaluationComponent implements OnInit {
             },
             formatter: (cell) => {
               const account = this.accounts.find(
-                (a) => a.id === cell.getValue()
+                (a) => a.id === cell.getValue(),
               );
               return account ? account.name : '';
             },
@@ -217,7 +217,7 @@ export class CreateEvaluationComponent implements OnInit {
             },
           },
         ],
-      }
+      },
     );
   }
 
@@ -322,13 +322,14 @@ export class CreateEvaluationComponent implements OnInit {
 
   CalualateDetails() {
     const formValue = this.evaluationForm.value;
-
+    console.log(formValue.createdAt);
     const createModel: Evaluation = {
       id: formValue.id,
       from: formValue.from,
       to: formValue.to,
       note: formValue.note,
       name: formValue.name,
+      createdAt: formValue.createdAt,
       profit: formValue.profit,
       profitPercentage: formValue.profitPercentage,
       income: formValue.income,
