@@ -565,7 +565,8 @@ internal class JournalService : IJournalService
 
                 // Delete Cost Center Details
                 await _uow.JournalDetailCostCenters.ExecuteUpdateAsync(d => d.JournalDetail.Journal.Id == id, e => e.SetProperty(d => d.IsDeleted, true));
-                
+                await _uow.SaveChangesAync();
+
                 await _uow.JournalDetail.ExecuteUpdateAsync(d => d.JournalId == journal.Id, e => e.SetProperty(d => d.IsDeleted, true));
 
                 await _uow.SaveChangesAync();
