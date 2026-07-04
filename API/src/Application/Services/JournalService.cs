@@ -561,18 +561,19 @@ internal class JournalService : IJournalService
                 journal.IsDeleted = true;
 
                 _uow.Journal.Update(journal);
+                await _uow.SaveChangesAync();
 
                 // Delete Cost Center Details
                 var journalDetailIds = journal.JournalDetails.Select(d => d.Id).ToList();
             
                 await _uow.JournalDetailCostCenters.ExecuteUpdateAsync(d => journalDetailIds.Contains(d.JournalDetailId), e => e.SetProperty(d => d.IsDeleted, true));
+                await _uow.SaveChangesAync();
 
-                await _uow.JournalDetail.ExecuteUpdateAsync(d => d.JournalId == journal.Id, e => e.SetProperty(d => d.IsDeleted, true));
+                await _uow.JournalDetail.ExecuteUpdateAsync(d => d.JournalId == journal.Id, e => e.SetProperty(d => d.IsDeleted, true))
+                await _uow.SaveChangesAync();
 
                 if (journal.Type == (byte)JournalTypes.Add || journal.Type == (byte)JournalTypes.Subtract)
                     await ResetPeriodValueBeforeJournal(journal.PeriodId, journal.Amount);
-
-                await _uow.SaveChangesAync();
 
                 transaction.Commit();
                return new ConfirmationResponse { Message = "Journal Deleted Successfully", IsSucceed = true };
