@@ -634,8 +634,7 @@ internal class JournalService : IJournalService
 
         var basicAccounts = new int[]
         {
-            setting.DrawersAccount.GetValueOrDefault(),
-            setting.BanksAccount.GetValueOrDefault(),
+            setting.CurrentCashAccount.GetValueOrDefault(),
             setting.LiabilitiesAccount.GetValueOrDefault(),
             setting.InvestmentAccount.GetValueOrDefault()
         };
@@ -647,22 +646,22 @@ internal class JournalService : IJournalService
         if (accounts.Count() != basicAccounts.Count()) // All Accounts Exists
               throw new InvalidDataException("There Are No Drawer, Banks Or Liabilities Accounts !");
 
-        Predicate<string> IsDrawerOrBank = (accountNumber) => accountNumber.StartsWith(dict[setting.DrawersAccount.GetValueOrDefault()]) || accountNumber.StartsWith(dict[setting.BanksAccount.GetValueOrDefault()]);
+        Predicate<string> IsCurrentCash = (accountNumber) => accountNumber.StartsWith(dict[setting.CurrentCashAccount.GetValueOrDefault()]);
 
         if (creditNumber.StartsWith(dict[setting.LiabilitiesAccount.GetValueOrDefault()]))
         {
-            journalType = IsDrawerOrBank(debitNumber) ? JournalTypes.Add : JournalTypes.Due;
+            journalType = IsCurrentCash(debitNumber) ? JournalTypes.Add : JournalTypes.Due;
 
         }
         else if (debitNumber.StartsWith(dict[setting.InvestmentAccount.GetValueOrDefault()]))
         {
             journalType = JournalTypes.Investment;
         }
-        else if (IsDrawerOrBank(creditNumber))
+        else if (IsCurrentCash(creditNumber))
         {
-            journalType = IsDrawerOrBank(debitNumber) ? JournalTypes.Forward : JournalTypes.Subtract;
+            journalType = IsCurrentCash(debitNumber) ? JournalTypes.Forward : JournalTypes.Subtract;
         }
-        else if (IsDrawerOrBank(debitNumber))
+        else if (IsCurrentCash(debitNumber))
         {
             journalType = JournalTypes.Add;
         }
