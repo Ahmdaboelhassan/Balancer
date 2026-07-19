@@ -125,22 +125,17 @@ public class ReportService : IReportService
         var settings = await _uow.Settings.GetFirst();
         var costCenter = await _uow.CostCenter.Get(costCenterId.GetValueOrDefault());
 
-        if (costCenter is null || settings is null || !settings.BanksAccount.HasValue || !settings.DrawersAccount.HasValue)
+        if (costCenter is null || settings is null || !settings.CurrentCashAccount.HasValue)
             return GetEmptyAccountStatement();
 
-        var banksAndSafes = (await _uow.Accounts
-            .GetAll(d => d.Id == settings.BanksAccount.GetValueOrDefault() || d.Id == settings.DrawersAccount.GetValueOrDefault()))
-            .ToDictionary(d => d.Id, d => d.Number);
+        var currentCashAccount = await _uow.Accounts.Get(settings.CurrentCashAccount.GetValueOrDefault());
 
-        var bankNumber = banksAndSafes[settings.BanksAccount.Value];
-        var drawerNumber = banksAndSafes[settings.DrawersAccount.Value];
-
-        if (string.IsNullOrEmpty(bankNumber) || string.IsNullOrEmpty(drawerNumber))
+        if (currentCashAccount is null)
             return GetEmptyAccountStatement();
 
         var journals = await _uow.JournalDetail
                    .SelectAllOrderBy(d =>
-                     (d.CostCenters.Any(cc => cc.CostCenterId == costCenterId) && !d.Account.Number.StartsWith(bankNumber) && !d.Account.Number.StartsWith(drawerNumber))
+                     (d.CostCenters.Any(cc => cc.CostCenterId == costCenterId) && !d.Account.Number.StartsWith(currentCashAccount.Number))
                      && (!from.HasValue || d.Journal.CreatedAt.Date >= from.Value.Date)
                      && (!to.HasValue || d.Journal.CreatedAt.Date <= to.Value.Date),
                         j => new
@@ -161,8 +156,7 @@ public class ReportService : IReportService
         {
             var openingJournals = await _uow.JournalDetail.AsQueryable()
                 .Where(d => d.CostCenters.Any(cc => cc.CostCenterId == costCenterId)
-                    && !d.Account.Number.StartsWith(bankNumber)
-                    && !d.Account.Number.StartsWith(drawerNumber)
+                    && !d.Account.Number.StartsWith(currentCashAccount.Number)
                     && d.Journal.CreatedAt < from.Value.Date)
                 .GroupBy(_ => 1)
                 .Select(g => new
