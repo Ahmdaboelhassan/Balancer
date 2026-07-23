@@ -151,20 +151,31 @@
                 >
               </li>
               <li>
-                <a
+               <a
                   routerLink="Account/List"
                   [queryParams]="{ archive: true }"
                   routerLinkActive="route-active"
-                  class="p-2 inline-block hover:text-slate-950"
-                >
-                  Archive</a
-                >
+                  [routerLinkActiveOptions]="{
+                    paths: 'exact',
+                    queryParams: 'exact',
+                    fragment: 'ignored',
+                    matrixParams: 'ignored'
+                  }"
+                  class="p-2 inline-block hover:text-slate-950">
+                  Archive
+              </a>
               </li>
               <li>
                 <a
                   routerLink="Account/List"
                   routerLinkActive="route-active"
                   class="p-2 inline-block hover:text-slate-950"
+                  [routerLinkActiveOptions]="{
+                    paths: 'exact',
+                    queryParams: 'exact',
+                    fragment: 'ignored',
+                    matrixParams: 'ignored'
+                  }"
                 >
                   List</a
                 >
@@ -205,6 +216,12 @@
                   [queryParams]="{ archive: true }"
                   routerLinkActive="route-active"
                   class="p-2 inline-block hover:text-slate-950"
+                  [routerLinkActiveOptions]="{
+                    paths: 'exact',
+                    queryParams: 'exact',
+                    fragment: 'ignored',
+                    matrixParams: 'ignored'
+                  }"
                 >
                   Archive</a
                 >
@@ -214,6 +231,12 @@
                   routerLink="CostCenter/List"
                   routerLinkActive="route-active"
                   class="p-2 inline-block hover:text-slate-950"
+                  [routerLinkActiveOptions]="{
+                    paths: 'exact',
+                    queryParams: 'exact',
+                    fragment: 'ignored',
+                    matrixParams: 'ignored'
+                  }"
                 >
                   List</a
                 >

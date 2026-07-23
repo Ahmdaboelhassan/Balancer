@@ -6,12 +6,12 @@ import {
   BudgetSummaryDTO,
   BudgetSummaryReportDTO,
 } from '../../Interfaces/Response/BudgetSummaryReportDTO';
-import { CurrencyPipe, DecimalPipe } from '@angular/common';
+import { CurrencyPipe, DecimalPipe, NgClass } from '@angular/common';
 import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-budget-summary',
-  imports: [DateRangeComponent, CurrencyPipe, DecimalPipe, RouterLink],
+  imports: [DateRangeComponent, CurrencyPipe, DecimalPipe, RouterLink, NgClass],
   templateUrl: './budget-summary.component.html',
   styleUrl: './budget-summary.component.css',
 })

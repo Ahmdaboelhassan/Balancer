@@ -133,6 +133,9 @@ export class HomeComponent implements OnInit {
           ],
           borderColor: '#fff',
           borderWidth: 2,
+          hoverOffset: 4,
+          responsive: true,
+    
         },
       ],
     });

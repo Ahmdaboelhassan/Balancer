@@ -335,7 +335,7 @@ public class ReportService : IReportService
         periodSummaries.Add(new BudgetSummaryDTO
         {
             Id = 0,
-            Name = "Total",
+            Name = "",
             Spent = totalPeriodSpent,
             Budget = totalPeriodBudget,
             Remains = totalPeriodRemaining,
@@ -443,7 +443,7 @@ public class ReportService : IReportService
         expensesAccounts.Add(new BudgetSummaryDTO
         {
             Id = 0,
-            Name = "Total",
+            Name = "",
             Spent = totalAccountsSpent,
             Budget = totalAccountsBudget,
             Remains = totalAccountsRemaining,

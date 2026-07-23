@@ -20,7 +20,8 @@ namespace Application.Mappers
                 AccountId = entity.AccountId,
                 Budget = entity.Budget,
                 Color = entity.Color,
-                DisplayName = entity.DisplayName
+                DisplayName = entity.DisplayName,
+                Notes = entity.Notes
             };
         }
 
@@ -39,7 +40,8 @@ namespace Application.Mappers
                 AccountId = dto.AccountId,
                 Budget = dto.Budget,
                 Color = dto.Color,
-                DisplayName = dto.DisplayName
+                DisplayName = dto.DisplayName,
+                Notes = dto.Notes
             };
         }
 
