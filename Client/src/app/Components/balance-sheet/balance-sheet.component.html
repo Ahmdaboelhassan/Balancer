@@ -5,6 +5,7 @@
   [hideFromDate]="true"
   [maxLevel]="9"
 ></app-date-range>
+
 <div class="daterange-result bg-white mt-4 rounded-xl overflow-auto">
   <table class="w-full text-sm text-left rtl:text-right text-gray-500">
     <tr class="text-xs text-white uppercase bg-slate-800">
@@ -38,8 +39,12 @@
               </a>
             </th>
             <td class="px-8 py-4 font-bold">{{ account.accountNumber }}</td>
-            <td class="px-8 py-4 font-bold">{{ account.debit | currency }}</td>
-            <td class="px-8 py-4 font-bold">{{ account.credit | currency }}</td>
+            <td class="px-8 py-4 font-bold cursor-pointer hover:scale-105 transition-all duration-200" (click)="ShowRates(account.debit)">
+              {{ account.debit | currency }}
+            </td>
+            <td class="px-8 py-4 font-bold cursor-pointer hover:scale-105 transition-all duration-200" (click)="ShowRates(account.credit)">
+              {{ account.credit | currency }}
+            </td>
           </tr>
         }
       </tbody>

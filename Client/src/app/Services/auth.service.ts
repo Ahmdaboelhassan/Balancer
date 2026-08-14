@@ -85,7 +85,7 @@ export class AuthService {
   }
 
   isPublicEndpoint(route: string): boolean {
-    const publicEndpoints = ['/Login', '/RefreshToken', '/Refresh', '/public'];
+    const publicEndpoints = ['/Login', '/RefreshToken', '/Refresh', '/public', 'api.gold-api.com/price', 'api.frankfurter.dev/v2'];
     return publicEndpoints.some((endpoint) => route.includes(endpoint));
   }
 
