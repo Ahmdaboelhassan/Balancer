@@ -28,6 +28,7 @@ export class BalanceSheetComponent {
   ) {
     this.titleServive.setTitle('Balance Sheet');
 
+    this.loadingService.DisableLoading();
     this.ratesService.getRates().subscribe({
       next: (rates) => { this.rates = rates; }
     });
@@ -41,9 +42,14 @@ export class BalanceSheetComponent {
     this.to = dates.to;
     
     this.loadingService.LoadingStarted();
+
     this.reportService.GetBalanceSheet(dates.to, dates.maxLevel)
       .subscribe({
-        next: (accounts) => { this.accounts = accounts; }
+        next: (accounts) => { this.accounts = accounts; },
+        complete : () => {
+            this.loadingService.LoadingFinsihed();
+            this.loadingService.EnableLoading();
+        }
       });
   }
 
@@ -61,7 +67,7 @@ export class BalanceSheetComponent {
       { label: 'Gold 20K (gram)', rate: this.rates.gold20EgpPerGram, value: amount / this.rates.gold20EgpPerGram },
       { label: 'Gold 18K (gram)', rate: this.rates.gold18EgpPerGram, value: amount / this.rates.gold18EgpPerGram },
       { label: 'Silver (gram)', rate: this.rates.silverEgpPerGram, value: amount / this.rates.silverEgpPerGram },
-      { label: 'BTC', rate: this.rates.btcEgp, value: amount / this.rates.btcEgp },
+      // { label: 'BTC', rate: this.rates.btcEgp, value: amount / this.rates.btcEgp },
     ];
 
     Swal.fire({
@@ -77,8 +83,7 @@ export class BalanceSheetComponent {
                   (row) => `
                   <tr class="border-b text-end">
                     <td class="py-2 px-4 border-r font-semibold text-start bg-gray-100">${row.label}</td>
-                    <td class="px-2 py-2 border-r text-start">${row.rate.toLocaleString('en-US', { maximumFractionDigits: 2 })}</td>
-                    <td class="px-2 py-2 font-semibold text-start">${row.value.toLocaleString('en-US', { maximumFractionDigits: 6 })}</td>
+                    <td class="px-2 py-2 font-semibold text-start">${row.value.toLocaleString('en-US', { maximumFractionDigits: 2 })}</td>
                   </tr>`
                 )
                 .join('')}

@@ -229,9 +229,11 @@ public class AccountService : IAccountService
             Balance = amount.ToString("c"),
             IsRevExp = isRevOrExp,
             IsCredit = amount < 0,
+            AccountDescreption = account.Description,
+            LastJournal = await _uow.Accounts.GetLastAccountJournal(accId, costCenterId),
         };
-
     }
+
     public async Task<decimal> GetBalance(Account account)
     {
         if (account is null) return 0;

@@ -8,12 +8,14 @@ export class LoadingService {
   private isDisabled = false;
 
   LoadingStarted() {
-    if (!this.isDisabled) {
-      this.isLoad.set(true);
-    }
+    this.isLoad.set(true);
   }
   LoadingFinsihed() {
-    this.isLoad.set(false);
+     this.isLoad.set(false);
+  }
+  
+  IsDisabled() {
+    return this.isDisabled;
   }
   DisableLoading() {
     this.isDisabled = true;

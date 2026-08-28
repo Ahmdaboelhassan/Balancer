@@ -7,5 +7,6 @@ public class JournalDetailRepo : Repository<JournalDetail>, IJournalDetailRepo
 {
     public JournalDetailRepo(AppDbContext context) : base(context)
     {
+        
     }
 }
