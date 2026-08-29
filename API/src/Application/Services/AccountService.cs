@@ -215,7 +215,9 @@ public class AccountService : IAccountService
         var RevExpNumbers = await _uow.Accounts.SelectAll(a => a.Id == settings.RevenueAccount || a.Id == settings.ExpensesAccount, a => a.Number);
 
         var isRevOrExp = RevExpNumbers.Any(n => account.Number.StartsWith(n));
-        
+
+        costCenterId = isRevOrExp ? costCenterId : null;
+
         var amount = await _uow.JournalDetail
                    .Sum(d => d.Account.Number.StartsWith(account.Number)
                     && (!isRevOrExp || d.Journal.CreatedAt.Date >= from && d.Journal.CreatedAt.Date <= to)

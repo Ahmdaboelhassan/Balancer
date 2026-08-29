@@ -14,7 +14,7 @@ public class AccountRepo : Repository<Account>, IAccountRepo
     {
        return _context.JournalDetails
             .Where(d => d.AccountId == accountId && (!costcenterId.HasValue || d.CostCenters.Any(cc => cc.CostCenterId == costcenterId.Value)))
-            .OrderByDescending(d => d.Id)
+            .OrderByDescending(d => d.Journal.Id)
             .Select(d => new LastAccountJournal
             {
                 JournalId = d.JournalId,
