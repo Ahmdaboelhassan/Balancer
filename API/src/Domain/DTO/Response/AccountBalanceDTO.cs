@@ -21,5 +21,6 @@ public class LastAccountJournal
     public string? DebitAccount { get; set; }
     public string? CreditAccount { get; set; }
     public DateTime JournalDate { get; set; }
+    public IEnumerable<string>? CostCenters { get; set; }
 }
 

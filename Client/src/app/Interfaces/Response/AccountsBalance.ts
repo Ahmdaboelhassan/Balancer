@@ -16,4 +16,5 @@ export interface LastAccountJournal {
   debitAccount?: string;
   creditAccount?: string;
   journalDate: string;
+  costCenters?: string[];
 }

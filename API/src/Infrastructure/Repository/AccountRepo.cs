@@ -31,7 +31,11 @@ public class AccountRepo : Repository<Account>, IAccountRepo
                 CreditAccount = d.Journal.JournalDetails
                     .Where(d => d.Credit > 0)
                     .Select(d => d.Account.Name)
-                    .FirstOrDefault()
+                    .FirstOrDefault(),
+
+                CostCenters = d.CostCenters
+                        .Select(s => s.CostCenter.Name)
+
             }).FirstOrDefaultAsync();
     }
 }

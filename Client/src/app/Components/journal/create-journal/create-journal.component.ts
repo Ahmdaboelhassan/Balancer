@@ -470,6 +470,26 @@ export class CreateJournalComponent {
           <div style="font-size:0.72rem; color:#94a3b8;">
             ${new Date(lastJournal.journalDate).toLocaleString()}
           </div>
+          ${
+            lastJournal.costCenters?.length
+              ? `<div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:8px;">
+                  ${lastJournal.costCenters
+                    .map(
+                      (costCenter) => `<span style="
+                        display:inline-flex;
+                        align-items:center;
+                        border-radius:12px;
+                        background:#cbd5e1;
+                        color:#334155;
+                        padding:2px 10px;
+                        font-size:0.7rem;
+                        font-weight:500;
+                      ">${costCenter}</span>`,
+                    )
+                    .join('')}
+                </div>`
+              : ''
+          }
         </a>
       `
       : '';

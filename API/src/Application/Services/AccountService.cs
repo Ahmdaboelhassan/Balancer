@@ -216,12 +216,10 @@ public class AccountService : IAccountService
 
         var isRevOrExp = RevExpNumbers.Any(n => account.Number.StartsWith(n));
 
-        costCenterId = isRevOrExp ? costCenterId : null;
-
         var amount = await _uow.JournalDetail
                    .Sum(d => d.Account.Number.StartsWith(account.Number)
-                    && (!isRevOrExp || d.Journal.CreatedAt.Date >= from && d.Journal.CreatedAt.Date <= to)
-                    && (!costCenterId.HasValue || d.CostCenters.Any(d => d.CostCenterId == costCenterId)),
+                    && (!isRevOrExp || (d.Journal.CreatedAt.Date >= from && d.Journal.CreatedAt.Date <= to))
+                    && (!isRevOrExp || !costCenterId.HasValue || d.CostCenters.Any(d => d.CostCenterId == costCenterId)),
                     d => d.Debit - d.Credit);
 
         return new AccountBalanceDTO
