@@ -8,4 +8,5 @@ export interface PeriodListItem {
   maxPages: number;
   periodBudget: number;
   remains: number;
+  isCurrent: boolean;
 }

@@ -21,6 +21,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { environment } from '../../../../environments/environment';
 import { AccountsBalance } from '../../../Interfaces/Response/AccountsBalance';
+import { QuillEditorComponent, QuillModules } from 'ngx-quill';
 
 @Component({
   imports: [
@@ -31,6 +32,7 @@ import { AccountsBalance } from '../../../Interfaces/Response/AccountsBalance';
     BidiModule,
     MatFormFieldModule,
     MatSelectModule,
+    QuillEditorComponent,
   ],
   templateUrl: './create-journal.component.html',
   styleUrl: './create-journal.component.css',
@@ -48,6 +50,18 @@ export class CreateJournalComponent {
     3: 'fa-solid fa-thumbtack text-blue-400',
     4: 'fa-solid fa-reply fa-flip-horizontal text-orange-400',
     5: 'fa-solid fa-wallet text-purple-400',
+  };
+  editorModules: QuillModules = {
+    toolbar: [
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ color: [] }],
+      [{ script: 'sub' }, { script: 'super' }],
+      [{ list: 'ordered' }, { list: 'bullet' }, { list: 'check' }],
+      [{ indent: '-1' }, { indent: '+1' }],
+      [{ direction: 'rtl' }, { align: [] }],
+      ['link', 'image'],
+      ['clean'],
+    ],
   };
 
   constructor(
@@ -325,7 +339,7 @@ export class CreateJournalComponent {
     const account = isDebit ? 'debit' : 'credit';
 
     const accountId = this.JournalForm.get(account)?.value;
-    const costCenterId = this.JournalForm.get("costCentersIds")?.value[0] || '';
+    const costCenterId = this.JournalForm.get('costCentersIds')?.value[0] || '';
 
     if (!accountId) {
       Swal.fire({
@@ -458,7 +472,7 @@ export class CreateJournalComponent {
               ${lastJournal.name ?? '-'}
             </span>
             <span style="color:#334155; font-weight:700; font-size:1.5rem; white-space:nowrap;">
-             ${ lastJournal.amount != null ? lastJournal.amount : '' }
+             ${lastJournal.amount != null ? lastJournal.amount : ''}
              <i class="${this.iconMap[lastJournal.type] ?? ''}"></i>
             </span>
           </div>

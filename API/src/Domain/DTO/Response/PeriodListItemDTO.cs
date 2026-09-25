@@ -9,5 +9,6 @@ public class PeriodListItemDTO
     public decimal TotalAmount { get; set; }
     public decimal? PeriodBudget { get; set; }
     public decimal? Remains { get; set; }
+    public bool IsCurrent { get; set; }
     public int MaxPages { get; set; }
 }

@@ -24,6 +24,7 @@ internal class PeriodService : IPeriodService
             From = sp.From.ToShortDateString(),
             To = sp.To.ToShortDateString(),
             TotalAmount = sp.TotalAmount,
+            IsCurrent = sp.IsCurrent,
             PeriodBudget = sp.PeriodBudget,
             Remains = sp.PeriodBudget.HasValue ? (sp.PeriodBudget > 0 ? sp.TotalAmount - sp.PeriodBudget : Math.Abs(sp.PeriodBudget.Value) - Math.Abs(sp.TotalAmount)) : null,
             IncreasedBalance = sp.TotalAmount >= 0,
@@ -41,6 +42,7 @@ internal class PeriodService : IPeriodService
               Name = sp.Name,
               From = sp.From.ToShortDateString(),
               To = sp.To.ToShortDateString(),
+              IsCurrent = sp.IsCurrent,
               TotalAmount = sp.TotalAmount,
               IncreasedBalance = sp.TotalAmount >= 0,
               PeriodBudget = sp.PeriodBudget,
@@ -56,6 +58,7 @@ internal class PeriodService : IPeriodService
             Name = sp.Name,
             From = sp.From.ToShortDateString(),
             To = sp.To.ToShortDateString(),
+            IsCurrent = sp.IsCurrent,
             TotalAmount = sp.TotalAmount,
             IncreasedBalance = sp.TotalAmount >= 0,
             PeriodBudget = sp.PeriodBudget,
@@ -81,6 +84,8 @@ internal class PeriodService : IPeriodService
         DTO.From = lastPeriod != null ? lastPeriod.To.AddDays(1) : time;
         DTO.To = DTO.From.AddDays(DTO.DaysCount - 1);
         DTO.Notes = $"New Period In {time.ToShortTimeString()}";
+        DTO.IsCurrent = true;
+
         return DTO;
     }
     public async Task<GetPeriodDTO> GetById(int id)
@@ -103,6 +108,7 @@ internal class PeriodService : IPeriodService
             TotalAmount = period.TotalAmount,
             LastUpdatedAt = period.LastUpdatedAt?.ToString("F") ?? "",
             PeriodBudget = period.PeriodBudget,
+            IsCurrent = period.IsCurrent
         };
 
         return periodDto;
@@ -125,6 +131,7 @@ internal class PeriodService : IPeriodService
             TotalAmount = lastPeriod.TotalAmount,
             LastUpdatedAt = lastPeriod.LastUpdatedAt?.ToString("F") ?? "",
             PeriodBudget = lastPeriod.PeriodBudget,
+            IsCurrent = lastPeriod.IsCurrent
         };
 
         return lastPeriodDto;

@@ -81,7 +81,10 @@ export class CreatePeriodComponent implements OnInit {
         disabled: true,
       }),
       daysCount: new FormControl(this.period?.daysCount),
-      isCurrent: new FormControl(this.period?.isCurrent ?? false),
+      isCurrent: new FormControl({
+        value: this.period?.isCurrent ?? false,
+        disabled: this.isEdit && this.period?.isCurrent === true,
+      }),
       periodBudget: new FormControl(this.period?.periodBudget),
       notes: new FormControl(this.period.notes),
     });
@@ -95,7 +98,7 @@ export class CreatePeriodComponent implements OnInit {
   }
 
   Submit() {
-    const formValue = this.periodForm.value;
+    const formValue = this.periodForm.getRawValue();
     const createModel: CreatePeriod = {
       id: formValue.id,
       from: formValue.from,

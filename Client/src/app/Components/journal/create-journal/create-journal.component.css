@@ -1,0 +1,21 @@
+
+quill-editor {
+  display: block;
+}
+::ng-deep quill-editor .ql-toolbar.ql-snow {
+  border-radius: 0.5rem 0.5rem 0 0;
+  border-color: #e2e8f0;
+  background: #f8fafc;
+}
+::ng-deep quill-editor .ql-container.ql-snow {
+  border-radius: 0 0 0.5rem 0.5rem;
+  border-color: #e2e8f0;
+  font-size: 0.95rem;
+  height: 150px;
+  resize: vertical;
+  overflow: auto;
+}
+::ng-deep quill-editor .ql-editor img {
+  max-width: 100%;
+  height: auto;
+}

@@ -169,14 +169,15 @@
 
           <div class="col-span-12">
             <label for="descroption"> Description </label>
-            <textarea
-              class="form-control w-full resize-none"
+            <quill-editor
+              class="w-full"
               formControlName="description"
+              format="html"
+              theme="snow"
+              [modules]="editorModules"
               placeholder="Describe What This Transaction For..."
-              rows="4"
-              style="resize: vertical"
-              dir="auto"
-            ></textarea>
+              [styles]="{ minHeight: '150px' }"
+            ></quill-editor>
           </div>
         </div>
         <div
