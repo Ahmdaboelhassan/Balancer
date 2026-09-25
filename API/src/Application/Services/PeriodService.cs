@@ -194,6 +194,9 @@ internal class PeriodService : IPeriodService
         var timeZone = TimeZoneInfo.FindSystemTimeZoneById(MagicStrings.TimeZone);
         var time = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZone);
 
+        if (period.IsCurrent && !DTO.IsCurrent)
+            return new ConfirmationResponse { IsSucceed = false, Message = "You Can Not Change Current Period To Not Current!" };
+
         if (period.IsCurrent != DTO.IsCurrent && DTO.IsCurrent)
             await _uow.Periods
                     .ExecuteUpdateAsync(p => p.IsCurrent, e => e.SetProperty(p => p.IsCurrent, false));
@@ -217,6 +220,9 @@ internal class PeriodService : IPeriodService
 
         if (period is null || period.IsDeleted)  
             return new ConfirmationResponse { IsSucceed = false, Message = "Period Is Not Exist!" };
+
+        if (period.IsCurrent)
+            return new ConfirmationResponse { IsSucceed = false, Message = "You Can Not Delete Current Period!" };
 
         var JournalIds = period.Journals.Select(j => j.Id);
 
