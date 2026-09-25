@@ -287,7 +287,7 @@ export class CreateJournalComponent {
         icon: 'question',
         showDenyButton: true,
         showCancelButton: true,
-        confirmButtonText: 'Increase Budget',
+        confirmButtonText: 'Decrease Saving and Increase Free Budget',
         denyButtonText: 'Increase Saving',
       }).then((typeResult) => {
         if (typeResult.isConfirmed || typeResult.isDenied) {
@@ -325,6 +325,7 @@ export class CreateJournalComponent {
     const account = isDebit ? 'debit' : 'credit';
 
     const accountId = this.JournalForm.get(account)?.value;
+    const costCenterId = this.JournalForm.get("costCentersIds")?.value[0] || '';
 
     if (!accountId) {
       Swal.fire({
@@ -349,7 +350,7 @@ export class CreateJournalComponent {
       .split('T')[0];
 
     this.accountService
-      .GetBalanceBasedOnType(accountId, from, to, '')
+      .GetBalanceBasedOnType(accountId, from, to, costCenterId)
       .subscribe({
         next: (result) => {
           const msgHtml = this.GetAccountBalanceHTMLTemplate(result, from, to);
@@ -410,6 +411,88 @@ export class CreateJournalComponent {
 
     const amountColor = isCredit ? '#c0392b' : '#1a7f4b';
     const arrowIcon = isCredit ? '↓' : '↑';
+
+    const descriptionSection = result.accountDescreption
+      ? `
+        <div style="
+          font-size: 0.82rem;
+          color: #64748b;
+          font-family: 'Segoe UI', sans-serif;
+          margin: -0.5rem 0 1rem;
+          line-height: 1.4;
+        ">
+          ${result.accountDescreption}
+        </div>
+      `
+      : '';
+
+    const lastJournal = result.lastJournal;
+    const lastJournalSection = lastJournal
+      ? `
+        <a href="/#/Journal/Edit/${lastJournal.journalId}" target="_blank" style="
+          display: block;
+          background: #f8f9fc;
+          border: 1px solid #e2e8f0;
+          border-radius: 12px;
+          padding: 14px 16px;
+          margin: 1.5rem;
+          text-align: left;
+          text-decoration: none;
+          font-family: 'Segoe UI', sans-serif;
+          transition: all 0.2s ease;
+          "
+          onmouseover="this.style.borderColor='#2563eb'; this.style.boxShadow='0 4px 14px rgba(37,99,235,0.15)';"
+          onmouseout="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none';"
+        >
+          <div style="
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #94a3b8;
+            margin-bottom: 8px;
+          ">
+            Last Journal
+          </div>
+          <div style="display:flex; justify-content:space-between; gap:12px; margin-bottom:4px;">
+            <span style="color:#334155; font-weight:600; font-size:0.85rem; display:inline-flex; align-items:center; gap:6px;">
+              ${lastJournal.name ?? '-'}
+            </span>
+            <span style="color:#334155; font-weight:700; font-size:1.5rem; white-space:nowrap;">
+             ${ lastJournal.amount != null ? lastJournal.amount : '' }
+             <i class="${this.iconMap[lastJournal.type] ?? ''}"></i>
+            </span>
+          </div>
+          <div style="font-size:0.75rem; color:#64748b; margin-bottom:2px;">
+           ${lastJournal.creditAccount ?? '-'} -> 
+            ${lastJournal.debitAccount ?? '-'}
+            &nbsp;&nbsp;
+          </div>
+          <div style="font-size:0.72rem; color:#94a3b8;">
+            ${new Date(lastJournal.journalDate).toLocaleString()}
+          </div>
+          ${
+            lastJournal.costCenters?.length
+              ? `<div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:8px;">
+                  ${lastJournal.costCenters
+                    .map(
+                      (costCenter) => `<span style="
+                        display:inline-flex;
+                        align-items:center;
+                        border-radius:12px;
+                        background:#cbd5e1;
+                        color:#334155;
+                        padding:2px 10px;
+                        font-size:0.7rem;
+                        font-weight:500;
+                      ">${costCenter}</span>`,
+                    )
+                    .join('')}
+                </div>`
+              : ''
+          }
+        </a>
+      `
+      : '';
 
     const dateSection = result.isRevExp
       ? `
@@ -476,6 +559,9 @@ export class CreateJournalComponent {
               </span>
             </div>
 
+            <!-- Account Description -->
+            ${descriptionSection}
+
         <!-- Divider -->
           <div style="
             width: 40px;
@@ -538,6 +624,8 @@ export class CreateJournalComponent {
               View Account Statement
             </a>
 
+            <!-- Last Journal -->
+            ${lastJournalSection}
           </div>
         `;
 

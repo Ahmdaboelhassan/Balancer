@@ -7,7 +7,9 @@ import Swal from 'sweetalert2';
 export const loadingInterceptor: HttpInterceptorFn = (req, next) => {
   const loadingService = inject(LoadingService);
 
-  loadingService.LoadingStarted();
+  if (!loadingService.IsDisabled()){
+     loadingService.LoadingStarted();
+  }
 
   return next(req).pipe(
     catchError((error) => {
@@ -33,6 +35,10 @@ export const loadingInterceptor: HttpInterceptorFn = (req, next) => {
 
       return throwError(() => error);
     }),
-    finalize(() => loadingService.LoadingFinsihed()),
+    finalize(() => { 
+        if (!loadingService.IsDisabled()){
+          loadingService.LoadingFinsihed();
+        }
+    }),
   );
 };

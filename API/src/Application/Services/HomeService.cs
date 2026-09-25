@@ -95,7 +95,7 @@ public class HomeService : IHomeService
             AvailableFunds = GetBudgetProgressTask.Result.availableFunds,
             OtherExpenses = GetBudgetProgressTask.Result.otherExpenses,
             OtherExpensesTarget = dashboard.OtherExpensesTarget + dashboard.AddOnExpensesTarget,
-            BudgetProgress = GetBudgetProgressTask.Result.budgetProgress,
+            BudgetProgress = GetBudgetProgressTask.Result.budgetProgress.Where(d => d.Spent < d.Budget || d.AccountId == settings.CurrentCashAccount),
             DayRate = settings.DefaultDayRate,
             PeriodDays = settings.DefaultPeriodDays.GetValueOrDefault(),
             OutSideBudgetCostCenterId = settings.NotBudgetCostCenter
@@ -140,7 +140,7 @@ public class HomeService : IHomeService
                         overBudget += Math.Max(0, totalSpent - x.ba.Budget);
 
                      return new BudgetAccountDTO
-                     {
+                     {   AccountId =  x.ba.AccountId,
                          DisplayName = x.ba.DisplayName,
                          Budget = x.ba.Budget,
                          Spent = totalSpent,

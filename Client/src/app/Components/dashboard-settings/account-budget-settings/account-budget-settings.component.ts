@@ -83,6 +83,7 @@ export class AccountBudgetSettingsComponent implements OnInit {
           field: 'displayName',
           editor: 'input',
         },
+       
         {
           title: 'Budget',
           field: 'budget',
@@ -98,6 +99,11 @@ export class AccountBudgetSettingsComponent implements OnInit {
           bottomCalcFormatter: 'money',
           bottomCalcFormatterParams: { precision: 2 },
           mutator: (value) => value || 0,
+        },
+         {
+          title: 'Notes',
+          field: 'notes',
+          editor: 'input',
         },
       ],
       rowContextMenu: [

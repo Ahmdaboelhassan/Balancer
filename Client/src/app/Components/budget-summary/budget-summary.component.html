@@ -13,27 +13,43 @@
     @if (accounts.length > 0) {
       <tbody>
         @for (account of accounts; track $index) {
-          <tr class="bg-white border-b hover:bg-gray-50 dark:hover:bg-gray-50">
+          <tr
+              class="border-b"
+            [ngClass]="
+              account.isOtherExpenses
+                ? 'bg-blue-100 hover:bg-blue-200'
+                : account.remains < 0
+                ? 'bg-red-100 hover:bg-red-200'
+                : account.remains == 0
+                ? 'bg-green-100 hover:bg-green-200'
+                : !account.name
+                ? 'bg-purple-200 hover:bg-purple-300'
+                : 'bg-white hover:bg-gray-100'
+            "
+          > 
             <th
               scope="row"
               class="px-6 py-4 font-bold text-base text-gray-900 whitespace-nowrap"
             >
               {{ account.name }}
-              <a
-                target="_blank"
-                [routerLink]="['/AccountStatement/Get']"
-                [queryParams]="{
-                  account: !account.isOtherExpenses ? account.id : '',
-                  costCenter: account.isOtherExpenses ? account.id : '',
-                  openingBalance: false,
-                  from: from,
-                  to: to,
-                }"
-              >
-                <i
-                  class="fa-solid fa-circle-info text-blue-700 hover:scale-125 cursor-pointer"
-                ></i>
-              </a>
+
+                @if (account.name) {
+                  <a
+                    target="_blank"
+                    [routerLink]="['/AccountStatement/Get']"
+                    [queryParams]="{
+                      account: !account.isOtherExpenses ? account.id : '',
+                      costCenter: account.isOtherExpenses ? account.id : '',
+                      openingBalance: false,
+                      from: from,
+                      to: to,
+                    }"
+                  >
+                    <i
+                      class="fa-solid fa-circle-info text-blue-700 hover:scale-125 cursor-pointer"
+                    ></i>
+                  </a>
+              }
             </th>
             <td class="px-8 py-4 font-bold">
               {{ account.budget | currency }}
@@ -60,6 +76,7 @@
 <div class="bg-white mt-3 rounded-xl overflow-auto">
   <table class="w-full text-sm text-left rtl:text-right text-gray-500">
     <tr class="text-xs text-white uppercase bg-slate-800">
+
       <th class="px-8 py-3">Period</th>
       <th class="px-5 py-3">Budget</th>
       <th class="px-8 py-3">Spent</th>
@@ -70,12 +87,14 @@
     @if (periods.length > 0) {
       <tbody>
         @for (period of periods; track $index) {
-          <tr class="bg-white border-b hover:bg-gray-50 dark:hover:bg-gray-50">
+          <tr class="border-b" 
+              [ngClass]="period.name ? 'bg-white hover:bg-gray-50' :'bg-purple-200 hover:bg-purple-300' ">
             <th
               scope="row"
               class="px-6 py-4 font-bold text-base text-gray-900 whitespace-nowrap"
             >
               {{ period.name }}
+               @if (period.name ) {
               <a
                 target="_blank"
                 [routerLink]="['/Period', 'PeriodJournals', period.id]"
@@ -84,6 +103,7 @@
                   class="fa-solid fa-circle-info text-blue-700 hover:scale-125 cursor-pointer"
                 ></i>
               </a>
+            }
             </th>
             <td class="px-8 py-4 font-bold">
               {{ period.budget | currency }}
@@ -111,9 +131,9 @@
       <th class="px-8 py-3">Account</th>
       <th class="px-5 py-3">Saving Target</th>
       <th class="px-8 py-3">Saving</th>
-      <th class="px-8 py-3">Remains</th>
+      <th class="px-8 py-3">Difference</th>
       <th class="px-8 py-3">Saving %</th>
-      <th class="px-8 py-3">Remain %</th>
+      <th class="px-8 py-3">Difference %</th>
     </tr>
     @if (savings.length > 0) {
       <tbody>

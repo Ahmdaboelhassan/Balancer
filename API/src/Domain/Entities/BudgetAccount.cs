@@ -10,6 +10,7 @@ namespace Domain.Entities
         public int AccountId { get; set; }
         public decimal Budget { get; set; }
         public string Color { get; set; }
+        public string? Notes { get; set; }
         public string DisplayName { get; set; }
 
         [ForeignKey(nameof(AccountId))]

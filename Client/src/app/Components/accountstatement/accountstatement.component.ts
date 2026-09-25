@@ -31,11 +31,20 @@ export class AccountstatementComponent {
   ignoreTo: boolean = false;
   ignoreFrom: boolean = false;
   @ViewChild('myForm') myForm!: NgForm;
+  iconMap: Record<number, string> = {
+        1: 'fa-solid fa-square-plus text-green-500',
+        2: 'fa-solid fa-square-minus text-red-400',
+        3: 'fa-solid fa-thumbtack text-blue-400',
+        4: 'fa-solid fa-reply fa-flip-horizontal text-orange-400',
+        5: 'fa-solid fa-wallet text-purple-400',
+  };
 
   constructor(
     private accountService: AccountService,
     private costCenterService: CostcenterService,
     private titleServive: Title,
+   
+
   ) {
     this.GetDefaultDate();
     this.accountService.GetAllAccountSelectList().subscribe({
@@ -234,6 +243,74 @@ export class AccountstatementComponent {
     const amountColor = isCredit ? '#c0392b' : '#1a7f4b';
     const arrowIcon = isCredit ? '↓' : '↑';
 
+     const lastJournal = result.lastJournal;
+    const lastJournalSection = lastJournal
+      ? `
+        <a href="/#/Journal/Edit/${lastJournal.journalId}" target="_blank" style="
+          display: block;
+          background: #f8f9fc;
+          border: 1px solid #e2e8f0;
+          border-radius: 12px;
+          padding: 14px 16px;
+          margin: 1.5rem;
+          text-align: left;
+          text-decoration: none;
+          font-family: 'Segoe UI', sans-serif;
+          transition: all 0.2s ease;
+          "
+          onmouseover="this.style.borderColor='#2563eb'; this.style.boxShadow='0 4px 14px rgba(37,99,235,0.15)';"
+          onmouseout="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none';"
+        >
+          <div style="
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #94a3b8;
+            margin-bottom: 8px;
+          ">
+            Last Journal
+          </div>
+          <div style="display:flex; justify-content:space-between; gap:12px; margin-bottom:4px;">
+            <span style="color:#334155; font-weight:600; font-size:0.85rem; display:inline-flex; align-items:center; gap:6px;">
+              ${lastJournal.name ?? '-'}
+            </span>
+            <span style="color:#334155; font-weight:700; font-size:1.5rem; white-space:nowrap;">
+             ${ lastJournal.amount != null ? lastJournal.amount : '' }
+             <i class="${this.iconMap[lastJournal.type] ?? ''}"></i>
+            </span>
+          </div>
+          <div style="font-size:0.75rem; color:#64748b; margin-bottom:2px;">
+           ${lastJournal.creditAccount ?? '-'} -> 
+            ${lastJournal.debitAccount ?? '-'}
+            &nbsp;&nbsp;
+          </div>
+          <div style="font-size:0.72rem; color:#94a3b8;">
+            ${new Date(lastJournal.journalDate).toLocaleString()}
+          </div>
+          ${
+            lastJournal.costCenters?.length
+              ? `<div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:8px;">
+                  ${lastJournal.costCenters
+                    .map(
+                      (costCenter) => `<span style="
+                        display:inline-flex;
+                        align-items:center;
+                        border-radius:12px;
+                        background:#cbd5e1;
+                        color:#334155;
+                        padding:2px 10px;
+                        font-size:0.7rem;
+                        font-weight:500;
+                      ">${costCenter}</span>`,
+                    )
+                    .join('')}
+                </div>`
+              : ''
+          }
+        </a>
+      `
+      : '';
+
     const dateSection = result.isRevExp
       ? `
         <div style="
@@ -361,6 +438,8 @@ export class AccountstatementComponent {
               View Account Statement
             </a>
 
+            <!-- Last Journal -->
+            ${lastJournalSection}
           </div>
         `;
 

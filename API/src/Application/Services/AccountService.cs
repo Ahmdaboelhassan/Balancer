@@ -215,11 +215,11 @@ public class AccountService : IAccountService
         var RevExpNumbers = await _uow.Accounts.SelectAll(a => a.Id == settings.RevenueAccount || a.Id == settings.ExpensesAccount, a => a.Number);
 
         var isRevOrExp = RevExpNumbers.Any(n => account.Number.StartsWith(n));
-        
+
         var amount = await _uow.JournalDetail
                    .Sum(d => d.Account.Number.StartsWith(account.Number)
-                    && (!isRevOrExp || d.Journal.CreatedAt.Date >= from && d.Journal.CreatedAt.Date <= to)
-                    && (!costCenterId.HasValue || d.CostCenters.Any(d => d.CostCenterId == costCenterId)),
+                    && (!isRevOrExp || (d.Journal.CreatedAt.Date >= from && d.Journal.CreatedAt.Date <= to))
+                    && (!isRevOrExp || !costCenterId.HasValue || d.CostCenters.Any(d => d.CostCenterId == costCenterId)),
                     d => d.Debit - d.Credit);
 
         return new AccountBalanceDTO
@@ -229,9 +229,11 @@ public class AccountService : IAccountService
             Balance = amount.ToString("c"),
             IsRevExp = isRevOrExp,
             IsCredit = amount < 0,
+            AccountDescreption = account.Description,
+            LastJournal = await _uow.Accounts.GetLastAccountJournal(accId, costCenterId),
         };
-
     }
+
     public async Task<decimal> GetBalance(Account account)
     {
         if (account is null) return 0;
