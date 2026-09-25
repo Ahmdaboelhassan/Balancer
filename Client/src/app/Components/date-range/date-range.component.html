@@ -1,159 +1,157 @@
-<header class="bg-white rounded-xl print:shadow-none shadow-sm px-4 print:p-0">
+<div
+  class="flex text-center items-center flex-col lg:flex-row min-h-56 lg:min-h-20 print:h-fit bg-white rounded-xl print:shadow-none shadow-sm px-4 print:p-0"
+  [ngClass]="hideFromDate ? 'justify-end gap-5' : 'justify-evenly'"
+>
   <div
-    class="flex text-center items-center flex-col lg:flex-row min-h-56 lg:min-h-20 print:h-fit"
-    [ngClass]="hideFromDate ? 'justify-end gap-5' : 'justify-evenly'"
+    class="w-full lg:w-6/12 flex justify-between items-center flex-col lg:flex-row"
   >
-    <div
-      class="w-full lg:w-6/12 flex justify-between items-center flex-col lg:flex-row"
-    >
-      @if (!hideFromDate) {
-        <input
-          type="date"
-          class="lg:w-2/5 w-full print:text-xs date-form-control lg:my-0 my-0.5"
-          required
-          [(ngModel)]="from"
-        />
-        <label
-          class="text-slate-900 font-bold text-lg print:text-lg hidden lg:inline-block lg:mx-2"
-          >To</label
-        >
-      }
+    @if (!hideFromDate) {
       <input
         type="date"
-        class="lg:w-2/5 w-full date-form-control print:text-xs lg:my-0 my-0.5"
+        class="lg:w-2/5 w-full print:text-xs date-form-control lg:my-0 my-0.5"
         required
-        [(ngModel)]="to"
+        [(ngModel)]="from"
       />
-      @if (showMaxLevelFilter) {
-        <select
-          [(ngModel)]="maxLevel"
-          (change)="EmitDatesValue()"
-          class="date-form-control print:text-xs lg:mx-2 lg:my-0my-1 w-full lg:w-auto print:hidden lg:my-0 my-1"
-        >
-          <option value="">All Levels</option>
-          <optgroup label="Level & Parents">
-            <option value="1">1st Level</option>
-            <option value="2">2nd Level</option>
-            <option value="3">3rd Level</option>
-            <option value="4">4th Level</option>
-            <option value="5">5th Level</option>
-          </optgroup>
-          <optgroup label="Level & Childs">
-            <option value="6">1st Level</option>
-            <option value="7">2nd Level</option>
-            <option value="8">3rd Level</option>
-            <option value="9">4th Level</option>
-            <option value="10">5th Level</option>
-          </optgroup>
-          <optgroup label="Level Only">
-            <option value="11">1st Level</option>
-            <option value="12">2nd Level</option>
-            <option value="13">3rd Level</option>
-            <option value="14">4th Level</option>
-            <option value="15">5th Level</option>
-          </optgroup>
-        </select>
-      }
-    </div>
+      <label
+        class="text-slate-900 font-bold text-lg print:text-lg hidden lg:inline-block lg:mx-2"
+        >To</label
+      >
+    }
+    <input
+      type="date"
+      class="lg:w-2/5 w-full date-form-control print:text-xs lg:my-0 my-0.5"
+      required
+      [(ngModel)]="to"
+    />
+  </div>
 
-    <div
-      class="lg:flex lg:justify-end gap-2 w-full items-center lg:w-5/12 print:hidden"
-    >
-      @if (!isYearRange) {
-        <div
-          class="flex w-full justify-center overflow-hidden lg:w-8/12 lg:mb-0 mb-1 me-4"
-          role="group"
-        >
-          <button
-            type="button"
-            class="px-1 py-0.5 lg:py-2.5 w-1/5 text-gray-900 bg-white border border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-blue-700"
-            (click)="DecrementMonth()"
-          >
-            <i class="fa-solid fa-calendar-minus"></i>
-          </button>
-          <button
-            type="button"
-            class="px-1 py-0.5 w-1/5 text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 hover:text-blue-700"
-            (click)="GetCurrentDay()"
-          >
-            <i class="fa-solid fa-calendar-day"></i>
-          </button>
-
-          <button
-            type="button"
-            class="px-1 py-0.5 w-1/5 text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 hover:text-blue-700"
-            (click)="GetDefaultWeekDates()"
-          >
-            <i class="fa-solid fa-calendar-week"></i>
-          </button>
-          <button
-            type="button"
-            class="px-1 py-0.5 w-1/5 text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 hover:text-blue-700"
-            (click)="GetDefaultDate()"
-          >
-            <i class="fas fa-calendar-alt"></i>
-          </button>
-          <button
-            type="button"
-            class="px-1 py-0.5 lg:py-2.5 w-1/5 text-gray-900 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-blue-700"
-            (click)="IncrementMonth()"
-          >
-            <i class="fa-solid fa-calendar-plus"></i>
-          </button>
-        </div>
-      }
-      <div class="w-full flex gap-1">
-        @if (journalFilter) {
-          <button
-            mat-button
-            (click)="openDialog()"
-            type="button"
-            class="btn-primary text-center"
-          >
-            <i class="fa-solid fa-list"></i>
-          </button>
-        }
+  <div
+    class="lg:flex lg:justify-end gap-2 w-full items-center lg:w-5/12 print:hidden"
+  >
+    @if (!isYearRange) {
+      <div
+        class="flex w-full justify-center overflow-hidden lg:w-8/12 lg:mb-0 mb-1 me-4"
+        role="group"
+      >
         <button
           type="button"
-          class="btn-primary flex-1"
-          (click)="EmitDatesValue()"
+          class="px-1 py-0.5 lg:py-2.5 w-1/5 text-gray-900 bg-white border border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-blue-700"
+          (click)="DecrementMonth()"
         >
-          <div class="flex justify-between items-center">
-            <span>Search</span>
-            <i class="fa-solid fa-magnifying-glass"></i>
-          </div>
+          <i class="fa-solid fa-calendar-minus"></i>
+        </button>
+        <button
+          type="button"
+          class="px-1 py-0.5 w-1/5 text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 hover:text-blue-700"
+          (click)="GetCurrentDay()"
+        >
+          <i class="fa-solid fa-calendar-day"></i>
+        </button>
+
+        <button
+          type="button"
+          class="px-1 py-0.5 w-1/5 text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 hover:text-blue-700"
+          (click)="GetDefaultWeekDates()"
+        >
+          <i class="fa-solid fa-calendar-week"></i>
+        </button>
+        <button
+          type="button"
+          class="px-1 py-0.5 w-1/5 text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 hover:text-blue-700"
+          (click)="GetDefaultDate()"
+        >
+          <i class="fas fa-calendar-alt"></i>
+        </button>
+        <button
+          type="button"
+          class="px-1 py-0.5 lg:py-2.5 w-1/5 text-gray-900 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-blue-700"
+          (click)="IncrementMonth()"
+        >
+          <i class="fa-solid fa-calendar-plus"></i>
         </button>
       </div>
-    </div>
-    @if (showCostCenterFilter) {
+    }
+    <div class="w-full flex gap-1">
+      @if (journalFilter) {
+        <button
+          mat-button
+          (click)="openDialog()"
+          type="button"
+          class="btn-primary text-center"
+        >
+          <i class="fa-solid fa-list"></i>
+        </button>
+      }
       <button
         type="button"
-        title="More Filters"
-        class="print:hidden px-2 py-1 lg:ms-2 rounded-lg hover:bg-gray-100 hover:text-blue-700"
-        [ngClass]="costCenter ? 'text-blue-700' : 'text-gray-900'"
-        (click)="ToggleExtraFilters()"
+        class="btn-primary flex-1"
+        (click)="EmitDatesValue()"
       >
-        <i
-          class="fa-solid fa-chevron-down transition-transform"
-          [ngClass]="{ 'rotate-180': showExtraFilters }"
-        ></i>
+        <div class="flex justify-between items-center">
+          <span>Search</span>
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </div>
       </button>
-    }
-  </div>
-  @if (showCostCenterFilter && showExtraFilters) {
-    <div
-      class="flex flex-col lg:flex-row items-center gap-2 pb-2 print:border-none print:mt-0 print:pt-0"
-    >
-      <ng-select
-        [items]="costCenters"
-        bindLabel="name"
-        bindValue="id"
-        [(ngModel)]="costCenter"
-        (change)="EmitDatesValue()"
-        placeholder="All Cost Centers"
-        class="w-full lg:w-3/12 text-start"
-      >
-      </ng-select>
     </div>
+  </div>
+  @if (showCostCenterFilter || showMaxLevelFilter) {
+    <button
+      type="button"
+      title="More Filters"
+      class="print:hidden px-2 py-1 lg:ms-2 rounded-lg hover:bg-gray-100 hover:text-blue-700"
+      [ngClass]="costCenter || maxLevel ? 'text-blue-700' : 'text-gray-900'"
+      (click)="ToggleExtraFilters()"
+    >
+      <i
+        class="fa-solid fa-chevron-down transition-transform"
+        [ngClass]="{ 'rotate-180': showExtraFilters }"
+      ></i>
+    </button>
   }
-</header>
+</div>
+@if (showCostCenterFilter || showMaxLevelFilter) {
+  <div
+    class="grid transition-all duration-300 ease-in-out"
+    [ngClass]="
+      showExtraFilters
+        ? 'grid-rows-[1fr] opacity-100'
+        : 'grid-rows-[0fr] opacity-0 print:hidden'
+    "
+    [attr.inert]="showExtraFilters ? null : ''"
+  >
+    <div class="overflow-hidden">
+      <div
+        class="bg-white rounded-xl shadow-sm print:shadow-none mt-2 py-3 px-4 print:p-0 flex flex-col lg:flex-row items-center gap-2 transition-transform duration-300 ease-in-out"
+        [ngClass]="showExtraFilters ? 'translate-y-0' : '-translate-y-3'"
+      >
+        @if (showMaxLevelFilter) {
+          <ng-select
+            [items]="levels"
+            bindLabel="name"
+            bindValue="id"
+            groupBy="group"
+            [(ngModel)]="maxLevel"
+            (change)="EmitDatesValue()"
+            placeholder="All Levels"
+            appendTo="body"
+            class="w-full lg:w-1/5 text-start print:hidden"
+          >
+          </ng-select>
+        }
+        @if (showCostCenterFilter) {
+          <ng-select
+            [items]="costCenters"
+            bindLabel="name"
+            bindValue="id"
+            [(ngModel)]="costCenter"
+            (change)="EmitDatesValue()"
+            placeholder="All Cost Centers"
+            appendTo="body"
+            class="w-full lg:w-1/5 text-start"
+          >
+          </ng-select>
+        }
+      </div>
+    </div>
+  </div>
+}

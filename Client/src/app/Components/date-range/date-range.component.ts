@@ -3,7 +3,6 @@ import {
   Component,
   EventEmitter,
   inject,
-  input,
   Input,
   OnInit,
   Output,
@@ -28,7 +27,7 @@ export class DateRangeComponent implements OnInit {
   @Input() isYearRange = false;
   @Input() hideFromDate = false;
   @Input() journalFilter = false;
-  @Input() maxLevel = '';
+  @Input() maxLevel: number | null = null;
   @Input() showCostCenterFilter = false;
   readonly dialog = inject(MatDialog);
   readonly journalService = inject(JournalService);
@@ -39,6 +38,17 @@ export class DateRangeComponent implements OnInit {
   costCenter: number | null = null;
   costCenters: CostCenterSelectList[] = [];
   showExtraFilters = false;
+  levels = [
+    ['Level & Parents', 1],
+    ['Level & Childs', 6],
+    ['Level Only', 11],
+  ].flatMap(([group, offset]) =>
+    ['1st', '2nd', '3rd', '4th', '5th'].map((name, i) => ({
+      id: +offset + i,
+      name: `${name} Level`,
+      group,
+    })),
+  );
 
   ngOnInit(): void {
     if (this.showCostCenterFilter) {
@@ -59,7 +69,7 @@ export class DateRangeComponent implements OnInit {
     this.dates.emit({
       from: this.from,
       to: this.to,
-      maxLevel: this.maxLevel,
+      maxLevel: this.maxLevel ?? null,
       costCenter: this.costCenter,
     });
   }
@@ -70,9 +80,12 @@ export class DateRangeComponent implements OnInit {
   GetDefaultDate() {
     const currentDate = new Date();
     let startMonth = this.isYearRange ? 0 : currentDate.getMonth();
-    let endMonth = this.isYearRange ? 12 : currentDate.getMonth() + 1;
+    let endMonth = this.isYearRange ? 12 : currentDate.getMonth() + 12;
+    let startYear = this.isYearRange
+      ? currentDate.getFullYear() - 2
+      : currentDate.getFullYear();
 
-    let firstDay = new Date(currentDate.getFullYear(), startMonth, 2);
+    let firstDay = new Date(startYear, startMonth, 2);
 
     let lastDay = new Date(currentDate.getFullYear(), endMonth, 1);
 
