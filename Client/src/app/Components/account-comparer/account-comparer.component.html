@@ -50,12 +50,15 @@
         </div>
         <div class="form-group col-span-6 lg:col-span-3">
           <label> Cost Center </label>
-          <select class="form-control w-full" ngModel name="costCenter">
-            <option value="">All Cost Centers</option>
-            <option *ngFor="let cost of costCenters" [value]="cost.id">
-              {{ cost.name }}
-            </option>
-          </select>
+          <ng-select
+            [items]="costCenters"
+            bindLabel="name"
+            bindValue="id"
+            ngModel
+            name="costCenter"
+            placeholder="All Cost Centers"
+          >
+          </ng-select>
         </div>
       </div>
       <div class="mt-5 grid grid-cols-2 gap-4">

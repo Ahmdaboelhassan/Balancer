@@ -12,10 +12,13 @@ import { FormsModule } from '@angular/forms';
 import { JournalSearchModalComponent } from './journal-search-modal/journal-search-modal.component';
 import { MatDialog } from '@angular/material/dialog';
 import { JournalService } from '../../Services/journal.service';
+import { NgSelectComponent } from '@ng-select/ng-select';
+import { CostcenterService } from '../../Services/costcenter.service';
+import { CostCenterSelectList } from '../../Interfaces/Response/CostCenterSelectList';
 
 @Component({
   selector: 'app-date-range',
-  imports: [FormsModule, NgClass],
+  imports: [FormsModule, NgClass, NgSelectComponent],
   templateUrl: './date-range.component.html',
   styleUrl: './date-range.component.css',
 })
@@ -26,13 +29,23 @@ export class DateRangeComponent implements OnInit {
   @Input() hideFromDate = false;
   @Input() journalFilter = false;
   @Input() maxLevel = '';
+  @Input() showCostCenterFilter = false;
   readonly dialog = inject(MatDialog);
   readonly journalService = inject(JournalService);
+  readonly costCenterService = inject(CostcenterService);
 
   from: any;
   to: any;
+  costCenter: number | null = null;
+  costCenters: CostCenterSelectList[] = [];
+  showExtraFilters = false;
 
   ngOnInit(): void {
+    if (this.showCostCenterFilter) {
+      this.costCenterService.GetAllCostCenterSelectList().subscribe({
+        next: (costCenters) => (this.costCenters = costCenters),
+      });
+    }
     this.GetDefaultDate();
     this.journalService.advancedSearch$.subscribe({
       next: (result: any) => {
@@ -47,7 +60,12 @@ export class DateRangeComponent implements OnInit {
       from: this.from,
       to: this.to,
       maxLevel: this.maxLevel,
+      costCenter: this.costCenter,
     });
+  }
+
+  ToggleExtraFilters() {
+    this.showExtraFilters = !this.showExtraFilters;
   }
   GetDefaultDate() {
     const currentDate = new Date();
@@ -60,7 +78,7 @@ export class DateRangeComponent implements OnInit {
 
     this.from = firstDay.toISOString().split('T')[0];
     this.to = lastDay.toISOString().split('T')[0];
-    this.dates.emit({ from: this.from, to: this.to, maxLevel: this.maxLevel });
+    this.EmitDatesValue();
   }
 
   DecrementMonth() {
@@ -72,7 +90,7 @@ export class DateRangeComponent implements OnInit {
 
     this.from = firstDay.toISOString().split('T')[0];
     this.to = lastDay.toISOString().split('T')[0];
-    this.dates.emit({ from: this.from, to: this.to, maxLevel: this.maxLevel });
+    this.EmitDatesValue();
   }
 
   IncrementMonth() {
@@ -85,14 +103,14 @@ export class DateRangeComponent implements OnInit {
 
     this.from = firstDay.toISOString().split('T')[0];
     this.to = lastDay.toISOString().split('T')[0];
-    this.dates.emit({ from: this.from, to: this.to, maxLevel: this.maxLevel });
+    this.EmitDatesValue();
   }
 
   GetCurrentDay() {
     const currentDate = new Date();
     this.from = this.formatLocalDate(currentDate);
     this.to = this.formatLocalDate(currentDate);
-    this.dates.emit({ from: this.from, to: this.to, maxLevel: this.maxLevel });
+    this.EmitDatesValue();
   }
 
   GetDefaultWeekDates() {
@@ -109,7 +127,7 @@ export class DateRangeComponent implements OnInit {
 
     this.from = this.formatLocalDate(firstDayOfWeek);
     this.to = this.formatLocalDate(lastDayOfWeek);
-    this.dates.emit({ from: this.from, to: this.to, maxLevel: this.maxLevel });
+    this.EmitDatesValue();
   }
   private formatLocalDate(date: Date): string {
     const year = date.getFullYear();

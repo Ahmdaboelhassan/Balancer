@@ -1,6 +1,7 @@
 <app-date-range
   (dates)="GetAccountsOverview($event)"
   [showMaxLevelFilter]="true"
+  [showCostCenterFilter]="true"
 ></app-date-range>
 <div class="daterange-result bg-white mt-2 rounded-xl overflow-auto">
   <table class="w-full text-sm text-left rtl:text-right text-gray-500">
@@ -29,7 +30,8 @@
               account: account.accountId,
               openingBalance: false,
               from: from,
-              to: to
+              to: to,
+              costCenter: costCenter
             }"
           >
             <i

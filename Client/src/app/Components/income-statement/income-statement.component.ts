@@ -16,6 +16,7 @@ export class IncomeStatementComponent {
   accounts: AccountSummary[] = [];
   to;
   from;
+  costCenter;
 
   constructor(
     private reportService: ReportService,
@@ -27,9 +28,12 @@ export class IncomeStatementComponent {
   GetIncomeStatement(dates: any) {
     this.to = dates.to;
     this.from = dates.from;
+    this.costCenter = dates.costCenter || null;
 
-    this.reportService.GetIncomeStatement(dates.from, dates.to).subscribe({
-      next: (accounts) => (this.accounts = accounts),
-    });
+    this.reportService
+      .GetIncomeStatement(dates.from, dates.to, this.costCenter)
+      .subscribe({
+        next: (accounts) => (this.accounts = accounts),
+      });
   }
 }

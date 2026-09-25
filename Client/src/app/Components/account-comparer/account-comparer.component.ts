@@ -6,12 +6,11 @@ import { AccountSelectList } from '../../Interfaces/Response/AccountSelectList';
 import { CostCenterSelectList } from '../../Interfaces/Response/CostCenterSelectList';
 import { AccountService } from '../../Services/account.service';
 import { CostcenterService } from '../../Services/costcenter.service';
-import { NgFor } from '@angular/common';
 import { NgSelectComponent } from '@ng-select/ng-select';
 
 @Component({
   selector: 'app-account-comparer',
-  imports: [FormsModule, NgFor, NgSelectComponent],
+  imports: [FormsModule, NgSelectComponent],
   templateUrl: './account-comparer.component.html',
   styleUrl: './account-comparer.component.css',
 })

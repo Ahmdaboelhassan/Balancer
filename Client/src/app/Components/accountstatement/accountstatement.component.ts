@@ -10,7 +10,6 @@ import { AccountService } from '../../Services/account.service';
 import { CostcenterService } from '../../Services/costcenter.service';
 import { AccountSelectList } from '../../Interfaces/Response/AccountSelectList';
 import { CostCenterSelectList } from '../../Interfaces/Response/CostCenterSelectList';
-import { NgFor } from '@angular/common';
 import { Title } from '@angular/platform-browser';
 import { NgSelectComponent } from '@ng-select/ng-select';
 import Swal from 'sweetalert2';
@@ -18,7 +17,7 @@ import { AccountsBalance } from '../../Interfaces/Response/AccountsBalance';
 import { environment } from '../../../environments/environment';
 
 @Component({
-  imports: [FormsModule, NgFor, NgSelectComponent],
+  imports: [FormsModule, NgSelectComponent],
   templateUrl: './accountstatement.component.html',
   styleUrl: './accountstatement.component.css',
 })

@@ -91,12 +91,15 @@
         </div>
         <div class="form-group col-span-2 lg:col-span-1">
           <label> Cost Center </label>
-          <select class="form-control w-full" ngModel name="costCenter">
-            <option value="">All Cost Centers</option>
-            <option *ngFor="let cost of costCenters" [value]="cost.id">
-              {{ cost.name }}
-            </option>
-          </select>
+          <ng-select
+            [items]="costCenters"
+            bindLabel="name"
+            bindValue="id"
+            ngModel
+            name="costCenter"
+            placeholder="All Cost Centers"
+          >
+          </ng-select>
         </div>
       </div>
 

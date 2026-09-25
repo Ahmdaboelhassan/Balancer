@@ -230,7 +230,7 @@ public class ReportService : IReportService
         };
     }
 
-    public async Task<IEnumerable<AccountSummaryDTO>> GetIncomeStatement(DateTime from, DateTime to)
+    public async Task<IEnumerable<AccountSummaryDTO>> GetIncomeStatement(DateTime from, DateTime to, int? costCenterId)
     {
         var settings = await _uow.Settings.GetFirst();
 
@@ -247,6 +247,7 @@ public class ReportService : IReportService
         var journals = await _uow.JournalDetail
             .SelectAll(d => d.Journal.CreatedAt.Date >= from && d.Journal.CreatedAt.Date <= to
                && (d.Account.Number.StartsWith(expensesAccount.Number) || d.Account.Number.StartsWith(RevenuesAccount.Number))
+               && (!costCenterId.HasValue || d.CostCenters.Any(cc => cc.CostCenterId == costCenterId))
             , d => new { accountId = d.AccountId, AccountNumber = d.Account.Number, AccountName = d.Account.Name, balance = d.Debit - d.Credit , d.Credit , d.Debit});
 
 
@@ -467,11 +468,12 @@ public class ReportService : IReportService
             Savings = savings
         };
     }
-    public async Task<IEnumerable<AccountSummaryDTO>> GetAccountsSummary(DateTime from, DateTime to)
+    public async Task<IEnumerable<AccountSummaryDTO>> GetAccountsSummary(DateTime from, DateTime to, int? costCenterId)
     {
 
         var journals = await _uow.JournalDetail
             .SelectAll(d => d.Journal.CreatedAt.Date >= from && d.Journal.CreatedAt.Date <= to
+               && (!costCenterId.HasValue || d.CostCenters.Any(cc => cc.CostCenterId == costCenterId))
             , d => new { accountId = d.AccountId, AccountNumber = d.Account.Number, AccountName = d.Account.Name, balance = d.Debit - d.Credit, d.Credit, d.Debit });
 
         if (journals.Count() == 0)
@@ -500,10 +502,11 @@ public class ReportService : IReportService
         return incomeStatement;
     }
 
-    public async Task<IEnumerable<AccountSummaryDTO>> GetAccountsOverview(DateTime from, DateTime to, int? maxLevel)
+    public async Task<IEnumerable<AccountSummaryDTO>> GetAccountsOverview(DateTime from, DateTime to, int? maxLevel, int? costCenterId)
     {
         var currentJournalAccounts = (await _uow.JournalDetail
             .SelectAll(d => d.Journal.CreatedAt.Date >= from && d.Journal.CreatedAt.Date <= to
+               && (!costCenterId.HasValue || d.CostCenters.Any(cc => cc.CostCenterId == costCenterId))
             , d => new { accountId = d.AccountId, AccountNumber = d.Account.Number, AccountName = d.Account.Name, balance = d.Debit - d.Credit, d.Credit, d.Debit }))
             .GroupBy(x => x.AccountNumber)
             .Select(j => new {AccountNumber = j.Key , Debit = j.Sum(a => a.Debit) , Credit = j.Sum(a => a.Credit)});

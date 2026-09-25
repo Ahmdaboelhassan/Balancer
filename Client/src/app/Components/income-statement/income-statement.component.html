@@ -1,4 +1,7 @@
-<app-date-range (dates)="GetIncomeStatement($event)"></app-date-range>
+<app-date-range
+  (dates)="GetIncomeStatement($event)"
+  [showCostCenterFilter]="true"
+></app-date-range>
 <div class="daterange-result bg-white mt-4 rounded-xl overflow-auto">
   <table class="w-full text-sm text-left rtl:text-right text-gray-500">
     <tr class="text-xs text-white uppercase bg-slate-800">
@@ -25,6 +28,7 @@
                   openingBalance: false,
                   from: from,
                   to: to,
+                  costCenter: costCenter,
                 }"
               >
                 <i

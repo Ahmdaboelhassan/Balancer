@@ -52,13 +52,21 @@ export class ReportService {
     return this.http.get<AccountComparer>(url);
   }
 
-  GetIncomeStatement(from, to) {
+  GetIncomeStatement(from, to, costcenter) {
     let url = this.url + `/IncomeStatement?from=${from}&to=${to}`;
+
+    if (costcenter) {
+      url += `&costcenter=${costcenter}`;
+    }
 
     return this.http.get<AccountSummary[]>(url);
   }
-  GetAccountsSummary(from, to) {
+  GetAccountsSummary(from, to, costcenter) {
     let url = this.url + `/AccountsSummary?from=${from}&to=${to}`;
+
+    if (costcenter) {
+      url += `&costcenter=${costcenter}`;
+    }
 
     return this.http.get<AccountSummary[]>(url);
   }
@@ -77,11 +85,14 @@ export class ReportService {
     }
     return this.http.get<AccountSummary[]>(url);
   }
-  GetAccountsOverview(from, to, maxLevel) {
+  GetAccountsOverview(from, to, maxLevel, costcenter) {
     let url = this.url + `/AccountsOverview?from=${from}&to=${to}`;
 
     if (maxLevel) {
       url += `&maxLevel=${maxLevel}`;
+    }
+    if (costcenter) {
+      url += `&costcenter=${costcenter}`;
     }
     return this.http.get<AccountSummary[]>(url);
   }

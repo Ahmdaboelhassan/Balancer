@@ -29,14 +29,14 @@ public class ReportController : ControllerBase
     }
 
     [HttpGet("IncomeStatement")]
-    public async Task<IActionResult> IncomeStatement(DateTime from, DateTime to)
+    public async Task<IActionResult> IncomeStatement(DateTime from, DateTime to, int? costCenter)
     {
-        return Ok(await _serviceContext.ReportService.GetIncomeStatement(from, to));
+        return Ok(await _serviceContext.ReportService.GetIncomeStatement(from, to, costCenter));
     }
     [HttpGet("AccountsSummary")]
-    public async Task<IActionResult> AccountsSummary(DateTime from, DateTime to)
+    public async Task<IActionResult> AccountsSummary(DateTime from, DateTime to, int? costCenter)
     {
-        return Ok(await _serviceContext.ReportService.GetAccountsSummary(from, to));
+        return Ok(await _serviceContext.ReportService.GetAccountsSummary(from, to, costCenter));
     }
 
     [HttpGet("BudgetSummary")]
@@ -46,9 +46,9 @@ public class ReportController : ControllerBase
     }
 
     [HttpGet("AccountsOverview")]
-    public async Task<IActionResult> AccountsOverview(DateTime from, DateTime to, int? maxLevel)
+    public async Task<IActionResult> AccountsOverview(DateTime from, DateTime to, int? maxLevel, int? costCenter)
     {
-        return Ok(await _serviceContext.ReportService.GetAccountsOverview(from, to, maxLevel));
+        return Ok(await _serviceContext.ReportService.GetAccountsOverview(from, to, maxLevel, costCenter));
     }
 
     [HttpGet("AccountComparer")]

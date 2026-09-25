@@ -23,13 +23,17 @@ export class AccountsSummaryComponent {
 
   to;
   from;
+  costCenter;
 
   GetAccountsSummary(dates: any) {
     this.to = dates.to;
     this.from = dates.from;
+    this.costCenter = dates.costCenter || null;
 
-    this.reportService.GetAccountsSummary(dates.from, dates.to).subscribe({
-      next: (accounts) => (this.accounts = accounts),
-    });
+    this.reportService
+      .GetAccountsSummary(dates.from, dates.to, this.costCenter)
+      .subscribe({
+        next: (accounts) => (this.accounts = accounts),
+      });
   }
 }

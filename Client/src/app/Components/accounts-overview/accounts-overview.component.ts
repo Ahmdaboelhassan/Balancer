@@ -16,6 +16,7 @@ export class AccountsOverviewComponent {
   accounts: AccountSummary[] = [];
   to;
   from;
+  costCenter;
 
   constructor(
     private reportService: ReportService,
@@ -27,9 +28,10 @@ export class AccountsOverviewComponent {
   GetAccountsOverview(filter: any) {
     this.to = filter.to;
     this.from = filter.from;
+    this.costCenter = filter.costCenter || null;
 
     this.reportService
-      .GetAccountsOverview(filter.from, filter.to, filter.maxLevel)
+      .GetAccountsOverview(filter.from, filter.to, filter.maxLevel, this.costCenter)
       .subscribe({
         next: (accounts) => (this.accounts = accounts),
       });
