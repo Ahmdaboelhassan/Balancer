@@ -80,7 +80,7 @@ export class DateRangeComponent implements OnInit {
   GetDefaultDate() {
     const currentDate = new Date();
     let startMonth = this.isYearRange ? 0 : currentDate.getMonth();
-    let endMonth = this.isYearRange ? 12 : currentDate.getMonth();
+    let endMonth = this.isYearRange ? 12 : currentDate.getMonth() + 1;
     let startYear = this.isYearRange
       ? currentDate.getFullYear() - 2
       : currentDate.getFullYear();
