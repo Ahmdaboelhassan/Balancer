@@ -8,16 +8,27 @@ import { Home } from '../../Interfaces/Response/Home';
 import { BudgetBarDirective } from '../../directive/budget-bar.directive';
 import { slideUpAnimation } from '../../Animations/slideUpAnimation';
 import { BudgetProgress } from '../../Interfaces/Response/BudgetProgress';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-home',
-  imports: [BaseChartDirective, BudgetBarDirective, NgClass, NgStyle],
+  imports: [
+    BaseChartDirective,
+    BudgetBarDirective,
+    NgClass,
+    NgStyle,
+    RouterLink,
+  ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
   animations: [slideUpAnimation],
 })
 export class HomeComponent implements OnInit {
   home: Home;
+
+  startOfMonth: string;
+  endOfMonth: string;
+
   budgetProgresses: BudgetProgress[];
 
   // Bar Chart
@@ -65,6 +76,7 @@ export class HomeComponent implements OnInit {
   ) {}
   ngOnInit(): void {
     this.titleService.setTitle('Balancer');
+    this.AddCurrentMonthDatesRange();
     this.homeService.GetHome().subscribe({
       next: (result) => {
         this.home = result;
@@ -228,5 +240,18 @@ export class HomeComponent implements OnInit {
         behavior: 'smooth',
       });
     }
+  }
+
+  AddCurrentMonthDatesRange() {
+    const today = new Date();
+    const start = new Date(today.getFullYear(), today.getMonth(), 2);
+    const end = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+
+    this.startOfMonth = this.formatDate(start);
+    this.endOfMonth = this.formatDate(end);
+  }
+
+  formatDate(date: Date) {
+    return date.toISOString().split('T')[0];
   }
 }

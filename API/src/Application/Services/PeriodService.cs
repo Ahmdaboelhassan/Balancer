@@ -145,6 +145,11 @@ internal class PeriodService : IPeriodService
         var timeZone = TimeZoneInfo.FindSystemTimeZoneById(MagicStrings.TimeZone);
         var time = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZone);
 
+
+        if (DTO.IsCurrent)
+            await _uow.Periods
+                    .ExecuteUpdateAsync(p => p.IsCurrent, e => e.SetProperty(p => p.IsCurrent, false));
+        
         var newPeriod = new Period
         {
             Name = periodName,
@@ -154,6 +159,7 @@ internal class PeriodService : IPeriodService
             DaysCount = (int)days,
             Notes = DTO.Notes,
             PeriodBudget = DTO.PeriodBudget,
+            IsCurrent = DTO.IsCurrent,
         };
         await _uow.Periods.AddAsync(newPeriod);
         await _uow.SaveChangesAync();
@@ -181,6 +187,10 @@ internal class PeriodService : IPeriodService
         var timeZone = TimeZoneInfo.FindSystemTimeZoneById(MagicStrings.TimeZone);
         var time = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZone);
 
+        if (period.IsCurrent != DTO.IsCurrent && DTO.IsCurrent)
+            await _uow.Periods
+                    .ExecuteUpdateAsync(p => p.IsCurrent, e => e.SetProperty(p => p.IsCurrent, false));
+
         period.Name = periodName;
         period.From = DTO.From;
         period.To = DTO.To;
@@ -188,6 +198,7 @@ internal class PeriodService : IPeriodService
         period.DaysCount = (int)days;
         period.Notes = DTO.Notes;
         period.PeriodBudget = DTO.PeriodBudget;
+        period.IsCurrent = DTO.IsCurrent;
 
         _uow.Periods.Update(period);
         await _uow.SaveChangesAync();

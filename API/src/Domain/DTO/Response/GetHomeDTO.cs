@@ -11,6 +11,7 @@ public class GetHomeDTO
     public IEnumerable<decimal> Revenues{ get; set; }
     public IEnumerable<string> MonthsNames{ get; set; }
     public IEnumerable<BudgetAccountDTO> BudgetProgress { get; set; }
+    public int? OutSideBudgetCostCenterId { get; set; }
     public decimal AvailableFunds { get; set; }
     public decimal OtherExpensesTarget { get; set; }
     public decimal DayRate { get; set; }

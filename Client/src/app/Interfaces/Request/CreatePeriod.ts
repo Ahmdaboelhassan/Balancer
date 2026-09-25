@@ -3,6 +3,7 @@ export interface CreatePeriod {
   from: string;
   to: string;
   daysCount: number;
+  isCurrent: boolean;
   periodBudget?: number;
   notes: string;
 }

@@ -13,4 +13,5 @@ export interface Home {
   periodDays: number;
   availableFunds: number;
   otherExpensesTarget: number;
+  outSideBudgetCostCenterId?: number | null;
 }

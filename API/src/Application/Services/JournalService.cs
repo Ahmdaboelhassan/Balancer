@@ -216,7 +216,7 @@ internal class JournalService : IJournalService
 
         if (currentPeriodId == 0)
         {
-            var lastPeriod = await _uow.Periods.GetLastOrderBy(p => p.To);
+            var lastPeriod = await _uow.Periods.Get(p => p.IsCurrent);
             currentPeriodId = lastPeriod?.Id ?? 0;
         }
    
@@ -332,7 +332,7 @@ internal class JournalService : IJournalService
                 var credit = await _uow.Accounts.Get(model.CreditAccountId);
                 var debit = await _uow.Accounts.Get(model.DebitAccountId);
 
-                Period? period = model.PeriodId == 0 ? await _uow.Periods.GetLastOrderBy(p => p.From) : await _uow.Periods.Get(model.PeriodId);
+                Period? period = model.PeriodId == 0 ? await _uow.Periods.Get(p => p.IsCurrent) : await _uow.Periods.Get(model.PeriodId);
 
                 if (credit == null || debit == null)
                     return new Result<int> { Message = "Credit Account or Debit Account is Wrong" };

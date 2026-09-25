@@ -81,6 +81,7 @@ export class CreatePeriodComponent implements OnInit {
         disabled: true,
       }),
       daysCount: new FormControl(this.period?.daysCount),
+      isCurrent: new FormControl(this.period?.isCurrent ?? false),
       periodBudget: new FormControl(this.period?.periodBudget),
       notes: new FormControl(this.period.notes),
     });
@@ -100,6 +101,7 @@ export class CreatePeriodComponent implements OnInit {
       from: formValue.from,
       to: formValue.to,
       daysCount: formValue.daysCount,
+      isCurrent: formValue.isCurrent,
       notes: formValue.notes,
       periodBudget: formValue.periodBudget,
     };

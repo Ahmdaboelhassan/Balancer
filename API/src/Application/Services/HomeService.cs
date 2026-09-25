@@ -98,6 +98,7 @@ public class HomeService : IHomeService
             BudgetProgress = GetBudgetProgressTask.Result.budgetProgress,
             DayRate = settings.DefaultDayRate,
             PeriodDays = settings.DefaultPeriodDays.GetValueOrDefault(),
+            OutSideBudgetCostCenterId = settings.NotBudgetCostCenter
         };
     }
 
