@@ -1,10 +1,10 @@
-name: Deploy API
+name: Deploy
 
 on:
   workflow_dispatch:
   push:
     branches:
-      - master  
+      - master
 
 jobs:
   build-and-deploy:
@@ -14,15 +14,30 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
+      # ---------- Client ----------
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install Client Dependencies
+        run: npm install --legacy-peer-deps
+        working-directory: ./Client
+
+      - name: Build Angular App
+        run: npm run build -- --output-path=dist
+        working-directory: ./Client
+
+      # ---------- API ----------
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '8.0.x'  # Change this to match your .NET version
-          
+          dotnet-version: '8.0.x'
+
       - name: Restore Dependencies
         run: dotnet restore
         working-directory: ./API/src/API
-        
+
       - name: Restore appsettings.json
         run: echo '${{ secrets.APPSETTINGS_JSON }}' > ./API/src/API/appsettings.json
 
@@ -30,11 +45,17 @@ jobs:
         run: dotnet publish -c Release -o ../../../publish
         working-directory: ./API/src/API
 
+      # ---------- Combine ----------
+      - name: Copy Client into API wwwroot
+        run: |
+          mkdir -p ./publish/wwwroot
+          cp -r ./Client/dist/browser/. ./publish/wwwroot/
+
       - name: Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
-         server: "site16186.siteasp.net"  # Your Monster ASP FTP server
-         username: ${{ secrets.FTP_USERNAME }}
-         password: ${{ secrets.FTP_PASSWORD }}
-         local-dir: "./publish/"
-         server-dir: "/wwwroot/"
+          server: "site16186.siteasp.net"
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: "./publish/"
+          server-dir: "/wwwroot/"

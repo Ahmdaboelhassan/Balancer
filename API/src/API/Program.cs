@@ -42,6 +42,10 @@ if (builder.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+// Serve the Angular client from wwwroot
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
 app.UseCors("Client");
 
 app.UseAuthentication();
@@ -50,5 +54,7 @@ app.UseAuthorization();
 
 
 app.MapControllers();
+
+app.MapFallbackToFile("index.html");
 
 app.Run();
