@@ -25,7 +25,7 @@ public class Repository<T> : IRepository<T> where T : class
     }
     public Task<T?> Get(Expression<Func<T, bool>> criteria, params string[] includes)
     {
-        var query = _set.AsNoTracking().Where(criteria);
+        var query = _set.Where(criteria);
         foreach (var item in includes)
             query = query.Include(item);
 

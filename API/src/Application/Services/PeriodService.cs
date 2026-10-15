@@ -83,9 +83,9 @@ internal class PeriodService : IPeriodService
         DTO.DaysCount = Settings?.DefaultPeriodDays ?? 7;
         DTO.From = lastPeriod != null ? lastPeriod.To.AddDays(1) : time;
         DTO.To = DTO.From.AddDays(DTO.DaysCount - 1);
-        DTO.Notes = $"New Period In {time.ToShortTimeString()}";
+        DTO.PeriodBudget = lastPeriod?.PeriodBudget;
+        DTO.Notes = string.IsNullOrWhiteSpace(lastPeriod?.Notes) || lastPeriod?.Notes?.Trim().StartsWith("Period In") == true ? $"Period In {time.ToShortTimeString()}" : $"From Last Period:\n{lastPeriod.Notes}";
         DTO.IsCurrent = true;
-
         return DTO;
     }
     public async Task<GetPeriodDTO> GetById(int id)

@@ -442,18 +442,15 @@ internal class JournalService : IJournalService
                 if (model.Id == 0)
                     return await Create(model);
 
-                var journal = await _uow.Journal.Get(j => j.Id == model.Id, "JournalDetails");
+                var journal = await _uow.Journal.Get(j => j.Id == model.Id, "JournalDetails.CostCenters");
 
                 if (journal is null)
                     return new Result<int> { Message = "Invalid Journal" };
 
-                // Reset Period Value 
-                if (journal.Type == (byte)JournalTypes.Add || journal.Type == (byte)JournalTypes.Subtract)
-                    await ResetPeriodValueBeforeJournal(journal.PeriodId, journal.Amount);
+                var accounts = await _uow.Accounts.GetAll(a => a.Id == model.CreditAccountId || a.Id == model.DebitAccountId);
 
-                var credit = await _uow.Accounts.Get(model.CreditAccountId);
-                var debit = await _uow.Accounts.Get(model.DebitAccountId);
-                var period = await _uow.Periods.Get(model.PeriodId);
+                var credit = accounts.FirstOrDefault(d => d.Id == model.CreditAccountId);
+                var debit = accounts.FirstOrDefault(d => d.Id == model.DebitAccountId);
 
                 if (credit is null || debit is null)
                     return new Result<int> { Message = "Credit Account or Debit Account is Wrong" };
@@ -461,6 +458,7 @@ internal class JournalService : IJournalService
                 if (credit.IsParent || debit.IsParent)
                     return new Result<int> { Message = "Can Not Make Journal Using Parent Accounts" };
 
+                var period = await _uow.Periods.Get(model.PeriodId);
                 if (period is null)
                     return new Result<int> { Message = "Some Thing Wrong While Selecting Journal Period" };
 
@@ -478,61 +476,49 @@ internal class JournalService : IJournalService
                     return new Result<int> { Message = $"Cannot Be Created Because It is {difference} Day(s) Before The Start Of The Selected Period From Day {date}" };
                 }
 
-                var journalType = await GetJournalType(credit.Number, debit.Number);
+                // Reset Period Value
+                if (journal.Type == (byte)JournalTypes.Add || journal.Type == (byte)JournalTypes.Subtract)
+                    await ResetPeriodValueBeforeJournal(journal.PeriodId, journal.Amount);
 
+                var journalType = await GetJournalType(credit.Number, debit.Number);
                 var journalAmount = journalType == JournalTypes.Subtract ? model.Amount * -1 : model.Amount;
 
-                if (journal.Type == (byte)JournalTypes.Add || journal.Type == (byte)JournalTypes.Subtract)
-                {
+                if (journalType == JournalTypes.Add || journalType == JournalTypes.Subtract)
                     await _uow.Periods.ExecuteUpdateAsync(p => p.Id == model.PeriodId, e => e.SetProperty(p => p.TotalAmount, p => p.TotalAmount + journalAmount));
-                }
-                period.LastUpdatedAt = DateTime.Now;
+                
+                var timezone = TimeZoneInfo.FindSystemTimeZoneById(MagicStrings.TimeZone);
+                var currentTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timezone);
 
-
-                var egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById(MagicStrings.TimeZone);
-                var egyptTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptTimeZone);
+                period.LastUpdatedAt = currentTime;
 
                 journal.PeriodId = model.PeriodId;
                 journal.Detail = model.Detail;
                 journal.Amount = journalAmount;
                 journal.Type = (byte)journalType;
-                journal.LastUpdatedAt = egyptTime;
+                journal.LastUpdatedAt = currentTime;
                 journal.Description = model.Description;
                 journal.CreatedAt = model.CreatedAt;
 
-                // Delete Cost Center Details
-                var journalDetailIds = journal.JournalDetails.Select(d => d.Id).ToList();
-                var journalDetailCostCenters = await _uow.JournalDetailCostCenters.GetAll(jdc => journalDetailIds.Contains(jdc.JournalDetailId));
+                var debitDetail = journal.JournalDetails.First(d => d.Debit > 0);
+                var creditDetail = journal.JournalDetails.First(d => d.Credit > 0);
 
-                _uow.JournalDetailCostCenters.DeleteRange(journalDetailCostCenters);
+                debitDetail.AccountId = model.DebitAccountId;
+                debitDetail.Debit = model.Amount;
 
-                // Delete Old Details
-                _uow.JournalDetail.DeleteRange(journal.JournalDetails);
+                creditDetail.AccountId = model.CreditAccountId;
+                creditDetail.Credit = model.Amount;
 
-                await _uow.SaveChangesAync();
-
-
-                journal.JournalDetails = new Collection<JournalDetail>
+                // Sync Cost Centers
+                foreach (var detail in new[] { debitDetail, creditDetail })
                 {
-                    new JournalDetail
-                    {
-                        AccountId = model.DebitAccountId,
-                        Credit = 0,
-                        Debit = model.Amount,
-                        JournalId = journal.Id,
-                        CostCenters = model.CostCentersIds.Select(ccId => new JournalDetailCostCenter { CostCenterId = ccId }).ToList(),
-                    },
-                    new JournalDetail
-                    {
-                        AccountId = model.CreditAccountId,
-                        Credit = model.Amount,
-                        Debit = 0,
-                        JournalId = journal.Id,
-                        CostCenters = model.CostCentersIds.Select(ccId => new JournalDetailCostCenter { CostCenterId = ccId }).ToList(),
-                    }
-                };
+                    var removed = detail.CostCenters.Where(c => !model.CostCentersIds.Contains(c.CostCenterId)).ToList();
+                    _uow.JournalDetailCostCenters.DeleteRange(removed);
 
-                _uow.Journal.Update(journal);
+                    var existingIds = detail.CostCenters.Select(c => c.CostCenterId).ToHashSet();
+                    var newCostCenters = model.CostCentersIds.Where(id => !existingIds.Contains(id)).ToList();
+                    foreach (var ccId in newCostCenters)
+                        detail.CostCenters.Add(new JournalDetailCostCenter { CostCenterId = ccId });
+                }
 
                 await _uow.SaveChangesAync();
 
