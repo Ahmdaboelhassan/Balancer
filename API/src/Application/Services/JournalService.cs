@@ -8,7 +8,6 @@ using Domain.Static;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 using System.Collections.ObjectModel;
-using static Azure.Core.HttpHeader;
 
 namespace Application.Services;
 internal class JournalService : IJournalService
@@ -83,8 +82,8 @@ internal class JournalService : IJournalService
                 Type = journal.Journal.Type,
                 Code = journal.Journal.Code,
                 Notes = $"{journal.CreditAccount?.Name ?? ""} -> {journal.DebitAccount?.Name ?? ""}",
-                LastUpdatedAt = journal.Journal.LastUpdatedAt?.ToString("f"),
-                ActualCreatedAt = journal.Journal.ActualCreatedAt?.ToString("f"),
+                LastUpdatedAt = journal.Journal.LastUpdatedAt?.ToString("dddd, dd/MM/yyyy hh:mm tt"),
+                ActualCreatedAt = journal.Journal.ActualCreatedAt?.ToString("dddd, dd/MM/yyyy hh:mm tt"),
                 PeriodId = journal.Journal.PeriodId,
                 Detail = journal.Journal.Detail,
                 Description = journal.Journal.Description,
@@ -381,10 +380,6 @@ internal class JournalService : IJournalService
                     if (defualtCostCenter.HasValue)
                         model.CostCentersIds.Add(defualtCostCenter.Value);
                 }
-
-
-
-          
 
                 var newJournal = new Journal
                 {

@@ -2,7 +2,6 @@ import { Component, HostListener, signal, WritableSignal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { JournalService } from '../../../Services/journal.service';
 import { Title } from '@angular/platform-browser';
-import { ToastrService } from 'ngx-toastr';
 import Swal from 'sweetalert2';
 
 import {
@@ -53,13 +52,14 @@ export class CreateJournalComponent {
   };
   editorModules: QuillModules = {
     toolbar: [
+      [{ size: ['small', false, 'large', 'huge'] }],
       ['bold', 'italic', 'underline', 'strike'],
       [{ color: [] }],
-      [{ script: 'sub' }, { script: 'super' }],
-      [{ list: 'ordered' }, { list: 'bullet' }, { list: 'check' }],
+      // [{ script: 'sub' }, { script: 'super' }],
+      // [{ list: 'ordered' }, { list: 'bullet' }],
       [{ indent: '-1' }, { indent: '+1' }],
-      [{ direction: 'rtl' }, { align: [] }],
-      ['link', 'image'],
+      // [{ direction: 'rtl' }, { align: [] }],
+      // ['link', 'image'],
       ['clean'],
     ],
   };
