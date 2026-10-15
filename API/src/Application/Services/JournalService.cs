@@ -226,6 +226,8 @@ internal class JournalService : IJournalService
                 To = period.To.ToShortDateString(),
                 Id = period.Id,
                 Name = period.Name,
+                TotalAmount = period.TotalAmount,
+                PeriodBudget = period.PeriodBudget,
                 Journals = period.Journals.OrderBy(j => j.CreatedAt)
                 .Select(j => new JournalListItemDTO
                 {
@@ -245,7 +247,10 @@ internal class JournalService : IJournalService
          if (period is null || !period.Any())
             return new PeriodJournals();
 
-         return period.First();
+         var result = period.First();
+         result.Remains = result.PeriodBudget.HasValue ? (result.PeriodBudget > 0 ? result.TotalAmount - result.PeriodBudget : Math.Abs(result.PeriodBudget.Value) - Math.Abs(result.TotalAmount)) : null;
+
+         return result;
 
     }
     public async Task<int> GetNextCode()

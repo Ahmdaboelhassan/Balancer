@@ -5,5 +5,8 @@ export interface Periodjournals {
   name: string;
   from: string;
   to: string;
-  journal: JournalListItem[];
+  totalAmount: number;
+  periodBudget?: number;
+  remains?: number;
+  journals: JournalListItem[];
 }

@@ -5,5 +5,8 @@ public class PeriodJournals
     public string Name { get; set; }
     public string From { get; set; }
     public string To { get; set; }
+    public decimal TotalAmount { get; set; }
+    public decimal? PeriodBudget { get; set; }
+    public decimal? Remains { get; set; }
     public IEnumerable<JournalListItemDTO> Journals { get; set; }
 }

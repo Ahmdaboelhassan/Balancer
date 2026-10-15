@@ -1,33 +1,75 @@
-@if(model){
-<div class="bg-white rounded-xl p-5">
-  <div class="flex flex-col lg:flex-row justify-between">
-    <div class="title">
-      @if(!isCurrentPeriod){
-      <h1 class="text-3xl text-slate-800 font-bold">
-        Journals For {{ model.name }}
-      </h1>
-      } @else {
-      <h1 class="text-3xl text-slate-800 font-bold">
-        Journals For Current Period
-      </h1>
+@if (model) {
+  <div class="bg-white rounded-xl p-5">
+    <div class="flex flex-col lg:flex-row justify-between">
+      <div class="title">
+        @if (!isCurrentPeriod) {
+          <h1 class="text-3xl text-slate-800 font-bold">
+            Journals For {{ model.name }}
+          </h1>
+        } @else {
+          <h1 class="text-3xl text-slate-800 font-bold">
+            Journals For Current Period
+          </h1>
+        }
+        <div class="md:flex mt-2">
+          <h2 [ngClass]="['text-lg text-gray-600']">
+            {{ model.from }} - {{ model.to }}
+          </h2>
+          @if (model.periodBudget) {
+            <div class="md:ms-4 md:mt-0 mt-2 flex items-center gap-2 flex-wrap">
+              <!-- Budget -->
+              <span
+                class="inline-flex items-center gap-1.5 rounded-full bg-blue-100 px-3 py-1 text-xs lg:text-md font-medium text-blue-700"
+                title="Budget"
+              >
+                <i class="fa-solid fa-wallet"></i>
+                {{ model.periodBudget }}
+              </span>
+
+              <!-- Spent -->
+              <span
+                class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs lg:text-md font-medium"
+                title="Spent"
+                [ngClass]="
+                  model.totalAmount >= 0
+                    ? 'bg-green-100 text-green-700'
+                    : 'bg-red-100 text-red-700'
+                "
+              >
+                <i class="fa-solid fa-coins"></i>
+                {{ model.totalAmount }}
+              </span>
+
+              <!-- Remaining -->
+              <span
+                class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs lg:text-md font-medium"
+                title="Remaining"
+                [ngClass]="
+                  model.remains >= 0
+                    ? 'bg-green-100 text-green-700'
+                    : 'bg-red-100 text-red-700'
+                "
+              >
+                <i class="fa-solid fa-chart-line"></i>
+                {{ model.remains }}
+              </span>
+            </div>
+          }
+        </div>
+      </div>
+      @if (!isCurrentPeriod) {
+        <div class="actions mt-2">
+          <a
+            [routerLink]="['/Journal', 'Create']"
+            [queryParams]="{ periodId: periodId }"
+            class="btn-primary print:hidden"
+            >Add Journal To Period ({{ periodId }})</a
+          >
+        </div>
       }
-      <h2 [ngClass]="['text-lg text-gray-600']">
-        {{ model.from }} - {{ model.to }}
-      </h2>
     </div>
-    @if(!isCurrentPeriod){
-    <div class="actions mt-2">
-      <a
-        [routerLink]="['/Journal', 'Create']"
-        [queryParams]="{ periodId: periodId }"
-        class="btn-primary print:hidden"
-        >Add Journal To Period ({{ periodId }})</a
-      >
-    </div>
-    }
   </div>
-</div>
-<div class="bg-white rounded-xl p-5 mt-4 min-h-[calc(100%-9rem)]">
-  <app-journal-list [journals]="model.journals"></app-journal-list>
-</div>
+  <div class="bg-white rounded-xl p-5 mt-4 min-h-[calc(100%-9rem)]">
+    <app-journal-list [journals]="model.journals"></app-journal-list>
+  </div>
 }
