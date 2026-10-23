@@ -1,3 +1,5 @@
+import { BudgetAccountTypes } from '../../Enums/BudgetAccountTypes';
+
 export interface BudgetSummaryDTO {
   id: number;
   name: string;
@@ -7,10 +9,15 @@ export interface BudgetSummaryDTO {
   spentPercentage?: number | null;
   remainPercentage?: number | null;
   isOtherExpenses: boolean;
+  color?: string | null;
+  type?: BudgetAccountTypes | null;
+  bestBudget?: number | null;
 }
 
 export interface BudgetSummaryReportDTO {
   periods: BudgetSummaryDTO[];
-  accounts: BudgetSummaryDTO[];
+  payOnceAccounts: BudgetSummaryDTO[];
+  incrementalAccounts: BudgetSummaryDTO[];
+  outSideBudgetAccounts: BudgetSummaryDTO[];
   savings: BudgetSummaryDTO[];
 }

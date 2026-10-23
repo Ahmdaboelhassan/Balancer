@@ -301,7 +301,7 @@ public class ReportService : IReportService
     public async Task<BudgetSummaryReportDTO> GetBudgetSummary(DateTime from, DateTime to)
     {
         var settings = await _uow.Settings.GetFirst();
-        var dashboardSettings = await _uow.DashboardSettings.GetFirst();
+        var dashboardSettings = await _uow.DashboardSettings.GetFirst(nameof(DashboardSettings.SavingTargetAccount));
 
         if (settings is null || dashboardSettings is null ||
             !settings.ExpensesAccount.HasValue ||
@@ -389,17 +389,26 @@ public class ReportService : IReportService
                         overBudgetTotal += Math.Max(0, spent - x.budget.Budget);
 
                     var remains = x.budget.Budget - spent;
-                    return new BudgetSummaryDTO
+                    return new
                     {
-                        Id = x.budget.AccountId,
-                        Name = x.budget.DisplayName,
-                        Budget = x.budget.Budget,
-                        Spent = spent,
-                        Remains = remains,
-                        SpentPercentage = x.budget.Budget != 0 ? Math.Round((spent / x.budget.Budget) * 100) : 0,
-                        RemainPercentage = x.budget.Budget != 0 ? Math.Round((remains / x.budget.Budget) * 100) : 0,
+                        x.budget.PaidMethodId,
+                        x.budget.TypeId,
+                        Summary = new BudgetSummaryDTO
+                        {
+                            Id = x.budget.AccountId,
+                            Name = x.budget.DisplayName,
+                            Budget = x.budget.Budget,
+                            Spent = spent,
+                            Remains = remains,
+                            SpentPercentage = x.budget.Budget != 0 ? Math.Round((spent / x.budget.Budget) * 100) : 0,
+                            RemainPercentage = x.budget.Budget != 0 ? Math.Round((remains / x.budget.Budget) * 100) : 0,
+                            Color = x.budget.Color,
+                            Type = x.budget.TypeId,
+                            BestBudget = x.budget.BestBudget,
+                        }
                     };
                 })
+            .OrderByDescending(x => x.Summary.Remains)
             .ToList();
 
         var excludedAccountNumbers = budgetAccounts
@@ -417,11 +426,7 @@ public class ReportService : IReportService
 
         var otherExpensesTarget =  dashboardSettings.OtherExpensesTarget + dashboardSettings.AddOnExpensesTarget;
 
-        budgetProgress = budgetProgress.OrderByDescending(x => x.Remains).ToList();
-
-        // TOTAL ACCOUNTS SUMMARY
-
-        budgetProgress.Add(new BudgetSummaryDTO
+        var otherExpensesSummary = new BudgetSummaryDTO
         {
             Id = settings.NotBudgetCostCenter ?? 0,
             IsOtherExpenses = true,
@@ -430,18 +435,71 @@ public class ReportService : IReportService
             Spent = otherExpenses,
             SpentPercentage = otherExpensesTarget != 0 ? Math.Round((otherExpenses / otherExpensesTarget) * 100) : 0,
             Remains = otherExpensesTarget - otherExpenses,
-            RemainPercentage = otherExpensesTarget != 0 ? Math.Round(((otherExpensesTarget - otherExpenses) / dashboardSettings.OtherExpensesTarget) * 100) : 0,
-        });
+            RemainPercentage = otherExpensesTarget != 0 ? Math.Round(((otherExpensesTarget - otherExpenses) / otherExpensesTarget) * 100) : 0,
+        };
 
+        // TOTAL ACCOUNTS SUMMARY
 
+        var payOnceAccounts = budgetProgress
+            .Where(d => d.TypeId != BudgetAccountTypes.OutSideBudget && d.PaidMethodId == PaidMethods.Once)
+            .Select(d => d.Summary);
 
-        var expensesAccounts = budgetProgress.Where(d => d.Id != settings.CurrentCashAccount).ToList();
+        var incrementalAccounts = budgetProgress
+            .Where(d => d.TypeId != BudgetAccountTypes.OutSideBudget && d.PaidMethodId == PaidMethods.Incrementals)
+            .Select(d => d.Summary);
 
-        var totalAccountsSpent = expensesAccounts.Sum(x => x.Spent);
-        var totalAccountsRemaining = expensesAccounts.Sum(x => x.Remains ?? 0);
-        var totalAccountsBudget = expensesAccounts.Sum(x => x.Budget ?? 0);
+        // Other expenses are the not budget expenses, so they are listed with the out side budget accounts
+        var outSideBudgetAccounts = budgetProgress
+            .Where(d => d.TypeId == BudgetAccountTypes.OutSideBudget)
+            .Select(d => d.Summary)
+            .Append(otherExpensesSummary);
 
-        expensesAccounts.Add(new BudgetSummaryDTO
+        // SAVING TARGET (same as Home, its budget is the Total Revenue)
+        var savings = new List<BudgetSummaryDTO>();
+
+        if (dashboardSettings.SavingTargetAccount != null)
+        {
+            var savingTargetSpent = journalTotalsByAccount
+                .Where(d => d.AccountNumber.StartsWith(dashboardSettings.SavingTargetAccount.Number))
+                .Sum(d => d.Total);
+
+            var savingTargetRemains = dashboardSettings.TotalRevenue - savingTargetSpent;
+
+            savings.Add(new BudgetSummaryDTO
+            {
+                Id = dashboardSettings.SavingTargetAccount.Id,
+                Name = string.IsNullOrWhiteSpace(dashboardSettings.SavingTargetDisplayName) ? dashboardSettings.SavingTargetAccount.Name : dashboardSettings.SavingTargetDisplayName,
+                IsSavingTarget = true,
+                Budget = dashboardSettings.TotalRevenue,
+                Spent = savingTargetSpent,
+                Remains = savingTargetRemains,
+                SpentPercentage = dashboardSettings.TotalRevenue != 0 ? Math.Round((savingTargetSpent / dashboardSettings.TotalRevenue) * 100) : 0,
+                RemainPercentage = dashboardSettings.TotalRevenue != 0 ? Math.Round((savingTargetRemains / dashboardSettings.TotalRevenue) * 100) : 0,
+            });
+        }
+
+        return new BudgetSummaryReportDTO
+        {
+            Periods = periodSummaries,
+            PayOnceAccounts = AddBudgetSummaryTotal(payOnceAccounts),
+            IncrementalAccounts = AddBudgetSummaryTotal(incrementalAccounts),
+            OutSideBudgetAccounts = AddBudgetSummaryTotal(outSideBudgetAccounts),
+            Savings = savings
+        };
+    }
+
+    private static List<BudgetSummaryDTO> AddBudgetSummaryTotal(IEnumerable<BudgetSummaryDTO> accounts)
+    {
+        var accountsList = accounts.ToList();
+
+        if (accountsList.Count == 0)
+            return accountsList;
+
+        var totalAccountsSpent = accountsList.Sum(x => x.Spent);
+        var totalAccountsRemaining = accountsList.Sum(x => x.Remains ?? 0);
+        var totalAccountsBudget = accountsList.Sum(x => x.Budget ?? 0);
+
+        accountsList.Add(new BudgetSummaryDTO
         {
             Id = 0,
             Name = "",
@@ -456,17 +514,7 @@ public class ReportService : IReportService
                 : null,
         });
 
-
-        var savings = budgetProgress
-            .Where(d => d.Id == settings.CurrentCashAccount || d.Id == settings.CurrentAssetsAccount)
-            .ToList();
-
-        return new BudgetSummaryReportDTO
-        {
-            Periods = periodSummaries,
-            Accounts = expensesAccounts,
-            Savings = savings
-        };
+        return accountsList;
     }
     public async Task<IEnumerable<AccountSummaryDTO>> GetAccountsSummary(DateTime from, DateTime to, int? costCenterId)
     {

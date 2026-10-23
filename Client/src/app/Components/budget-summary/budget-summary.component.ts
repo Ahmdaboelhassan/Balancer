@@ -8,6 +8,10 @@ import {
 } from '../../Interfaces/Response/BudgetSummaryReportDTO';
 import { CurrencyPipe, DecimalPipe, NgClass } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import {
+  BudgetAccountTypeOptions,
+  BudgetAccountTypes,
+} from '../../Enums/BudgetAccountTypes';
 
 @Component({
   selector: 'app-budget-summary',
@@ -17,7 +21,12 @@ import { RouterLink } from '@angular/router';
 })
 export class BudgetSummaryComponent {
   periods: BudgetSummaryDTO[] = [];
-  accounts: BudgetSummaryDTO[] = [];
+  // Each grid lists its accounts followed by its total row
+  accountGrids: { title: string; accounts: BudgetSummaryDTO[] }[] = [
+    { title: 'Pay Once', accounts: [] },
+    { title: 'Incremental', accounts: [] },
+    { title: 'Out Side Budget', accounts: [] },
+  ];
   savings: BudgetSummaryDTO[] = [];
   to: string;
   from: string;
@@ -29,6 +38,10 @@ export class BudgetSummaryComponent {
     this.titleService.setTitle('Budget Summary');
   }
 
+  getTypeLabel(type: BudgetAccountTypes): string {
+    return BudgetAccountTypeOptions.find((o) => o.value === type)?.label ?? '';
+  }
+
   GetBudgetSummary(dates: any) {
     this.to = dates.to;
     this.from = dates.from;
@@ -36,7 +49,14 @@ export class BudgetSummaryComponent {
     this.reportService.GetBudgetSummary(dates.from, dates.to).subscribe({
       next: (result) => {
         this.periods = result.periods ?? [];
-        this.accounts = result.accounts ?? [];
+        this.accountGrids = [
+          { title: 'Pay Once', accounts: result.payOnceAccounts ?? [] },
+          { title: 'Incremental', accounts: result.incrementalAccounts ?? [] },
+          {
+            title: 'Out Side Budget',
+            accounts: result.outSideBudgetAccounts ?? [],
+          },
+        ];
         this.savings = result.savings ?? [];
       },
     });

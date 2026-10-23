@@ -1,36 +1,47 @@
 <app-date-range (dates)="GetBudgetSummary($event)"></app-date-range>
 
-<div class="bg-white mt-2 rounded-xl overflow-auto">
+@for (grid of accountGrids; track grid.title) {
+<div class="bg-white rounded-xl overflow-auto" [ngClass]="$first ? 'mt-2' : 'mt-3'">
   <table class="w-full text-sm text-left rtl:text-right text-gray-500">
     <tr class="text-xs text-white uppercase bg-slate-800">
-      <th class="px-8 py-3">Account</th>
+      <th class="px-8 py-3">{{ grid.title }}</th>
       <th class="px-5 py-3">Budget</th>
       <th class="px-8 py-3">Spent</th>
       <th class="px-8 py-3">Remains</th>
       <th class="px-8 py-3">Spent %</th>
       <th class="px-8 py-3">Remain %</th>
     </tr>
-    @if (accounts.length > 0) {
+    @if (grid.accounts.length > 0) {
       <tbody>
-        @for (account of accounts; track $index) {
+        @for (account of grid.accounts; track $index) {
           <tr
               class="border-b"
-            [ngClass]="
-              account.isOtherExpenses
-                ? 'bg-blue-100 hover:bg-blue-200'
-                : account.remains < 0
-                ? 'bg-red-100 hover:bg-red-200'
-                : account.remains == 0
-                ? 'bg-green-100 hover:bg-green-200'
-                : !account.name
-                ? 'bg-purple-200 hover:bg-purple-300'
-                : 'bg-white hover:bg-gray-100'
+              [ngClass]="
+              !account.name ? 
+                'bg-slate-300 hover:bg-slate-400 hover:text-white'
+                  : account.remains < 0
+                  ? 'bg-red-100 hover:bg-red-200'
+                  : account.remains == 0
+                  ? 'bg-green-100 hover:bg-green-200'
+                  : 'bg-white hover:bg-gray-100'
             "
-          > 
+          >
             <th
               scope="row"
               class="px-6 py-4 font-bold text-base text-gray-900 whitespace-nowrap"
             >
+              @if (account.color) {
+                <span
+                  class="inline-block w-3 h-3 rounded-full me-2"
+                  [style.background-color]="account.color"
+                ></span>
+              }
+              @else if (account.color == null && account.name) {
+                <span
+                  class="inline-block w-3 h-3 rounded-full me-2"
+                  [style.background-color]="'#000000'"
+                ></span>
+              }
               {{ account.name }}
 
                 @if (account.name) {
@@ -50,6 +61,20 @@
                     ></i>
                   </a>
               }
+              @if (account.type) {
+                <span
+                  class="ms-2 align-middle inline-flex items-center rounded-full bg-slate-200 px-2.5 py-0.5 text-xs font-medium text-slate-700"
+                >
+                  {{ getTypeLabel(account.type) }}
+                </span>
+              }
+              <!-- @if (account.bestBudget) {
+                <span
+                  class="ms-1 align-middle inline-flex items-center rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-700"
+                >
+                  Best {{ account.bestBudget | currency }}
+                </span>
+              } -->
             </th>
             <td class="px-8 py-4 font-bold">
               {{ account.budget | currency }}
@@ -72,6 +97,7 @@
     }
   </table>
 </div>
+}
 
 <div class="bg-white mt-3 rounded-xl overflow-auto">
   <table class="w-full text-sm text-left rtl:text-right text-gray-500">
@@ -88,7 +114,7 @@
       <tbody>
         @for (period of periods; track $index) {
           <tr class="border-b" 
-              [ngClass]="period.name ? 'bg-white hover:bg-gray-50' :'bg-purple-200 hover:bg-purple-300' ">
+              [ngClass]="period.name ? 'bg-white hover:bg-gray-50' :   'bg-slate-300 hover:bg-slate-400 hover:text-white' ">
             <th
               scope="row"
               class="px-6 py-4 font-bold text-base text-gray-900 whitespace-nowrap"
@@ -143,6 +169,12 @@
               scope="row"
               class="px-6 py-4 font-bold text-base text-gray-900 whitespace-nowrap"
             >
+              @if (account.color) {
+                <span
+                  class="inline-block w-3 h-3 rounded-full me-2"
+                  [style.background-color]="account.color"
+                ></span>
+              }
               {{ account.name }}
               <a
                 target="_blank"
