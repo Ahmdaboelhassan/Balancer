@@ -135,6 +135,7 @@ public class HomeService : IHomeService
                      return new BudgetAccountDTO
                      {   AccountId =  x.ba.AccountId,
                          DisplayName = x.ba.DisplayName,
+                         Type = x.ba.TypeId,
                          Budget = x.ba.Budget,
                          Spent = totalSpent,
                          Percentage = (x.ba.Budget != 0) ? Math.Round((totalSpent / x.ba.Budget) * 100) : 0,
@@ -154,7 +155,11 @@ public class HomeService : IHomeService
         if (dashboard.ApplyOverBudgetToFunds)
             otherExpenses += overBudget;
 
-        var availableFunds = dashboard.OtherExpensesTarget - otherExpenses + dashboard.AddOnExpensesTarget;
+        var otherExpensesBudgetTargets = budgetProgress
+            .Where(d => d.Type == BudgetAccountTypes.OutSideBudget)
+            .Sum(d => d.Budget);
+
+        var availableFunds = dashboard.OtherExpensesTarget - otherExpenses + dashboard.AddOnExpensesTarget + otherExpensesBudgetTargets;
 
         // Saving Target is calculated separately, its budget is the Total Revenue
         BudgetAccountDTO? currentCash = null;
@@ -179,13 +184,15 @@ public class HomeService : IHomeService
                 .Where(d => d.Spent < d.Budget)
                 .Sum(d => d.Budget - d.Spent);
 
+      
+
         return new HomeBudgetDto
         {
             BudgetProgress = budgetProgress.Where(d => d.Spent < d.Budget),
             OtherExpenses = otherExpenses,
             OverBudget = overBudget,
             AvailableFunds = availableFunds,
-            OtherExpensesTarget = dashboard.OtherExpensesTarget + dashboard.AddOnExpensesTarget,
+            OtherExpensesTarget = dashboard.OtherExpensesTarget + dashboard.AddOnExpensesTarget + otherExpensesBudgetTargets,
             CurrentCash = currentCash,
             TotalRemains = totalRemains,
             CurrentCashBudgetAfterRemian = (currentCash?.Spent ?? 0) 
