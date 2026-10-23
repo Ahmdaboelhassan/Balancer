@@ -437,7 +437,8 @@ public class ReportService : IReportService
         // Other expenses are the not budget expenses, so they are listed with the out side budget accounts
         var outSideBudgetAccounts = budgetProgress
             .Where(d => d.TypeId == BudgetAccountTypes.OutSideBudget)
-            .Select(d => d.Summary);
+            .Select(d => d.Summary)
+            .ToList();
            
         var outSideBudgetAccountsSum = outSideBudgetAccounts.Sum(d => d.Budget);
 
@@ -455,7 +456,7 @@ public class ReportService : IReportService
             RemainPercentage = otherExpensesTarget != 0 ? Math.Round(((otherExpensesTarget - otherExpenses) / otherExpensesTarget) * 100) : 0,
         };
 
-        outSideBudgetAccounts.Append(otherExpensesSummary);
+        outSideBudgetAccounts.Add(otherExpensesSummary);
         // SAVING TARGET (same as Home, its budget is the Total Revenue)
         var savings = new List<BudgetSummaryDTO>();
 
