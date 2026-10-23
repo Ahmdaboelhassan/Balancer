@@ -424,20 +424,6 @@ public class ReportService : IReportService
         if (dashboardSettings.ApplyOverBudgetToFunds)
             otherExpenses += overBudgetTotal;
 
-        var otherExpensesTarget =  dashboardSettings.OtherExpensesTarget + dashboardSettings.AddOnExpensesTarget;
-
-        var otherExpensesSummary = new BudgetSummaryDTO
-        {
-            Id = settings.NotBudgetCostCenter ?? 0,
-            IsOtherExpenses = true,
-            Name = "Other Expenses",
-            Budget = otherExpensesTarget,
-            Spent = otherExpenses,
-            SpentPercentage = otherExpensesTarget != 0 ? Math.Round((otherExpenses / otherExpensesTarget) * 100) : 0,
-            Remains = otherExpensesTarget - otherExpenses,
-            RemainPercentage = otherExpensesTarget != 0 ? Math.Round(((otherExpensesTarget - otherExpenses) / otherExpensesTarget) * 100) : 0,
-        };
-
         // TOTAL ACCOUNTS SUMMARY
 
         var payOnceAccounts = budgetProgress
@@ -451,9 +437,25 @@ public class ReportService : IReportService
         // Other expenses are the not budget expenses, so they are listed with the out side budget accounts
         var outSideBudgetAccounts = budgetProgress
             .Where(d => d.TypeId == BudgetAccountTypes.OutSideBudget)
-            .Select(d => d.Summary)
-            .Append(otherExpensesSummary);
+            .Select(d => d.Summary);
+           
+        var outSideBudgetAccountsSum = outSideBudgetAccounts.Sum(d => d.Budget);
 
+        var otherExpensesTarget = dashboardSettings.OtherExpensesTarget + dashboardSettings.AddOnExpensesTarget + (outSideBudgetAccountsSum ?? 0);
+
+        var otherExpensesSummary = new BudgetSummaryDTO
+        {
+            Id = settings.NotBudgetCostCenter ?? 0,
+            IsOtherExpenses = true,
+            Name = "Other Expenses",
+            Budget = otherExpensesTarget,
+            Spent = otherExpenses,
+            SpentPercentage = otherExpensesTarget != 0 ? Math.Round((otherExpenses / (otherExpensesTarget)) * 100) : 0,
+            Remains = otherExpensesTarget - otherExpenses,
+            RemainPercentage = otherExpensesTarget != 0 ? Math.Round(((otherExpensesTarget - otherExpenses) / otherExpensesTarget) * 100) : 0,
+        };
+
+        outSideBudgetAccounts.Append(otherExpensesSummary);
         // SAVING TARGET (same as Home, its budget is the Total Revenue)
         var savings = new List<BudgetSummaryDTO>();
 
