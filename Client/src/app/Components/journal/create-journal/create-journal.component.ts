@@ -58,7 +58,7 @@ export class CreateJournalComponent {
       // [{ script: 'sub' }, { script: 'super' }],
       // [{ list: 'ordered' }, { list: 'bullet' }],
       [{ indent: '-1' }, { indent: '+1' }],
-      // [{ direction: 'rtl' }, { align: [] }],
+      [{ direction: 'rtl' }],
       // ['link', 'image'],
       ['clean'],
     ],

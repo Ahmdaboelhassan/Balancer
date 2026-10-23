@@ -15,6 +15,6 @@ namespace Domain.IServices
       Task<DashboardSettingsDTO> GetDashboardSettings();
       Task<ConfirmationResponse> EditDashboardSettings(DashboardSettingsDTO settings);
       Task<IEnumerable<BudgetAccountSettingsDTO>> GetBudgetAccountSettings();
-      Task<ConfirmationResponse> EditBudgetAccountSettings(IEnumerable<BudgetAccountSettingsDTO> settings);
+      Task<ConfirmationResponse> EditBudgetAccountSettings(BudgetSettingsDTO settings);
     }
 }

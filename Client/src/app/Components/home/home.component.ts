@@ -1,7 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { BaseChartDirective } from 'ng2-charts';
 import { AccountsBalance } from '../../Interfaces/Response/AccountsBalance';
-import { NgClass, NgStyle } from '@angular/common';
+import { CurrencyPipe, NgClass, NgStyle } from '@angular/common';
 import { HomeService } from '../../Services/home.service';
 import { Title } from '@angular/platform-browser';
 import { Home } from '../../Interfaces/Response/Home';
@@ -15,6 +15,7 @@ import { RouterLink } from '@angular/router';
   imports: [
     BaseChartDirective,
     BudgetBarDirective,
+    CurrencyPipe,
     NgClass,
     NgStyle,
     RouterLink,
@@ -30,6 +31,7 @@ export class HomeComponent implements OnInit {
   endOfMonth: string;
 
   budgetProgresses: BudgetProgress[];
+  currentCash: BudgetProgress | null = null;
 
   // Bar Chart
   RevenuesAndExpensesChart = signal({});
@@ -48,8 +50,6 @@ export class HomeComponent implements OnInit {
     periods: 0,
     days: 0,
   };
-
-  moneyNeed: string = '0';
 
   colors = [
     'bg-green-500',
@@ -81,6 +81,7 @@ export class HomeComponent implements OnInit {
       next: (result) => {
         this.home = result;
         this.budgetProgresses = this.GetBudgetProgress(this.home, false);
+        this.currentCash = result.budget.currentCash;
         this.balances.set(result.accountsSummary);
         this.InitializeLineChart(result.lastPeriods);
         this.IntializePieChart(result.journalsTypesSummary);
@@ -89,7 +90,7 @@ export class HomeComponent implements OnInit {
           result.expenses,
           result.monthsNames,
         );
-        this.GetEstimatedMonthNeed(result.periodDays, result.dayRate);
+        this.CalculateTimeLeft(result.periodDays);
       },
     });
   }
@@ -171,7 +172,11 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  GetEstimatedMonthNeed(periodDays, dayRate) {
+  get IsCurrentCashShort(): boolean {
+    return (this.home?.budget?.currentCash.spent ?? 0) < 0;
+  }
+
+  CalculateTimeLeft(periodDays) {
     const currentDate = new Date();
 
     const lastDay = new Date(
@@ -183,12 +188,6 @@ export class HomeComponent implements OnInit {
     const timeDifference = lastDay.getTime() - currentDate.getTime();
     const days = Math.ceil(timeDifference / 1000 / 60 / 60 / 24);
     const periods = Math.floor(days / periodDays);
-    const money = days * dayRate;
-
-    this.moneyNeed = new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(money);
 
     this.timeLeft = { periods: periods, days: days };
   }
@@ -226,7 +225,7 @@ export class HomeComponent implements OnInit {
   }
 
   GetBudgetProgress(home: Home, fillAmount: boolean): BudgetProgress[] {
-    return home.budgetProgress.map((el) => ({
+    return (home.budget?.budgetProgress ?? []).map((el) => ({
       budget: el.budget,
       color: el.color,
       displayName: el.displayName,

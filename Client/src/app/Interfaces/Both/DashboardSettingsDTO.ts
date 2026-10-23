@@ -6,5 +6,9 @@ export interface DashboardSettingsDTO {
   account4: number;
   otherExpensesTarget: number;
   addOnExpensesTarget: number;
+  totalRevenue: number;
+  totalIncome: number;
+  savingTargetAccountId?: number | null;
+  savingTargetDisplayName?: string | null;
   applyOverBudgetToFunds: boolean;
 }

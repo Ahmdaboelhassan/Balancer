@@ -1,5 +1,5 @@
 import { AccountsBalance } from './AccountsBalance';
-import { BudgetProgress } from './BudgetProgress';
+import { HomeBudget } from './HomeBudget';
 
 export interface Home {
   accountsSummary: AccountsBalance[];
@@ -8,10 +8,8 @@ export interface Home {
   expenses: number[];
   revenues: number[];
   monthsNames: string[];
-  budgetProgress: BudgetProgress[];
+  budget: HomeBudget;
   dayRate: number;
   periodDays: number;
-  availableFunds: number;
-  otherExpensesTarget: number;
   outSideBudgetCostCenterId?: number | null;
 }

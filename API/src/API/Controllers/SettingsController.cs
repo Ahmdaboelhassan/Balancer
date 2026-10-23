@@ -57,7 +57,7 @@ namespace API.Controllers
         }
 
         [HttpPost("EditBudgetAccountSettings")]
-        public async Task<IActionResult> EditBudgetAccountSettings(IEnumerable<BudgetAccountSettingsDTO> model)
+        public async Task<IActionResult> EditBudgetAccountSettings(BudgetSettingsDTO model)
         {
             var result = await _settingsService.EditBudgetAccountSettings(model);
             if (result.IsSucceed)

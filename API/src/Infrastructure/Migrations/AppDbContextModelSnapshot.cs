@@ -75,6 +75,9 @@ namespace API.Migrations
                     b.Property<int>("AccountId")
                         .HasColumnType("int");
 
+                    b.Property<decimal>("BestBudget")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<decimal>("Budget")
                         .HasColumnType("decimal(18,2)");
 
@@ -86,8 +89,17 @@ namespace API.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<decimal>("MaximumBudget")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("Notes")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PaidMethodId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TypeId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -154,7 +166,21 @@ namespace API.Migrations
                     b.Property<decimal>("OtherExpensesTarget")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int?>("SavingTargetAccountId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SavingTargetDisplayName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("TotalIncome")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TotalRevenue")
+                        .HasColumnType("decimal(18,2)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("SavingTargetAccountId");
 
                     b.ToTable("DashboardSettings");
                 });
@@ -525,6 +551,15 @@ namespace API.Migrations
                         .IsRequired();
 
                     b.Navigation("Account");
+                });
+
+            modelBuilder.Entity("Domain.Entities.DashboardSettings", b =>
+                {
+                    b.HasOne("Domain.Entities.Account", "SavingTargetAccount")
+                        .WithMany()
+                        .HasForeignKey("SavingTargetAccountId");
+
+                    b.Navigation("SavingTargetAccount");
                 });
 
             modelBuilder.Entity("Domain.Entities.EvaluationDetail", b =>

@@ -19,6 +19,10 @@ namespace Application.Mappers
                 Id = entity.Id,
                 AccountId = entity.AccountId,
                 Budget = entity.Budget,
+                BestBudget = entity.BestBudget,
+                MaximumBudget = entity.MaximumBudget,
+                PaidMethodId = entity.PaidMethodId,
+                TypeId = entity.TypeId,
                 Color = entity.Color,
                 DisplayName = entity.DisplayName,
                 Notes = entity.Notes
@@ -39,6 +43,10 @@ namespace Application.Mappers
             {
                 AccountId = dto.AccountId,
                 Budget = dto.Budget,
+                BestBudget = dto.BestBudget,
+                MaximumBudget = dto.MaximumBudget,
+                PaidMethodId = dto.PaidMethodId,
+                TypeId = dto.TypeId,
                 Color = dto.Color,
                 DisplayName = dto.DisplayName,
                 Notes = dto.Notes

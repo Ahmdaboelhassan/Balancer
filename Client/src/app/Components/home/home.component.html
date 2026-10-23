@@ -62,12 +62,32 @@
           <div
             class="bg-white relative transition-all overflow-y-auto hide-scrollbar rounded-xl mb-2 p-5 h-[323px]"
           >
-            <button
-              class="absolute top-2 right-2 hover:text-lg"
-              (click)="TogglePieChart()"
-            >
-              <i [ngClass]="[switchPieIcon(), 'fa-solid', 'text-gray-700']"></i>
-            </button>
+            <div class="absolute top-2 right-2 flex items-center gap-3">
+              @if (!(pieChart() && showPieChat())) {
+                <a
+                  routerLink="/BudgetSummary"
+                  title="Budget Summary Report"
+                  class="transition-all hover:scale-125"
+                >
+                  <i class="fa-solid fa-file-invoice-dollar text-gray-700"></i>
+                </a>
+                <a
+                  routerLink="/BudgetAccountSettings"
+                  title="Budget Settings"
+                  class="transition-all hover:scale-125"
+                >
+                  <i class="fa-solid fa-gear text-gray-700"></i>
+                </a>
+              }
+              <button
+                class="transition-all hover:scale-125"
+                (click)="TogglePieChart()"
+              >
+                <i
+                  [ngClass]="[switchPieIcon(), 'fa-solid', 'text-gray-700']"
+                ></i>
+              </button>
+            </div>
             @if (pieChart() && showPieChat()) {
               <canvas
                 baseChart
@@ -83,6 +103,7 @@
                 @slideUp
               >
                 <div class="flex flex-col text-nowrap font-medium w-full mt-6">
+                
                   @for (item of budgetProgresses; track $index) {
                     <div class="mb-6">
                       <div class="flex justify-between items-center">
@@ -146,38 +167,52 @@
           target="_blank"
         >
           <!-- Available -->
-          <div class="min-w-[110px]">
+          <div class="min-w-[120px]">
             <p
               class="bg-green-100 text-green-800 text-xs font-medium px-1 py-0.5 rounded-sm mb-3"
             >
               Available Funds
             </p>
             <span class="text-xl font-bold block">
-              ${{ home?.availableFunds ?? 0 }}
+              ${{ home?.budget?.availableFunds ?? 0 }}
             </span>
           </div>
 
           <!-- Total -->
-          <div class="min-w-[110px]">
+          <div class="min-w-[120px]">
             <p
               class="bg-indigo-100 text-indigo-800 text-xs font-medium px-1 py-0.5 rounded-sm mb-3"
             >
               Total Funds
             </p>
             <span class="text-xl font-bold block">
-              ${{ home?.otherExpenses ?? 0 }}
+              ${{ home?.budget?.otherExpenses ?? 0 }}
+            
             </span>
           </div>
 
-          <!-- Target -->
-          <div class="min-w-[110px]">
+        @if (home?.budget?.overBudget > 0) {
+          <!-- over budget -->
+          <div class="min-w-[120px]">
             <p
-              class="bg-purple-100 text-purple-800 text-xs font-medium px-1 py-0.5 rounded-sm mb-3"
+              class="bg-rose-100 text-rose-800 text-xs font-medium px-1 py-0.5 rounded-sm mb-3"
+            >
+              Over Budget
+            </p>
+            <span class="text-xl font-bold block">
+              {{ home?.budget?.overBudget ?? 0 }}
+            </span>
+          </div>
+          } 
+          <!-- Target -->
+          <div class="min-w-[120px]">
+            <p
+              class="bg-yellow-100 text-yellow-800 text-xs font-medium px-1 py-0.5 rounded-sm mb-3"
             >
               Target
             </p>
             <span class="text-xl font-bold block">
-              ${{ home?.otherExpensesTarget ?? 0 }}
+              ${{ home?.budget?.otherExpensesTarget ?? 0 }}
             </span>
           </div>
         </a>
@@ -192,17 +227,54 @@
         </div>
       </div>
       <div
-        class="bg-white rounded-lg flex col-span-3 lg:col-span-1 justify-between items-center shadow-sm p-5 lg:hover:shadow-lg transition-all"
+        class="bg-white rounded-lg px-5 flex col-span-3 lg:col-span-1 justify-between items-center shadow-sm  lg:hover:shadow-lg transition-all  h-[100px]"
       >
-        <div class="info">
-          <p class="text-sm text-gray-600 mb-2">Estimated Money Need</p>
-          <span class="text-2xl font-bold"> {{ moneyNeed }} </span>
-          <span class="text-sm text-gray-500">${{ home.dayRate }} Per Day</span>
+        <div 
+          #budgetContainer
+          class="cursor-pointer py-5 gap-2 overflow-y-auto [&::-webkit-scrollbar]:w-0 [&::-webkit-scrollbar]:h-0 h-[100px]"
+          style="max-width: 75%"
+         >
+          <p class="text-sm text-gray-600 mb-2 truncate">
+            {{ home.budget?.currentCash?.displayName ?? "Save Target" }}
+          </p>
+          <span
+            class="text-xl font-bold"
+            [ngClass]="IsCurrentCashShort ? 'text-red-600' : 'text-green-700'"
+          >
+            {{ (home.budget?.currentCash?.spent ?? 0) | currency }}
+          </span>
+      <div class="flex gap-1 mt-12 text-xs text-gray-500">
+        <span>
+          <span class="inline-block bg-blue-100 text-blue-700 w-[95px] p-1  font-medium">
+            Target
+          </span>
+          <p class="font-semibold text-gray-700 mt-2 text-sm">
+            {{ (home.budget?.currentCash?.budget ?? 0) | currency }}
+          </p>
+        </span>
+
+        <span>
+          <span class="inline-block bg-amber-100 text-amber-700 w-[95px]  p-1  font-medium">
+            Remains
+          </span>
+          <p class="font-semibold text-gray-700 mt-2 text-sm">
+            {{ (home.budget?.totalRemains ?? 0) | currency }}
+          </p>
+        </span>
+
+        <span>
+          <span class="inline-block bg-green-100 text-green-700 w-[100px] text-xs p-1 font-medium">
+            After Remains
+          </span>
+          <p class="font-semibold text-gray-700 mt-2 text-sm">
+            {{ (home.budget?.currentCashBudgetAfterRemian ?? 0) | currency }}
+          </p>
+        </span>
+      </div>
         </div>
         <div
-          class="rounded-3xl {{
-            colors[5]
-          }}  flex justify-center items-center text-white"
+          class="rounded-3xl ms-3 shrink-0 flex justify-center items-center text-white transition-colors"
+          [ngClass]="IsCurrentCashShort ? 'bg-red-500' : 'bg-green-500'"
           style="height: 60px; width: 60px"
         >
           <i class="{{ icons[5] }} fa-2xl"></i>

@@ -19,6 +19,10 @@ namespace Application.Mappers
                 Account4 = dashboardSettings.Account4,
                 OtherExpensesTarget = dashboardSettings.OtherExpensesTarget,
                 AddOnExpensesTarget = dashboardSettings.AddOnExpensesTarget,
+                TotalRevenue = dashboardSettings.TotalRevenue,
+                TotalIncome = dashboardSettings.TotalIncome,
+                SavingTargetAccountId = dashboardSettings.SavingTargetAccountId,
+                SavingTargetDisplayName = dashboardSettings.SavingTargetDisplayName,
                 ApplyOverBudgetToFunds = dashboardSettings.ApplyOverBudgetToFunds
             };
         }
@@ -42,6 +46,10 @@ namespace Application.Mappers
                 Account4 = dashboardSettingsDTO.Account4,
                 OtherExpensesTarget = dashboardSettingsDTO.OtherExpensesTarget,
                 AddOnExpensesTarget = dashboardSettingsDTO.AddOnExpensesTarget,
+                TotalRevenue = dashboardSettingsDTO.TotalRevenue,
+                TotalIncome = dashboardSettingsDTO.TotalIncome,
+                SavingTargetAccountId = dashboardSettingsDTO.SavingTargetAccountId,
+                SavingTargetDisplayName = dashboardSettingsDTO.SavingTargetDisplayName,
                 ApplyOverBudgetToFunds = dashboardSettingsDTO.ApplyOverBudgetToFunds
             };
         }

@@ -5,7 +5,7 @@ import { SettingDTO } from '../Interfaces/Both/SettingDTO';
 import { Observable } from 'rxjs';
 import { ConfirmationRespose } from '../Interfaces/Response/ConfirmationRespose';
 import { HttpClient } from '@angular/common/http';
-import { BudgetAccountSettingsDTO } from '../Interfaces/Both/BudgetAccountSettingsDTO';
+import { BudgetSettingsDTO } from '../Interfaces/Both/BudgetSettingsDTO';
 
 @Injectable({
   providedIn: 'root',
@@ -47,9 +47,9 @@ export class SettingsService {
     return this.http.get(`${this.url}/GetBudgetAccountSettings`);
   }
 
-  // Edit budget account settings
+  // Edit budget account settings with other expenses and add on expenses targets
   editBudgetAccountSettings(
-    model: BudgetAccountSettingsDTO[]
+    model: BudgetSettingsDTO
   ): Observable<ConfirmationRespose> {
     return this.http.post<ConfirmationRespose>(
       `${this.url}/EditBudgetAccountSettings`,

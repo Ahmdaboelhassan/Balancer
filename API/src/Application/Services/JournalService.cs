@@ -576,30 +576,20 @@ internal class JournalService : IJournalService
         if (dto.Amount <= 0)
             return new ConfirmationResponse { Message = "Amount Must Be Greater Than Zero" };
 
-        var setting = await _uow.Settings.GetFirst();
-        if (setting is null)
-            return new ConfirmationResponse { Message = "Application Has No Settings" };
+        var dashboard = await _uow.DashboardSettings.GetFirst();
 
-        var currentCashAccount = await _uow.BudgetAccounts.Get(a => a.AccountId == setting.CurrentCashAccount);
+        if (dashboard == null)
+            return new ConfirmationResponse { Message = "Dashboard Settings Not Found" };
 
-        if (currentCashAccount == null)
-            return new ConfirmationResponse { Message = "Current Cash Account Not Found" };
+        var savingTargetChange = dto.IsBudgetIncrease ? (dto.Amount * -1) : dto.Amount; // When Increase Budget We Decrease Saving Target Budget
 
-        currentCashAccount.Budget += dto.IsBudgetIncrease ? (dto.Amount * -1) : dto.Amount; // When Increase Budget We Decrease Saving Target Budget  
-
-        _uow.BudgetAccounts.Update(currentCashAccount);
+        // Current Cash saving target on Home is the Total Revenue
+        dashboard.TotalRevenue += savingTargetChange;
 
         if (dto.IsBudgetIncrease)
-        {
-            var dashboard = await _uow.DashboardSettings.GetFirst();
-
-            if (dashboard == null)
-                return new ConfirmationResponse { Message = "Dashboard Settings Not Found" };
-
             dashboard.AddOnExpensesTarget += dto.Amount;
-            _uow.DashboardSettings.Update(dashboard);
-        }
-        
+
+        _uow.DashboardSettings.Update(dashboard);
         await _uow.SaveChangesAync();
 
         return new ConfirmationResponse { Message = "Budget Adjusted Successfully", IsSucceed = true };
@@ -668,16 +658,13 @@ internal class JournalService : IJournalService
             setting.FixedAssetsAccount.GetValueOrDefault()
         };
 
-        var outBudgetAccounts = await _uow.Accounts.GetAll(a => outBudgetAccountIds.Contains(a.Id));
-        var outBudgetAccountNumbers = outBudgetAccounts.Select(a => a.Number).ToList();
-
-        if (outBudgetAccounts.Count != outBudgetAccountIds.Count())
+        var outBudgetAccountNumbers = await _uow.Accounts.SelectAll(a => outBudgetAccountIds.Contains(a.Id), a => a.Number);
+        
+        if (outBudgetAccountNumbers.Count != outBudgetAccountIds.Count())
             return null;
 
-        var budgetAccounts = await _uow.BudgetAccounts.GetAll("Account");
-        var budgetAccountNumbers = budgetAccounts.Select(ba => ba.Account.Number).ToList();
-
-
+        var budgetAccountNumbers = await _uow.BudgetAccounts.SelectAll(d => d.TypeId != BudgetAccountTypes.OutSideBudget, d => d.Account.Number);
+        
         if (outBudgetAccountNumbers.Any(d => debitAccount.Number.StartsWith(d))
             && !budgetAccountNumbers.Any(d => debitAccount.Number.StartsWith(d))){
             return setting.NotBudgetCostCenter;

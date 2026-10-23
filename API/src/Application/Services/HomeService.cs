@@ -15,12 +15,10 @@ namespace Application.Services;
 
 public class HomeService : IHomeService
 {
-    private readonly IAccountService _accountService;
     private readonly IServiceScopeFactory _scope;
 
     public HomeService(IAccountService accountService, IServiceScopeFactory scope)
     {
-        _accountService = accountService;
         _scope = scope;
     }
 
@@ -30,7 +28,7 @@ public class HomeService : IHomeService
         await using var scope = _scope.CreateAsyncScope();
         var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-        var dashboard = await unitOfWork.DashboardSettings.GetFirst();
+        var dashboard = await unitOfWork.DashboardSettings.GetFirst(nameof(DashboardSettings.SavingTargetAccount));
         var settings = await unitOfWork.Settings.GetFirst();
         if (dashboard == null || settings == null)
             return GetEmptyHome();
@@ -92,18 +90,14 @@ public class HomeService : IHomeService
             Revenues = lastMonthsJournalsTask.Result.revenues,
             MonthsNames = lastMonthsJournalsTask.Result.months,
             JournalsTypesSummary = journalsTypesSummaryTask.Result,
-            AvailableFunds = GetBudgetProgressTask.Result.availableFunds,
-            OtherExpenses = GetBudgetProgressTask.Result.otherExpenses,
-            OtherExpensesTarget = dashboard.OtherExpensesTarget + dashboard.AddOnExpensesTarget,
-            BudgetProgress = GetBudgetProgressTask.Result.budgetProgress.Where(d => d.Spent < d.Budget || d.AccountId == settings.CurrentCashAccount),
+            Budget = GetBudgetProgressTask.Result,
             DayRate = settings.DefaultDayRate,
             PeriodDays = settings.DefaultPeriodDays.GetValueOrDefault(),
             OutSideBudgetCostCenterId = settings.NotBudgetCostCenter
         };
     }
 
-    private async Task<(IEnumerable<BudgetAccountDTO> budgetProgress, decimal otherExpenses, decimal availableFunds)> 
-        GetBudgetProgressAsync(DashboardSettings dashboard, Settings settings, HashSet<string> accountSet, DateTime current)
+    private async Task<HomeBudgetDto> GetBudgetProgressAsync(DashboardSettings dashboard, Settings settings, HashSet<string> accountSet, DateTime current)
     {
         await using var scope = _scope.CreateAsyncScope();
 
@@ -112,12 +106,11 @@ public class HomeService : IHomeService
         var currentMonthJournals = (await unitOfWork.JournalDetail
                    .GetAll(j => (j.Journal.CreatedAt.Month == current.Month && j.Journal.CreatedAt.Year == current.Year), "Journal", "Account", "CostCenters"));
 
+        var budgetAccounts = await unitOfWork.BudgetAccounts.GetAll("Account");
 
         var groupedJournals = currentMonthJournals 
                    .GroupBy(j => j.Account.Number)
                    .Select(j => new { AccountNumber = j.Key, Total = j.Sum(j => j.Debit - j.Credit) });
-
-        var budgetAccounts = await unitOfWork.BudgetAccounts.GetAll("Account");
 
         decimal overBudget = 0;
 
@@ -158,13 +151,47 @@ public class HomeService : IHomeService
             : !excludedAccounts.Any(a => x.Account.Number.StartsWith(a))))
             .Sum(x => x.Debit - x.Credit);
 
-
         if (dashboard.ApplyOverBudgetToFunds)
             otherExpenses += overBudget;
 
-        var availableFunds = dashboard.OtherExpensesTarget - otherExpenses + dashboard.AddOnExpensesTarget ;
+        var availableFunds = dashboard.OtherExpensesTarget - otherExpenses + dashboard.AddOnExpensesTarget;
+
+        // Saving Target is calculated separately, its budget is the Total Revenue
+        BudgetAccountDTO? currentCash = null;
+
+        if (dashboard.SavingTargetAccount != null)
+        {
+            var savingTargetSpent = groupedJournals
+                .Where(d => d.AccountNumber.StartsWith(dashboard.SavingTargetAccount.Number))
+                .Sum(d => d.Total);
+
+            currentCash = new BudgetAccountDTO
+            {
+                AccountId = dashboard.SavingTargetAccount.Id,
+                DisplayName = string.IsNullOrWhiteSpace(dashboard.SavingTargetDisplayName) ? dashboard.SavingTargetAccount.Name : dashboard.SavingTargetDisplayName,
+                Budget = dashboard.TotalRevenue,
+                Spent = savingTargetSpent,
+                Percentage = (dashboard.TotalRevenue != 0) ? Math.Round((savingTargetSpent / dashboard.TotalRevenue) * 100) : 0,
+            };
+        }
         
-        return (budgetProgress, otherExpenses, availableFunds);
+        var totalRemains = budgetProgress
+                .Where(d => d.Spent < d.Budget)
+                .Sum(d => d.Budget - d.Spent);
+
+        return new HomeBudgetDto
+        {
+            BudgetProgress = budgetProgress.Where(d => d.Spent < d.Budget),
+            OtherExpenses = otherExpenses,
+            OverBudget = overBudget,
+            AvailableFunds = availableFunds,
+            OtherExpensesTarget = dashboard.OtherExpensesTarget + dashboard.AddOnExpensesTarget,
+            CurrentCash = currentCash,
+            TotalRemains = totalRemains,
+            CurrentCashBudgetAfterRemian = (currentCash?.Spent ?? 0) 
+                                        - (availableFunds > 0 ? availableFunds : 0) 
+                                        - totalRemains 
+        };
     }
     private async Task<IEnumerable<decimal>> GetLastPeriodsBalancesAsync(int count)
     {
@@ -279,19 +306,21 @@ public class HomeService : IHomeService
                 "Jan", "Feb", "Mar", "Apr", "May", "Jun",
                 "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
             },
-            AvailableFunds = 0,
             DayRate = 0,
             PeriodDays = 0,
-            BudgetProgress = new List<BudgetAccountDTO> { 
-                new BudgetAccountDTO { 
-                    Budget = 0,
-                    Color = "",
-                    DisplayName = "No Account",
-                    Percentage = 0,
-                    Spent = 0
-                
-                } }
-           
+            Budget = new HomeBudgetDto
+            {
+                AvailableFunds = 0,
+                BudgetProgress = new List<BudgetAccountDTO> {
+                    new BudgetAccountDTO {
+                        Budget = 0,
+                        Color = "",
+                        DisplayName = "No Account",
+                        Percentage = 0,
+                        Spent = 0
+
+                    } }
+            }
         };
     }
 

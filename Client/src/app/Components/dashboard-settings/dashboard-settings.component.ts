@@ -12,15 +12,10 @@ import { DashboardSettingsDTO } from '../../Interfaces/Both/DashboardSettingsDTO
 import { ToastrService } from 'ngx-toastr';
 import { RouterLink } from '@angular/router';
 import { NgSelectComponent } from '@ng-select/ng-select';
-import { AccountBudgetSettingsComponent } from './account-budget-settings/account-budget-settings.component';
 
 @Component({
   selector: 'app-dashboard-settings',
-  imports: [
-    ReactiveFormsModule,
-    NgSelectComponent,
-    AccountBudgetSettingsComponent,
-  ],
+  imports: [ReactiveFormsModule, NgSelectComponent],
   templateUrl: './dashboard-settings.component.html',
   styleUrl: './dashboard-settings.component.css',
 })
@@ -54,9 +49,6 @@ export class DashboardSettingsComponent implements OnInit {
       account2: [ds.account2 ?? 0, [Validators.required]],
       account3: [ds.account3 ?? 0, [Validators.required]],
       account4: [ds.account4 ?? 0, [Validators.required]],
-      otherExpensesTarget: [ds.otherExpensesTarget, [Validators.required]],
-      addOnExpensesTarget: [ds.addOnExpensesTarget, [Validators.required]],
-      applyOverBudgetToFunds: [ds.applyOverBudgetToFunds],
     });
   }
 

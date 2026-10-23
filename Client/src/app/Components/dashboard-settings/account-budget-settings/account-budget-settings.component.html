@@ -6,11 +6,108 @@
 
   <div class="py-5">
     <div #budgetAccountsTable></div>
+    <form
+      [formGroup]="budgetSettingsForm"
+      class="grid grid-cols-1 md:grid-cols-2 gap-4 my-8"
+    >
+      <div class="form-group ">
+        <label for="otherExpensesTarget">Other Expenses Target</label>
+        <input
+          type="number"
+          id="otherExpensesTarget"
+          formControlName="otherExpensesTarget"
+          class="form-control w-full"
+        />
+      </div>
+      <div class="form-group">
+        <label for="addOnExpensesTarget">Add On Expenses Target</label>
+        <input
+          type="number"
+          id="addOnExpensesTarget"
+          formControlName="addOnExpensesTarget"
+          class="form-control w-full"
+        />
+      </div>
+       <div class="form-group">
+          <label for="totalIncome">Total Income</label>
+          <input
+            type="number"
+            id="totalIncome"
+            formControlName="totalIncome"
+            class="form-control w-full"
+          />
+      </div>
+      <div class="form-group">
+       
+        <div class="flex items-center gap-2">
+          <label for="totalRevenue">Total Revenue</label>
+          @if (!isTotalRevenueAuto) {
+            <button
+              type="button"
+              class="text-gray-500 hover:text-gray-800 transition-all"
+              title="Recalculate (Budgets + Other Expenses + Add On Expenses)"
+              (click)="resetTotalRevenue()"
+            >
+              <i class="fa-solid fa-rotate-left"></i>
+            </button>
+          }
+        </div>
+        <input
+          type="number"
+          id="totalRevenue"
+          formControlName="totalRevenue"
+          (input)="onTotalRevenueInput()"
+          class="form-control w-full"
+        />
+      </div>
+      
+
+      <div class="form-group">
+        <label for="savingTargetAccountId">Saving Target Account</label>
+        <ng-select
+          [items]="accounts"
+          bindLabel="name"
+          bindValue="id"
+          id="savingTargetAccountId"
+          formControlName="savingTargetAccountId"
+          placeholder="Current Cash Account"
+        >
+        </ng-select>
+      </div>
+      <div class="form-group">
+        <label for="savingTargetDisplayName">Saving Target Display Name</label>
+        <input
+          type="text"
+          id="savingTargetDisplayName"
+          formControlName="savingTargetDisplayName"
+          class="form-control w-full"
+        />
+      </div>
+
+      <div class="form-group flex items-center">
+        <label class="inline-flex items-center cursor-pointer">
+          <input
+            type="checkbox"
+            id="applyOverBudgetToFunds"
+            formControlName="applyOverBudgetToFunds"
+            name="ignoreTo"
+            class="sr-only peer"
+          />
+          <div
+            class="relative w-11 h-6 bg-gray-200 rounded-full peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"
+          ></div>
+          <span class="ms-3 text-sm font-medium text-gray-900"
+            >Apply Over Budget to Funds</span
+          >
+        </label>
+      </div>
+    </form>
 
     <div class="mt-5 flex gap-2">
       <button
         type="button"
         class="btn-save w-full md:w-1/4"
+        [disabled]="!budgetSettingsForm.valid"
         (click)="onSubmit()"
       >
         Save

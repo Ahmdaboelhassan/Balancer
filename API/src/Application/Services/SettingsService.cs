@@ -1,6 +1,7 @@
 ﻿using Application.Mappers;
 using Domain.DTO.Both;
 using Domain.DTO.Response;
+using Domain.Entities;
 using Domain.IRepository;
 using Domain.IServices;
 
@@ -94,15 +95,11 @@ namespace Application.Services
             existedSettings.Account3 = settings.Account3;
             existedSettings.Account4 = settings.Account4;
 
-            existedSettings.AddOnExpensesTarget = settings.AddOnExpensesTarget;
-            existedSettings.ApplyOverBudgetToFunds = settings.ApplyOverBudgetToFunds;
-            existedSettings.OtherExpensesTarget = settings.OtherExpensesTarget;
             _unitOfWork.DashboardSettings.Update(existedSettings);
             await _unitOfWork.SaveChangesAync();
 
             return new ConfirmationResponse() { IsSucceed = true, Message = "Dashboard Settings updated successfully." };
         }
-
 
         public async Task<IEnumerable<BudgetAccountSettingsDTO>> GetBudgetAccountSettings()
         {
@@ -114,23 +111,55 @@ namespace Application.Services
             return settings.ToDTO();
         }
 
-        public async Task<ConfirmationResponse> EditBudgetAccountSettings(IEnumerable<BudgetAccountSettingsDTO> settings)
+        public async Task<ConfirmationResponse> EditBudgetAccountSettings(BudgetSettingsDTO settings)
         {
+            if (!settings.BudgetAccounts.Any())
+                return new ConfirmationResponse() { IsSucceed = false, Message = "No Budget Account Settings provided to update." };
+
+            if (settings.BudgetAccounts.Any(s => !Enum.IsDefined(s.PaidMethodId) || !Enum.IsDefined(s.TypeId)))
+                return new ConfirmationResponse() { IsSucceed = false, Message = "Invalid Paid Method or Type in Budget Account Settings." };
+
+            if (settings.SavingTargetAccountId.HasValue && !await _unitOfWork.Accounts.Exists(a => a.Id == settings.SavingTargetAccountId))
+                return new ConfirmationResponse() { IsSucceed = false, Message = "Saving Target Account Not Found." };
+
             var existedSettings = await _unitOfWork.BudgetAccounts.GetAll();
 
             if (existedSettings.Any())
                 _unitOfWork.BudgetAccounts.DeleteRange(existedSettings);
 
-            if (!settings.Any())
-                return new ConfirmationResponse() { IsSucceed = false, Message = "No Budget Account Settings provided to update." };
-            
-            var newBudgetAccounts = settings.ToEntity();
+            await _unitOfWork.BudgetAccounts.AddRange(settings.BudgetAccounts.ToEntity());
 
-            await _unitOfWork.BudgetAccounts.AddRange(newBudgetAccounts);
+            // Expenses targets, totals and over budget option are stored on DashboardSettings, saved in the same transaction
+            var dashboardSettings = await _unitOfWork.DashboardSettings.GetFirst();
+
+            if (dashboardSettings == null)
+            {
+                await _unitOfWork.DashboardSettings.AddAsync(new DashboardSettings
+                {
+                    OtherExpensesTarget = settings.OtherExpensesTarget,
+                    AddOnExpensesTarget = settings.AddOnExpensesTarget,
+                    TotalRevenue = settings.TotalRevenue,
+                    TotalIncome = settings.TotalIncome,
+                    SavingTargetAccountId = settings.SavingTargetAccountId,
+                    SavingTargetDisplayName = settings.SavingTargetDisplayName,
+                    ApplyOverBudgetToFunds = settings.ApplyOverBudgetToFunds
+                });
+            }
+            else
+            {
+                dashboardSettings.OtherExpensesTarget = settings.OtherExpensesTarget;
+                dashboardSettings.AddOnExpensesTarget = settings.AddOnExpensesTarget;
+                dashboardSettings.TotalRevenue = settings.TotalRevenue;
+                dashboardSettings.TotalIncome = settings.TotalIncome;
+                dashboardSettings.SavingTargetAccountId = settings.SavingTargetAccountId;
+                dashboardSettings.SavingTargetDisplayName = settings.SavingTargetDisplayName;
+                dashboardSettings.ApplyOverBudgetToFunds = settings.ApplyOverBudgetToFunds;
+                _unitOfWork.DashboardSettings.Update(dashboardSettings);
+            }
+
             await _unitOfWork.SaveChangesAync();
-            
-            return new ConfirmationResponse() { IsSucceed = true, Message = "Budget Account Settings created successfully." };
 
+            return new ConfirmationResponse() { IsSucceed = true, Message = "Budget Account Settings saved successfully." };
         }
     }
 }
