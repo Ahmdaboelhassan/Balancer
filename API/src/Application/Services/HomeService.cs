@@ -194,7 +194,7 @@ public class HomeService : IHomeService
             BudgetProgress = budgetProgress.Where(d => d.Spent < d.Budget),
             OtherExpenses = otherExpenses,
             OverBudget = overBudget,
-            AvailableFunds = availableFunds + (availableOtherExpnsesBudget > 0 ? availableOtherExpnsesBudget : 0),
+            AvailableFunds = availableFunds + availableOtherExpnsesBudget,
             OtherExpensesTarget = dashboard.OtherExpensesTarget + dashboard.AddOnExpensesTarget + otherExpensesBudgetTargets,
             CurrentCash = currentCash,
             TotalRemains = totalRemains,
