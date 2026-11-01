@@ -129,7 +129,8 @@ public class HomeService : IHomeService
                          .Where(d => d.AccountNumber.StartsWith(x.ba.Account.Number))
                          .Sum(d => d.Total);
 
-                     if (IsAccountNumberInAccountSet(x.ba.Account.Number))
+                     // Outside budget already included in other expenses, so we don't count it in over budget
+                     if (IsAccountNumberInAccountSet(x.ba.Account.Number) && x.ba.TypeId != BudgetAccountTypes.OutSideBudget)
                         overBudget += Math.Max(0, totalSpent - x.ba.Budget);
 
                      return new BudgetAccountDTO
@@ -143,18 +144,39 @@ public class HomeService : IHomeService
                      };
                  }).ToList();
 
-        var excludedAccounts = budgetAccounts.Where(a => IsAccountNumberInAccountSet(a.Account.Number)).Select(x => x.Account.Number);
+
+        // Exclude account in budget progress
+        var excludedAccountsNumbers = !settings.NotBudgetCostCenter.HasValue
+            ? budgetAccounts.Where(a => a.TypeId != BudgetAccountTypes.OutSideBudget && IsAccountNumberInAccountSet(a.Account.Number)).Select(x => x.Account.Number)
+            : [];
 
         var otherExpenses = currentMonthJournals
-            .Where(x => IsAccountNumberInAccountSet(x.Account.Number) 
-            && (settings.NotBudgetCostCenter.HasValue 
-            ? (x.CostCenters.Any(cc => cc.CostCenterId == settings.NotBudgetCostCenter))
-            : !excludedAccounts.Any(a => x.Account.Number.StartsWith(a))))
-            .Sum(x => x.Debit - x.Credit);
+         .Where(x =>
+             IsAccountNumberInAccountSet(x.Account.Number)
+             && (
+                  settings.NotBudgetCostCenter.HasValue
+                     ? x.CostCenters.Any(cc => cc.CostCenterId == settings.NotBudgetCostCenter)
+                     : !excludedAccountsNumbers.Any(a => x.Account.Number.StartsWith(a))
+                )
+         )
+         .Sum(x => x.Debit - x.Credit);
+
+        otherExpenses += (dashboard.ApplyOverBudgetToFunds ? overBudget : 0);
 
         var otherExpensesBudgetTargets = budgetProgress
-            .Where(d => d.Type == BudgetAccountTypes.OutSideBudget)
-            .Sum(d => d.Budget);
+             .Where(d => d.Type == BudgetAccountTypes.OutSideBudget)
+             .Sum(d => d.Budget);
+
+        var otherExpneseTargets = dashboard.OtherExpensesTarget + dashboard.AddOnExpensesTarget + otherExpensesBudgetTargets;
+
+        // other expenses Budget already Calc
+        var availableFunds = otherExpneseTargets - otherExpenses;
+
+        // out side budget is not included in the total remains, because it is already included in available funds, and we don't want to double count it.
+        var totalRemains = budgetProgress
+                .Where(d => d.Spent < d.Budget && d.Type != BudgetAccountTypes.OutSideBudget)
+                .Sum(d => d.Budget - d.Spent);
+
 
         // Saving Target is calculated separately, its budget is the Total Revenue
         BudgetAccountDTO? currentCash = null;
@@ -171,21 +193,10 @@ public class HomeService : IHomeService
                 DisplayName = string.IsNullOrWhiteSpace(dashboard.SavingTargetDisplayName) ? dashboard.SavingTargetAccount.Name : dashboard.SavingTargetDisplayName,
                 Budget = dashboard.TotalRevenue,
                 Spent = savingTargetSpent,
-                Percentage = (dashboard.TotalRevenue != 0) ? Math.Round((savingTargetSpent / dashboard.TotalRevenue) * 100) : 0,
+                Percentage = dashboard.TotalRevenue != 0 ? Math.Round((savingTargetSpent / dashboard.TotalRevenue) * 100) : 0,
             };
         }
 
-        otherExpenses += (dashboard.ApplyOverBudgetToFunds ? overBudget : 0);
-
-        var otherExpneseTargets = dashboard.OtherExpensesTarget + dashboard.AddOnExpensesTarget + otherExpensesBudgetTargets;
-
-        // other expenses Budget already Calc
-        var availableFunds = otherExpneseTargets - otherExpenses;
-
-        var totalRemains = budgetProgress
-                .Where(d => d.Spent < d.Budget && d.Type != BudgetAccountTypes.OutSideBudget)
-                .Sum(d => d.Budget - d.Spent);
-        
         return new HomeBudgetDto
         {
             BudgetProgress = budgetProgress.Where(d => d.Spent < d.Budget),
@@ -195,9 +206,7 @@ public class HomeService : IHomeService
             OtherExpensesTarget = otherExpneseTargets,
             CurrentCash = currentCash,
             TotalRemains = totalRemains,
-            CurrentCashBudgetAfterRemian = (currentCash?.Spent ?? 0) 
-                                        - (availableFunds > 0 ? availableFunds : 0) 
-                                        - totalRemains 
+            CurrentCashBudgetAfterRemian = (currentCash?.Spent ?? 0) - Math.Max(0, availableFunds) - totalRemains
         };
     }
     private async Task<IEnumerable<decimal>> GetLastPeriodsBalancesAsync(int count)
