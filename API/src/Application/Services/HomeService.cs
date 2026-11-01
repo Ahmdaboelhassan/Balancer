@@ -160,7 +160,7 @@ public class HomeService : IHomeService
             .Where(d => d.Type == BudgetAccountTypes.OutSideBudget)
             .Sum(d => d.Spent);
 
-        var availableOtherExpnsesBudget = otherExpensesBudgetTargets - otherExpensesBudgetSpent;
+        var availableOtherExpnsesBudget = otherExpensesBudgetTargets > otherExpensesBudgetSpent ? otherExpensesBudgetTargets - otherExpensesBudgetSpent : 0;
 
         // Saving Target is calculated separately, its budget is the Total Revenue
         BudgetAccountDTO? currentCash = null;
