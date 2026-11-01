@@ -156,12 +156,6 @@ public class HomeService : IHomeService
             .Where(d => d.Type == BudgetAccountTypes.OutSideBudget)
             .Sum(d => d.Budget);
 
-        var otherExpensesBudgetSpent = budgetProgress
-            .Where(d => d.Type == BudgetAccountTypes.OutSideBudget)
-            .Sum(d => d.Spent);
-
-        var availableOtherExpnsesBudget = otherExpensesBudgetTargets > otherExpensesBudgetSpent ? otherExpensesBudgetTargets - otherExpensesBudgetSpent : 0;
-
         // Saving Target is calculated separately, its budget is the Total Revenue
         BudgetAccountDTO? currentCash = null;
 
@@ -183,10 +177,13 @@ public class HomeService : IHomeService
 
         otherExpenses += (dashboard.ApplyOverBudgetToFunds ? overBudget : 0);
 
-        var availableFunds = dashboard.OtherExpensesTarget - otherExpenses + dashboard.AddOnExpensesTarget;
+        var otherExpneseTargets = dashboard.OtherExpensesTarget + dashboard.AddOnExpensesTarget + otherExpensesBudgetTargets;
+
+        // other expenses Budget already Calc
+        var availableFunds = otherExpneseTargets - otherExpenses;
 
         var totalRemains = budgetProgress
-                .Where(d => d.Spent < d.Budget)
+                .Where(d => d.Spent < d.Budget && d.Type != BudgetAccountTypes.OutSideBudget)
                 .Sum(d => d.Budget - d.Spent);
         
         return new HomeBudgetDto
@@ -194,8 +191,8 @@ public class HomeService : IHomeService
             BudgetProgress = budgetProgress.Where(d => d.Spent < d.Budget),
             OtherExpenses = otherExpenses,
             OverBudget = overBudget,
-            AvailableFunds = availableFunds + availableOtherExpnsesBudget,
-            OtherExpensesTarget = dashboard.OtherExpensesTarget + dashboard.AddOnExpensesTarget + otherExpensesBudgetTargets,
+            AvailableFunds = availableFunds,
+            OtherExpensesTarget = otherExpneseTargets,
             CurrentCash = currentCash,
             TotalRemains = totalRemains,
             CurrentCashBudgetAfterRemian = (currentCash?.Spent ?? 0) 
